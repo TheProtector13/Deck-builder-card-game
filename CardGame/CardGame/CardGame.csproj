@@ -22,7 +22,7 @@
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
     <PackageReference Include="Microsoft.NETCore.Targets" Version="5.0.0" />
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.4.1" />
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4.1" />
+    <!-- <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4.1" /> -->
     <PackageReference Include="NETStandard.Library" Version="2.0.3" />
     <PackageReference Include="runtime.native.System" Version="4.3.1" />
     <PackageReference Include="SharpDX" Version="4.2.0" />
