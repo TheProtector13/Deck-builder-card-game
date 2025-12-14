@@ -1,0 +1,95 @@
+150 card (130+20)
+
+5 frakció:
+	- Inteligence (the eye) - ellenség kártyáit mutajta (kézben, scrap pile, deck-et sorrendben), vagy elrejti a miénket, kártya ellopás egy körre. (kék)
+
+Amount-TextureName Has_ForeGround Fraction Attack Health Money Price Terrainmodifier(if_has) Effect EffectAmount EffectRequirement(if_has) stringName stringDesc StringQuote
+
+3-Drone YES THEEYE 1 0 0 1 NO ShowHand 1 NO "Drónok" "Felfed egy kártyát\naz ellenfél kezében" "'új szemszög a világhoz!'"
+3-Media NO THEEYE 0 0 2 2 NO HealthBonus 2 THEEYE "Média" string.empty "'Az emberek oda akarnak menni,\nahová vezetni akarják őket'"
+3-Counter_inteligence YES THEEYE 0 0 1 3 NO AntiShow 1 NO "Ellenhírszerzés" "Megakadályozza a lapok\nfelfedését" "'A csend a leghangosabb retesz.'"
+2-Inteligence NO THEEYE 1 0 1 3 NO ShowDeck 2 NO "Hírszerzés" "Felfed két lapot\naz ellenfél pakliából" "'A titok a hírszerzés szíve.'"
+2-Lopakodo YES THEEYE 5 0 0 3 <-0.5;0;0> AttackBonus 2 THEEYE "Lopakodó" string.empty "'Láthatatlan, de hatékony.'"
+2-Corruption NO THEEYE 2 1 0 4 NO StealCard 1 THEEYE "Korrupció" "Ellopja az ellenfél\negy kártyáját" "'... a demokrácia ellensége.'"
+2-Lawyer NO THEEYE 0 3 3 4 NO MoneyBonus 2 THEEYE "Ügyvéd" string.empty "'A jog ereje a jogi bizonytalanságban rejlik.'"
+2-Sabotage NO THEEYE 7 0 0 4 NO AntiShow 1 NO "Szabotázs" "Megakadályozza a lapok\nfelfedését" "'A rend megzavarásának művészete.'"
+2-Spy NO THEEYE 0 0 0 4 NO StealCard 1 NO "Kém" "Ellopja az ellenfél\negy kártyáját" "'A valóságot csak az árnyékok ismerik.'"
+2-Satelite YES THEEYE 0 1 0 5 NO ShowHand 5 NO "Műhold" "Felfedi az ellenfél\nkezét" "'..csupán egy lángoló üstökös.'"
+1-Puppet NO THEEYE 4 2 2 6 StealCard 1 NO "Báb" "Ellopja az ellenfél\negy kártyáját" "'A szabad akarat jellemvonás.'"
+1-The_council NO THEEYE 7 3 0 8 NO ShowDeck 10 NO "A tanács" "Felfedi az ellenfél\npakliát" "'..a színfalak mögül.'"
+1-MrNobody NO THEEYE 8 0 2 8 NO StealCard 1 NO "Mr. Senki" "Ellopja az ellenfél\negy kártyáját" "'A látszólagos ártatlanság a legjobb álcázás.'"
+
+	- Attack (Empire) - közepesen támad, ellenséget lapok scrap pile-ba helyezésére kényszerítheti, vagy további lapokat húzathat a deck-ből (sárga)
+
+Amount-TextureName Has_ForeGround Fraction Attack Health Money Price Terrainmodifier(if_has) Effect EffectAmount EffectRequirement(if_has) stringName stringDesc StringQuote
+
+3-Militia YES EMPIRE 1 0 0 1 NO NONE 0 NO "Milícia" string.empty "'A fő cél az, hogy minden ember fel legyen fegyverezve.'"
+3-Scout YES EMPIRE 1 0 0 1 NO DrawCard 1 EMPIRE "Felderítő" "Egy krátyát húz\na pakliból" "'A felderítésre fordított idő ritkán vész kárba!'"
+3-Infantry YES EMPIRE 2 0 0 2 <0.5;-0.5;0> AttackBonus 1 EMPIRE "Gyalogság" string.empty "'..a csata királynője.'"
+2-Mechanized YES EMPIRE 3 0 0 3 <-0.3;0;0> AttackBonus 1 EMPIRE "Gépesített gyalogság" string.empty "'Tűz alatt megállni ostobaság.'"
+2-Heavy_infantry YES EMPIRE 4 0 0 3 <0.5;0;0.25> NONE 0 NO "Nehéz gyalogság" string.empty "'..a hegyek remegnek.'"
+2-Specialist YES EMPIRE 6 0 0 4 <0.5;0.3;0.2> AttackBonus 2 EMPIRE "Specialista" string.empty "'A legjobbak legjobbjai!'"
+2-Anti_air YES EMPIRE 4 0 0 4 NO ScrapEnemyCard 1 EMPIRE "Légelhárító" "Az ellenfél eldob\negy kártyát" "'A legjobb égbolt, a tiszta égbolt'"
+2-Mine NO EMPIRE 6 0 0 5 NO ScrapEnemyCard 1 EMPIRE "Aknamező" "Az ellenfél eldob\negy kártyát" "'Minden lépés lehet diadal vagy tragédia.'"
+1-"Orbital"[0] YES EMPIRE 8 0 0 6 <-0.25;0;0> ScrapEnemyCard 1 NO "Termoszférikus bombázás" "Az ellenfél eldob\negy kártyát" "'..és leszakad az ég!'"
+2-"SP"[0] YES EMPIRE 6 0 1 7 NO HealthBonus 2 EMPIRE "Komp" string.empty "'Egyszerű, de rendíthetetlen.'"
+2-"SP"[1] YES EMPIRE 7 0 2 7 NO DrawCard 1 NO "Romboló" "Egy krátyát húz\na pakliból" "'Ne add fel a hajót!'"
+1-General NO EMPIRE 7 2 0 8 NO AttackBonus 3 EMPIRE "Tábornok" string.empty "'A háború célja a béke elérése.'"
+1-Emperor NO EMPIRE 8 0 0 8 NO DrawCard 2 NO "Az uralkodó" "Két krátyát húz a pakliból" "'Ha a szív nem királyi,\nannak birtokosa sohasem király.'"
+
+	- Diplomacy (alliance) - pénzt és hp-t ad. A boltból kártyákat távolíthat el, így akadályozva az ellenfelet. (zöld)
+
+Amount-TextureName Has_ForeGround Fraction Attack Health Money Price Terrainmodifier(if_has) Effect EffectAmount EffectRequirement(if_has) stringName stringDesc StringQuote
+
+3-"Medicine"[0] NO ALLIANCE 0 2 0 1 NO NONE 0 NO "Gyógyszerek" string.empty "'Az egészség a legnagyobb ajándék.'"
+3-"Medicine"[1] NO ALLIANCE 0 3 0 2 NO HealthBonus 1 ALLIANCE "Orvosi csomag" string.empty "'Lélek gyógyul, test követi.'"
+3-"Medicine"[2] NO ALLIANCE 0 4 0 3 NO HealthBonus 1 ALLIANCE "Traumakészlet" string.empty "'Ahol élet, ott remény!'"
+2-Trader YES ALLIANCE 0 0 3 3 NO MoneyBonus 2 ALLIANCE "Kereskedő" string.empty "'A minőség a legjobb üzleti terv.'"
+2-Trading_post YES ALLIANCE 0 1 2 3 NO ScrapFromShop 1 ALLIANCE "Kereskedelmi állomás" "Eltávolít egy lapot\na boltból" "'A vagyon egy pennyvel kezdődik.'"
+2-Sanctions NO ALLIANCE 3 1 0 4 NO ScrapFromShop 1 NO "Szankciók" "Eltávolít egy lapot\na boltból" "'A pokolba vezető út olyan gyors tud lenni!'"
+2-Embassy NO ALLIANCE 0 5 2 4 NO MoneyBonus 1 ALLIANCE "Követség" string.empty "'Több a haza ennél!'"
+2-Scientists NO ALLIANCE 0 3 2 3 NO MoneyBonus 1 ALLIANCE "Tudósok" string.empty "'Egyetlen szerzőt másolni plágium,\nsok szerzőt másolni kutatás.'"
+2-Citadella NO ALLIANCE 0 2 3 5 NO ScrapFromShop 2 ALLIANCE "Fellegvár" "Eltávolít két lapot\na boltból" "'A kulturális sokszínűség kaleidoszkópja.'"
+2-Utopia NO ALLIANCE 0 5 3 6 NO HealthBonus 5 ALLIANCE "Utópia" string.empty "'Az utópia a horizont. Már\nlátod, s mégis oly távoli.'"
+1-HeadScientist NO ALLIANCE 2 5 0 7 NO MoneyBonus 5 ALLIANCE "Vezető tudós" string.empty "'Az elmém rossz környék, ahová\nnem szeretek egyedül menni.'"
+1-Ambassador NO ALLIANCE 0 2 2 8 NO ScrapFromShop 5 ALLIANCE "Nagykövet" "Eltávolítja az összes\nlapot a boltból" "'Az őszinteség kérdéseket szül.'"
+1-Minister NO ALLIANCE 3 5 5 8 NO DrawCard 1 ALLIANCE "Miniszterelnök" "Egy krátyát húz\na pakliból" "'Vitából pattan elő az igazság szikrája.'"
+
+	- Machines - Erős támadás és támadást növelő szorzók. (Fekete)
+
+Amount-TextureName Has_ForeGround Fraction Attack Health Money Price Terrainmodifier(if_has) Effect EffectAmount EffectRequirement(if_has) stringName stringDesc StringQuote
+
+3-Combat_drones YES MACHINES 2 0 0 1 NO NONE 0 NO "Harci drón" string.empty "'Sok lúd ...'"
+3-"Robot"[0] YES MACHINES 3 0 0 2 <0.3;0;0> AttackBonus 1 MACHINES "FR-2.1.7" string.empty "'Megérkezett az előőrs ...'"
+3-"Robot"[1] YES MACHINES 4 0 0 3 <0.5;0;0.25> AttackBonus 1 MACHINES "SP-0.2.3" string.empty "'..célba tévedünk!'"
+3-"Robot"[2] YES MACHINES 5 0 0 4 <0.6;0;0> AttackBonus 2 MACHINES "HX-1.0.1" string.empty "'Nem fog rajtuk a golyó!!'"
+2-Booting NO MACHINES 4 3 0 3 NO AttackBonus 3 MACHINES "Bootolás.." string.empty "Tartalékok üzembehelyezése?.. Y/N"
+2-Unstoppable YES MACHINES 6 0 0 4 NO AttackBonus 2 MACHINES "Megállíthatatlan" string.empty "'A küldetést befejezem ..'"
+2-RobotDrone YES MACHINES 7 0 0 5 NO AttackBonus 3 MACHINES "Robotgép" string.empty "'Célpont bemérve..'"
+1-"Orbital"[1] YES MACHINES 9 0 0 6 NO ScrapEnemyCards 1 MACHINES "Orbitális bombázás" "Az ellenfél eldob\negy kártyát" "'Először villámlásnak hiszed..'"
+2-"SP"[2] YES MACHINES 5 0 0 7 NO AttackBonus 8 MACHINES "Csapatszállító" string.empty "'Bevetésre felkészülni..'"
+2-"SP"[3] YES MACHINES 6 0 0 7 <0;0.5;0.5> AttackBonus 6 MACHINES "Cirkáló" string.empty "'Körözés a célterület felett..'"
+1-Factory NO MACHINES 5 5 0 8 NO DrawCard 2 MACHINES "A Gyár" "Két krátyát húz\na pakliból" "'Egy újabb széria..'"
+1-The_fleet NO MACHINES 9 0 0 8 NO AttackBonus 7 MACHINES "A flotta" string.empty "'Nincs ember, aki útját állhatná.'"
+1-The_inteligence NO MACHINES 9 5 0 8 NO AttackBonus 9 MACHINES "Az inteligencia" string.empty "'Van, hogy még a csoda sem segíthet.'"
+
+	- Collector cult - Kevés pénz, gyenge támadás, és kártyák eltávolítása a pakliból. (piros)
+
+Amount-TextureName Has_ForeGround Fraction Attack Health Money Price Terrainmodifier(if_has) Effect EffectAmount EffectRequirement(if_has) stringName stringDesc StringQuote
+
+3-Black_market YES COLLECTORCULT 0 0 2 1 NO NONE 0 NO "Fekete piac" string.empty "'Jövedelmező, de veszélyes!'"
+3-Collectors YES COLLECTORCULT 1 0 1 2 NO ScrapOwnCard 1 COLLECTORCULT "Gyűjtögetők" "Eltávolítja egy kártyád\na pakliból" "'Egyeseknek lom, másnak kincs!'"
+3-Relic NO COLLECTORCULT 0 0 2 2 NO MoneyBonus 1 COLLECTORCULT "Relikvia" string.empty "'Nincs semmi új, kivéve,\namit elfelejtettünk.'"
+2-Sacred_scripture NO COLLECTORCULT 0 1 2 2 NO HealthBonus 1 COLLECTORCULT "Szent iratok" string.empty "'A könyvbe hamisság ne csússzék,\nés az igazság ki ne maradjon belőle!'"
+2-Inaugurated NO COLLECTORCULT 3 0 1 3 NO AttackBonus 1 COLLECTORCULT "Felavatott" string.empty "'A haladás folyóját ezer forrás táplálja.'"
+2-Pilgrim NO COLLECTORCULT 5 0 1 4 NO ScrapOwnCard 1 COLLECTORCULT "Zarándok" "Eltávolítja egy kártyád\na pakliból" "'Oda megyek, hol lelkem megpihen.'"
+2-Heretic NO COLLECTORCULT 3 0 0 4 NO ScrapOwnCard 1 NO "Eretnek" "Eltávolítja egy kártyád\na pakliból" "'Az őszinteség kérdéseket szül.'"
+2-The_archive NO COLLECTORCULT 0 0 3 5 NO MoneyBonus 2 COLLECTORCULT "Az archívum" string.empty "'A könyvtár a szellemi táplálék tárháza!'"
+2-The_archivist NO COLLECTORCULT 5 0 1 6 NO ScrapeFromShop 2 COLLECTORCULT "Az irattáros" "Eltávolít két lapot\na boltból" "'Nagy idők szülik a nagy embereket.'"
+2-Transcendence NO COLLECTORCULT 6 0 0 7 NO HealthBonus 8 COLLECTORCULT "Transzcendencia" string.empty "'A tökéletesség nem cél,\nhanem alapvető norma.'"
+1-Cyborg NO COLLECTORCULT 6 0 0 7 NO AttackBonus 4 COLLECTORCULT "Cyborg" string.empty "'Idővel változik az élet,\nés vele változunk mi is.'"
+1-Blessed_mars NO COLLECTORCULT 0 3 5 8 NO AttackBonus 8 COLLECTORCULT "Áldott Mars" string.empty "'Mars aeternum! Mars mindörökké!'"
+1-The_builder NO COLLECTORCULT 7 0 2 8 NO ScrapOwnCard 1 NO "Az alkotó" "Eltávolítja egy kártyád\na pakliból" "'Eleve lehetetlen, hogy bármi lehetetlen.'"
+
+	-Frakciómentes
+-Money 1 2 3
