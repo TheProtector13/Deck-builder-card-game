@@ -4,6 +4,7 @@ Egy pakliépítő kártyajáték, amely a MonoGame motorra épül.
 <img width="1920" height="1080" alt="Képernyőkép 2025-12-15 195943" src="https://github.com/user-attachments/assets/d6d5ab2a-b4af-4172-9787-a1e4ee544a60" />
 
 ## Irányítás:
+Kilépéshez nyomj **ESC**-et.
 Kattints az objektumokra a **jobb egérgombbal** (például kártyákra, paklikra és halmokra) azok megtekintéséhez.  
 <img width="1920" height="1080" alt="Képernyőkép 2025-12-15 200435" src="https://github.com/user-attachments/assets/a2f17bc8-5094-43ff-b430-d274dd97bc56" />
 <img width="1920" height="1080" alt="Képernyőkép 2025-12-15 200525" src="https://github.com/user-attachments/assets/154f6c7f-b84d-4622-ab25-10515cbec43c" />
@@ -23,6 +24,17 @@ A játékos és az ellenfél a következő tulajdonságokkal rendelkezik:
 - Sárga kör - Pénz ebben a körben
 - Kék szív - Játékos/ellenfél életereje  
 <img width="448" height="202" alt="Képernyőkép 2025-12-15 201514" src="https://github.com/user-attachments/assets/7f80cd22-8a99-41c9-bbe5-a3dd8afdd4d9" />
+
+## Játékmenet:
+1. A játék kezdetén minden játékos 10-10 lapot kap a pakliába. Ezek a lapok nem frakciókötöttek. Egy darab pénz egységet biztosítanak a játékosnak.
+2. A játék körökből áll, ahol a játékosok egymás után kerülnek sorra, majd új kör kezdődik.
+3. Minden kör kezdetén a játékosok 5 lapot húznak a pakliukból, amiből a kör során mindet ki is kell játszaniuk. Egy kör egy adott játékos számára csak akkor érhet véget, ha kezében nem marad kártya.
+4. A lapok kijátszása során, vagy akár azt követően, a játékos jogosult kártyákat vásárolni a boltból a lapok kijátszása során szerzett pénzösszegből. A megvásárolt lapok az adott játékos "scrap pila"-jába, azaz az *eldobott halomba* kerülnek. A kártyák kijátszása által szerzett pénzösszeg csak az adott kör végéig érvényes, nem marad meg.
+5. A kör végén a játékos által begyűjtött támadási pontok levondónak az ellenfél életerejéből. A kijátszott lapok az *eldobott halomba* kerülnek.
+6. A következő kör megkezdődik a lapok kiosztásával az adott játékos pakliából, ha a pakliban nincs több lap, akkor az *eldobott halomból* keverjük be ismét a paklit.
+7. A körök addig ismétlődnek, amíg az ellenfél vagy a játékos életereje el nem fogy!
+
+<img width="1920" height="1080" alt="Képernyőkép 2025-12-16 133338" src="https://github.com/user-attachments/assets/bf2685ee-ad9d-4b83-b88c-6fe1074ab274" />
 
 ## A játék célja:
 - Az ellenfél legyőzése az életerejének nullára csökkentésével
@@ -55,6 +67,7 @@ A deck builder card game based on monogame engine.
 <img width="1920" height="1080" alt="Képernyőkép 2025-12-15 195943" src="https://github.com/user-attachments/assets/d6d5ab2a-b4af-4172-9787-a1e4ee544a60" />
 
 ## Controls:
+Press **ESC** key to leave and close the game.
 Click on objects with the **right mouse button** (for example cards, decks and piles) to inspect them. 
 <img width="1920" height="1080" alt="Képernyőkép 2025-12-15 200435" src="https://github.com/user-attachments/assets/a2f17bc8-5094-43ff-b430-d274dd97bc56" />
 <img width="1920" height="1080" alt="Képernyőkép 2025-12-15 200525" src="https://github.com/user-attachments/assets/154f6c7f-b84d-4622-ab25-10515cbec43c" />
@@ -74,11 +87,21 @@ Both the player and the enemy has the next attributes:
 - Blue hearth - The health of the player/enemy
 <img width="448" height="202" alt="Képernyőkép 2025-12-15 201514" src="https://github.com/user-attachments/assets/7f80cd22-8a99-41c9-bbe5-a3dd8afdd4d9" />
 
+## Gameplay:
+1. At the start of the game, each player receives 10 cards in their deck. These cards are not tied to any faction and each provides one unit of money.
+2. The game is played in turns, with players taking turns one after another, after which a new round begins.
+3. At the beginning of each turn, players draw 5 cards from their deck. All drawn cards must be played during that turn. A turn for a player can only end when they have no cards left in their hand.
+4. While playing cards, or after playing them, the player may purchase cards from the shop using the money gained from played cards. Purchased cards are placed into the player’s *scrap pile* (discard pile). Money gained during a turn is only valid until the end of that turn and does not carry over.
+5. At the end of the turn, the attack points collected by the player are deducted from the opponent’s health. All played cards are placed into the *discard pile*.
+6. The next turn begins by drawing cards from the player’s deck. If the deck is empty, the *discard pile* is shuffled back into the deck.
+7. Turns repeat until either the player’s or the enemy’s health is reduced to zero.
 
-Objective of the game:
+<img width="1920" height="1080" alt="Screenshot 2025-12-16 133338" src="https://github.com/user-attachments/assets/bf2685ee-ad9d-4b83-b88c-6fe1074ab274" />
+
+## Objective of the game:
 - Defeat the enemy by reducing their health to ZERO
 
-To archive this:
+## To archive this:
 - Build your deck by buying cards from the shop
 - Use a deck-building strategy that counters the enemies
 
