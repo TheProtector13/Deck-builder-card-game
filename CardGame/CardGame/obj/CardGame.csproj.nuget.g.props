@@ -13,4 +13,9 @@
     <SourceRoot Include="C:\Users\lacuk\.nuget\packages\" />
     <SourceRoot Include="E:\VisualStudio\SHARED\NuGetPackages\" />
   </ItemGroup>
+  <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <Import Project="$(NuGetPackageRoot)scisharp.tensorflow.redist\2.16.0\build\netstandard2.0\SciSharp.TensorFlow.Redist.props" Condition="Exists('$(NuGetPackageRoot)scisharp.tensorflow.redist\2.16.0\build\netstandard2.0\SciSharp.TensorFlow.Redist.props')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.ml.cpumath\5.0.0\build\netstandard2.0\Microsoft.ML.CpuMath.props" Condition="Exists('$(NuGetPackageRoot)microsoft.ml.cpumath\5.0.0\build\netstandard2.0\Microsoft.ML.CpuMath.props')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.ml\5.0.0\build\netstandard2.0\Microsoft.ML.props" Condition="Exists('$(NuGetPackageRoot)microsoft.ml\5.0.0\build\netstandard2.0\Microsoft.ML.props')" />
+  </ImportGroup>
 </Project>

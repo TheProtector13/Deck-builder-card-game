@@ -54,9 +54,25 @@
               "target": "Package",
               "version": "[1.5.2, )"
             },
+            "Microsoft.ML": {
+              "target": "Package",
+              "version": "[5.0.0, )"
+            },
+            "Microsoft.ML.CpuMath": {
+              "target": "Package",
+              "version": "[5.0.0, )"
+            },
+            "Microsoft.ML.DataView": {
+              "target": "Package",
+              "version": "[5.0.0, )"
+            },
+            "Microsoft.ML.TensorFlow": {
+              "target": "Package",
+              "version": "[5.0.0, )"
+            },
             "Microsoft.NETCore.DotNetAppHost": {
               "target": "Package",
-              "version": "[10.0.0, )"
+              "version": "[10.0.1, )"
             },
             "Microsoft.NETCore.DotNetHostPolicy": {
               "target": "Package",
@@ -85,6 +101,10 @@
             "NETStandard.Library": {
               "target": "Package",
               "version": "[2.0.3, )"
+            },
+            "SciSharp.TensorFlow.Redist": {
+              "target": "Package",
+              "version": "[2.16.0, )"
             },
             "SharpDX": {
               "target": "Package",
@@ -136,7 +156,7 @@
             },
             "System.Diagnostics.DiagnosticSource": {
               "target": "Package",
-              "version": "[10.0.0, )"
+              "version": "[10.0.1, )"
             },
             "System.Diagnostics.Tracing": {
               "target": "Package",

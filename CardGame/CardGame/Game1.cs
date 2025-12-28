@@ -19,7 +19,8 @@ namespace CardGame {
             _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
             _graphics.PreferMultiSampling = true;
-            //_graphics.IsFullScreen = true;
+            _graphics.HardwareModeSwitch = false;
+            _graphics.IsFullScreen = true;
             this.IsFixedTimeStep = true;
             this.TargetElapsedTime = System.TimeSpan.FromSeconds(1d / 60d);
             Content.RootDirectory = "Content";
@@ -38,6 +39,7 @@ namespace CardGame {
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             ResourceManager.Init(Content);
+            MLController.Init();
             // ******* //
             // TESTING //
             bg = new BackGround();

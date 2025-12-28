@@ -1,0 +1,21 @@
+X6: (hatszor) (nem lehet mind 0)
+---
+EXISTS
+ScrapEnemyCard
+ScrapFromShop
+AntiShow
+StealCard
+DrawCard
+ScrapOwnCard
+AttackBonus
+HealthBonus
+MoneyBonus
+ShowHand
+ShowDeck
+SelfDestruct
+---
+
+1 réteg: 	accuracy: 1.0000 - loss: 7.1054e-04
+2 réteg: 	accuracy: 0.9116 - loss: 0.1250 - val_accuracy: 0.9126 - val_loss: 0.1239
+2x2 réteg:	accuracy: 0.9126 - loss: 0.1249 - val_accuracy: 0.9750 - val_loss: 0.1261
+2x3 réteg:	accuracy: 0.9127 - loss: 0.1250 - val_accuracy: 0.8735 - val_loss: 0.1255

@@ -15,7 +15,11 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FontStashSharp.MonoGame" Version="1.5.2" />
-    <PackageReference Include="Microsoft.NETCore.DotNetAppHost" Version="10.0.0" />
+    <PackageReference Include="Microsoft.ML" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ML.CpuMath" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ML.DataView" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ML.TensorFlow" Version="5.0.0" />
+    <PackageReference Include="Microsoft.NETCore.DotNetAppHost" Version="10.0.1" />
     <PackageReference Include="Microsoft.NETCore.DotNetHostPolicy" Version="8.0.22" />
     <PackageReference Include="Microsoft.NETCore.DotNetHostResolver" Version="8.0.22" />
     <PackageReference Include="Microsoft.NETCore.Jit" Version="2.0.8" />
@@ -25,6 +29,7 @@
     <!-- <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4.1" /> -->
     <PackageReference Include="NETStandard.Library" Version="2.0.3" />
     <PackageReference Include="runtime.native.System" Version="4.3.1" />
+    <PackageReference Include="SciSharp.TensorFlow.Redist" Version="2.16.0" />
     <PackageReference Include="SharpDX" Version="4.2.0" />
     <PackageReference Include="SharpDX.Direct2D1" Version="4.2.0" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
@@ -37,7 +42,7 @@
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
     <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.0" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.1" />
     <PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0" />
     <PackageReference Include="System.Globalization" Version="4.3.0" />
     <PackageReference Include="System.IO" Version="4.3.0" />
@@ -74,6 +79,42 @@
     </None>
     <None Update="Content\FONTS\FONT_TE.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\discardingAI\fingerprint.pb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\discardingAI\saved_model.pb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\discardingAI\variables\variables.data-00000-of-00001">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\discardingAI\variables\variables.index">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\shoppingAI\fingerprint.pb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\shoppingAI\saved_model.pb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\shoppingAI\variables\variables.data-00000-of-00001">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\shoppingAI\variables\variables.index">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\strategyAI\fingerprint.pb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\strategyAI\saved_model.pb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\strategyAI\variables\variables.data-00000-of-00001">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\strategyAI\variables\variables.index">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">

@@ -1,0 +1,16 @@
+X2: (kétszer)
+---
+EXISTS
+ScrapEnemyCard
+ScrapFromShop
+AntiShow
+StealCard
+DrawCard
+ScrapOwnCard
+AttackBonus
+HealthBonus
+MoneyBonus
+ShowHand
+ShowDeck
+SelfDestruct
+---

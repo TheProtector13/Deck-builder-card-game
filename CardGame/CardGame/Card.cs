@@ -72,18 +72,18 @@ namespace CardGame {
         public Fraction EffectRequirement { get; init; } = Fraction.None;
 
         public enum Effect {
-            SelfDestruct,
-            ScrapOwnCard,
+            ScrapEnemyCard,
             ScrapFromShop,
             AntiShow,
-            ShowHand,
-            ShowDeck,
             StealCard,
-            ScrapEnemyCard,
             DrawCard,
+            ScrapOwnCard,
             AttackBonus,
             HealthBonus,
             MoneyBonus,
+            ShowHand,
+            ShowDeck,
+            SelfDestruct,
             None
         }
 
