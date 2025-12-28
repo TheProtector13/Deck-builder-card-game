@@ -94,6 +94,10 @@
               "target": "Package",
               "version": "[5.0.0, )"
             },
+            "MonoGame.Content.Builder.Task": {
+              "target": "Package",
+              "version": "[3.8.4.1, )"
+            },
             "MonoGame.Framework.WindowsDX": {
               "target": "Package",
               "version": "[3.8.4.1, )"

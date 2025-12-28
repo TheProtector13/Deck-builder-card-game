@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime;
+using System.Security.Cryptography;
 using FontStashSharp;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -304,7 +305,7 @@ namespace CardGame {
                             for (int i = 0; i < card.EffectAmount; i++) {
                                 int scrapindex = 0;
                                 if (RandomAI) {
-                                    scrapindex = Random.Shared.Next(0, Shop.Length);
+                                    scrapindex = RandomNumberGenerator.GetInt32(0, Shop.Length);
                                 }
                                 else {
                                     float[] distribution = GetStrategyDistribution(false);
@@ -323,7 +324,7 @@ namespace CardGame {
                                             .Select(x => x.index)
                                             .ToList();
                                         while (maxIndices.Count > 0) {
-                                            int maxIndex = maxIndices[Random.Shared.Next(0, maxIndices.Count)];
+                                            int maxIndex = maxIndices[RandomNumberGenerator.GetInt32(0, maxIndices.Count)];
                                             maxIndices.Remove(maxIndex);
                                             foundCardIndexes = Shop.Select((card, index) => new { card, index })
                                                 .Where(x => x.card != null && x.card.CardFraction == (Card.Fraction)maxIndex)
@@ -1013,7 +1014,7 @@ namespace CardGame {
                             while (affordableCards.Count > 0) {
                                 Card toBuy;
                                 if (RandomAI)
-                                    toBuy = affordableCards[Random.Shared.Next(0, affordableCards.Count)];
+                                    toBuy = affordableCards[RandomNumberGenerator.GetInt32(0, affordableCards.Count)];
                                 else {
                                     List<float> maxIndexes = strategy!.Prediction.ToList();
                                     maxIndexes.Sort();
