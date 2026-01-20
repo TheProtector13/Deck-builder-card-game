@@ -32,6 +32,14 @@ namespace CardGame {
         /// Gets or sets the file path to the font resources. Relative to the Content root directory.
         /// </summary>
         public static string FontPath { get; set; } = string.Empty;
+        /// <summary>
+        /// Gets the total number of resources currently available for the application. Including textures, sound effects, songs, and fonts.
+        /// </summary>
+        public static Int64 TotalResources { get; private set; } = 0;
+        /// <summary>
+        /// Gets the total number of resources that have been loaded by the application.
+        /// </summary>
+        public static Int64 LoadedResources { get; private set; } = 0;
 
         private static HashSet<FontSystem> toReset = [];
 
@@ -103,9 +111,19 @@ namespace CardGame {
             string currentpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Content.RootDirectory);
             // Load Textures
             string currentpath_T = Path.Combine(currentpath, TexturePath);
-            string[] files = Directory.GetFiles(currentpath_T, "*.xnb", SearchOption.AllDirectories);
+            string[] filesT = Directory.GetFiles(currentpath_T, "*.xnb", SearchOption.AllDirectories);
+            string currentpath_F = Path.Combine(currentpath, FontPath);
+            string[] filesF = Directory.GetFiles(currentpath_F, "*.*", SearchOption.AllDirectories);
+            string currentpath_S = Path.Combine(currentpath, SongPath);
+            string[] filesS = Directory.GetFiles(currentpath_S, "*.xnb", SearchOption.AllDirectories);
+            string currentpath_E = Path.Combine(currentpath, SoundPath);
+            string[] filesSFX = Directory.GetFiles(currentpath_E, "*.xnb", SearchOption.AllDirectories);
+            TotalResources += filesT.Length; //set resource count
+            TotalResources += filesF.Length;
+            TotalResources += filesS.Length;
+            TotalResources += filesSFX.Length;
             List<string> piplinepaths = [];
-            foreach (string file in files) {
+            foreach (string file in filesT) {
                 string relativePath = Path.GetRelativePath(currentpath, file);
                 string pipelinepath = Path.ChangeExtension(relativePath, null).Replace(Path.DirectorySeparatorChar, '/');
                 piplinepaths.Add(pipelinepath);
@@ -139,6 +157,7 @@ namespace CardGame {
                 List<Texture2D> textureseq = [];
                 foreach (Tuple<string, int> item in sequence) {
                     textureseq.Add(Content.Load<Texture2D>(item.Item1));
+                    LoadedResources++;
                 }
                 string newkey = key.Split("/").Last();
                 if (!textures.ContainsKey(newkey)) {
@@ -152,6 +171,7 @@ namespace CardGame {
                 string key = path.Split("/").Last();
                 if (!textures.ContainsKey(key)) {
                     textures.Add(key, [Content.Load<Texture2D>(path)]);
+                    LoadedResources++;
                 }
                 else {
                     throw new Exception($"Duplicate texture key: {key} ! Texture names MUST be unique!");
@@ -160,10 +180,8 @@ namespace CardGame {
             Textures = textures.ToImmutableDictionary();
             // Load Songs
             if (SongPath != string.Empty) {
-                string currentpath_S = Path.Combine(currentpath, SongPath);
-                files = Directory.GetFiles(currentpath_S, "*.xnb", SearchOption.AllDirectories);
                 piplinepaths.Clear();
-                foreach (string file in files) {
+                foreach (string file in filesS) {
                     string relativePath = Path.GetRelativePath(currentpath, file);
                     string pipelinepath = Path.ChangeExtension(relativePath, null).Replace(Path.DirectorySeparatorChar, '/');
                     piplinepaths.Add(pipelinepath);
@@ -172,6 +190,7 @@ namespace CardGame {
                     string key = path.Split("/").Last();
                     if (!songs.ContainsKey(key)) {
                         songs.Add(key, Content.Load<Song>(path));
+                        LoadedResources++;
                     }
                     else {
                         throw new Exception($"Duplicate song key: {key} ! Song names MUST be unique!");
@@ -181,10 +200,8 @@ namespace CardGame {
             }
             // Load SoundEffects
             if (SoundPath != string.Empty) {
-                string currentpath_E = Path.Combine(currentpath, SoundPath);
-                files = Directory.GetFiles(currentpath_E, "*.xnb", SearchOption.AllDirectories);
                 piplinepaths.Clear();
-                foreach (string file in files) {
+                foreach (string file in filesSFX) {
                     string relativePath = Path.GetRelativePath(currentpath, file);
                     string pipelinepath = Path.ChangeExtension(relativePath, null).Replace(Path.DirectorySeparatorChar, '/');
                     piplinepaths.Add(pipelinepath);
@@ -193,6 +210,7 @@ namespace CardGame {
                     string key = path.Split("/").Last();
                     if (!soundeffects.ContainsKey(key)) {
                         soundeffects.Add(key, Content.Load<SoundEffect>(path));
+                        LoadedResources++;
                     }
                     else {
                         throw new Exception($"Duplicate sound effect key: {key} ! Sound effect names MUST be unique!");
@@ -202,11 +220,9 @@ namespace CardGame {
             }
             // Load Fonts
             if (FontPath != string.Empty) {
-                string currentpath_F = Path.Combine(currentpath, FontPath);
-                files = Directory.GetFiles(currentpath_F, "*.*", SearchOption.AllDirectories);
                 piplinepaths.Clear();
                 List<string> relativepaths = [];
-                foreach (string file in files) {
+                foreach (string file in filesF) {
                     string relativePath = Path.GetRelativePath(AppDomain.CurrentDomain.BaseDirectory, file).Replace(Path.DirectorySeparatorChar, '/');
                     string pipelinepath = Path.ChangeExtension(relativePath, null).Split("/").Last();
                     relativepaths.Add(relativePath);
@@ -218,6 +234,7 @@ namespace CardGame {
                         fontSystem.CurrentAtlasFull += ClearFonts;
                         fontSystem.AddFont(File.ReadAllBytes(relativepaths[i]));
                         fonts.Add(piplinepaths[i], fontSystem);
+                        LoadedResources++;
                     }
                     else {
                         throw new Exception($"Duplicate font key: {piplinepaths[i]} ! Font names MUST be unique!");
@@ -243,6 +260,15 @@ namespace CardGame {
             toReset.Clear();
         }
 
+        /// <summary>
+        /// Returns a 1x1 texture filled with the specified color, creating and caching it if necessary.
+        /// </summary>
+        /// <remarks>The returned texture is cached for reuse. Repeated calls with the same color will
+        /// return the same Texture2D instance, which can improve performance and reduce memory usage.</remarks>
+        /// <param name="color">The color to fill the texture with.</param>
+        /// <param name="spriteBatch">The sprite batch whose graphics device is used to create the texture.</param>
+        /// <returns>A 1x1 Texture2D instance filled with the specified color. If a texture with the given color has already been
+        /// created, the cached instance is returned.</returns>
         public static Texture2D GetColor(Color color, SpriteBatch spriteBatch)
         {
             foreach (Texture2D tex in SingleColorTextures) {
@@ -257,6 +283,13 @@ namespace CardGame {
             SingleColorTextures.Add(newTex);
             return newTex;
         }
+
+        /// <summary>
+        /// Calculates the overall progress of resource loading as a fractional value between 0.0 and 1.0.
+        /// </summary>
+        /// <returns>A double value representing the proportion of resources that have been loaded. Returns 1.0 if there are no
+        /// resources to load.</returns>
+        public static double GetLoadProgress() => TotalResources == 0 ? 1.0 : (double)LoadedResources / (double)TotalResources;
 
     }
 }

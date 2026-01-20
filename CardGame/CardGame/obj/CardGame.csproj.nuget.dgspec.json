@@ -110,42 +110,6 @@
               "target": "Package",
               "version": "[2.16.0, )"
             },
-            "SharpDX": {
-              "target": "Package",
-              "version": "[4.2.0, )"
-            },
-            "SharpDX.DXGI": {
-              "target": "Package",
-              "version": "[4.2.0, )"
-            },
-            "SharpDX.Direct2D1": {
-              "target": "Package",
-              "version": "[4.2.0, )"
-            },
-            "SharpDX.Direct3D11": {
-              "target": "Package",
-              "version": "[4.2.0, )"
-            },
-            "SharpDX.Direct3D9": {
-              "target": "Package",
-              "version": "[4.2.0, )"
-            },
-            "SharpDX.Mathematics": {
-              "target": "Package",
-              "version": "[4.2.0, )"
-            },
-            "SharpDX.MediaFoundation": {
-              "target": "Package",
-              "version": "[4.2.0, )"
-            },
-            "SharpDX.XAudio2": {
-              "target": "Package",
-              "version": "[4.2.0, )"
-            },
-            "SharpDX.XInput": {
-              "target": "Package",
-              "version": "[4.2.0, )"
-            },
             "System.Collections": {
               "target": "Package",
               "version": "[4.3.0, )"
@@ -226,7 +190,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

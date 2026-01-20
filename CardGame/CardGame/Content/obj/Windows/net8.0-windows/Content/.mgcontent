@@ -57,6 +57,23 @@
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/CARDS/ICONS/TargetIcon.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/CARDS/ICONS/TheEyeIcon.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/CARDS/ICONS/TheEyeIconWB.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/MUSIC/1honor-and-sword.mp3</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/MUSIC/1Motivator.mp3</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/MUSIC/1Oboro-Mysterious_Lights.mp3</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/MUSIC/2Floating_Cities.mp3</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/MUSIC/2GoOn.mp3</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/MUSIC/2Rynos_Theme.mp3</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/MUSIC/2wind-peter-bamitale.mp3</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/MUSIC/3 glass-wind.mp3</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/MUSIC/3Adding_the_Sun.mp3</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/MUSIC/3beauty-of-nature.mp3</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/MUSIC/MAIN.wav</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/BGCrack.wav</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/Defeat.wav</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/Explode.wav</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/Flip.wav</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/Shuffle.wav</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/Victory.wav</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/BG/DesertPlanet/DesertPlanet0000.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/BG/DesertPlanet/DesertPlanet0001.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/BG/DesertPlanet/DesertPlanet0002.png</File>
@@ -3062,6 +3079,60 @@
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/BG/Space/Space3.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/BG/Space/Space4.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/BG/Space/Space5.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_0.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_1.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_10.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_11.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_12.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_13.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_14.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_15.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_16.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_17.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_18.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_19.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_2.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_20.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_21.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_22.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_23.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_24.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_25.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_26.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_27.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_28.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_29.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_3.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_30.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_31.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_32.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_33.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_34.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_35.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_36.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_37.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_38.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_39.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_4.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_40.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_41.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_42.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_43.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_44.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_45.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_46.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_47.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_48.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_49.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_5.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_50.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_51.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_52.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_53.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_6.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_7.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_8.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_9.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/BUTTON1.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/BUTTON2.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/Defeat.png</File>
@@ -3189,6 +3260,23 @@
     <File>TEXTURES/CARDS/ICONS/TargetIcon.png</File>
     <File>TEXTURES/CARDS/ICONS/TheEyeIcon.png</File>
     <File>TEXTURES/CARDS/ICONS/TheEyeIconWB.png</File>
+    <File>MUSIC/1honor-and-sword.mp3</File>
+    <File>MUSIC/1Motivator.mp3</File>
+    <File>MUSIC/1Oboro-Mysterious_Lights.mp3</File>
+    <File>MUSIC/2Floating_Cities.mp3</File>
+    <File>MUSIC/2GoOn.mp3</File>
+    <File>MUSIC/2Rynos_Theme.mp3</File>
+    <File>MUSIC/2wind-peter-bamitale.mp3</File>
+    <File>MUSIC/3 glass-wind.mp3</File>
+    <File>MUSIC/3Adding_the_Sun.mp3</File>
+    <File>MUSIC/3beauty-of-nature.mp3</File>
+    <File>MUSIC/MAIN.wav</File>
+    <File>SFX/BGCrack.wav</File>
+    <File>SFX/Defeat.wav</File>
+    <File>SFX/Explode.wav</File>
+    <File>SFX/Flip.wav</File>
+    <File>SFX/Shuffle.wav</File>
+    <File>SFX/Victory.wav</File>
     <File>TEXTURES/GAME_BG/DesertPlanet/DesertPlanet0000.png</File>
     <File>TEXTURES/GAME_BG/DesertPlanet/DesertPlanet0001.png</File>
     <File>TEXTURES/GAME_BG/DesertPlanet/DesertPlanet0002.png</File>
@@ -6194,6 +6282,60 @@
     <File>TEXTURES/GAME_BG/Space/Space3.png</File>
     <File>TEXTURES/GAME_BG/Space/Space4.png</File>
     <File>TEXTURES/GAME_BG/Space/Space5.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_0.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_1.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_10.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_11.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_12.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_13.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_14.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_15.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_16.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_17.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_18.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_19.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_2.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_20.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_21.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_22.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_23.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_24.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_25.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_26.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_27.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_28.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_29.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_3.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_30.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_31.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_32.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_33.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_34.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_35.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_36.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_37.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_38.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_39.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_4.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_40.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_41.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_42.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_43.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_44.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_45.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_46.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_47.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_48.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_49.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_5.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_50.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_51.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_52.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_53.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_6.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_7.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_8.png</File>
+    <File>TEXTURES/LOAD_UI/loadingCards_9.png</File>
     <File>TEXTURES/UI/BUTTON1.png</File>
     <File>TEXTURES/UI/BUTTON2.png</File>
     <File>TEXTURES/UI/Defeat.png</File>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <SourceFile>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/MUSIC/MAIN.wav</SourceFile>
+  <SourceTime>2026-01-04T19:31:45.4560119+01:00</SourceTime>
+  <DestFile>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/bin/Windows/Content/MUSIC/MAIN.xnb</DestFile>
+  <DestTime>2026-01-10T20:21:41.961643+01:00</DestTime>
+  <Importer>WavImporter</Importer>
+  <ImporterTime>2024-08-16T19:05:56+02:00</ImporterTime>
+  <Processor>SongProcessor</Processor>
+  <ProcessorTime>2024-08-16T19:05:56+02:00</ProcessorTime>
+  <Parameters>
+    <Key>Quality</Key>
+    <Value>Best</Value>
+  </Parameters>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput>
+    <string>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/bin/Windows/Content/MUSIC/MAIN.wma</string>
+  </BuildOutput>
+</PipelineBuildEvent>
