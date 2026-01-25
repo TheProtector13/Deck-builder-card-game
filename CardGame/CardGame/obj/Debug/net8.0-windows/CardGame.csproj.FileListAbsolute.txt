@@ -3301,3 +3301,11 @@ E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\ne
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\Content\TEXTURES\LOAD_UI\loadingCards_7.xnb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\Content\TEXTURES\LOAD_UI\loadingCards_8.xnb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\Content\TEXTURES\LOAD_UI\loadingCards_9.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\Content\TEXTURES\UI\ManualButton0.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\Content\TEXTURES\UI\ManualButton1.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\Content\TEXTURES\UI\PlayButton0.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\Content\TEXTURES\UI\PlayButton1.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\Content\TEXTURES\UI\PlayButton2.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\Content\TEXTURES\UI\SettingsButton0.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\Content\TEXTURES\UI\SettingsButton1.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\Content\TEXTURES\MANUAL\MANUAL_IMG1.xnb

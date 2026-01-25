@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 #nullable enable
 namespace CardGame {
@@ -10,8 +9,9 @@ namespace CardGame {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         //TEST
-        private BackGround bg;
-        private ForeGround fg;
+        private BackGround? bg;
+        private ForeGround? fg;
+        private MainMenu menu;
         private SplashScreen? splashScreen;
         private Task ResourceManagerLoading;
 
@@ -47,6 +47,7 @@ namespace CardGame {
             ResourceManagerLoading = Task.Run(() => {
                 ResourceManager.Init(Content);
                 MLController.Init();
+                MusicPlayer.Init();
             });
             // ******* //
             // TESTING //            
@@ -56,8 +57,9 @@ namespace CardGame {
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            //    if (splashScreen is null && (fg is null || fg.WINNER != ForeGround.GameWinner.InProgress))
+            //        Exit();
 
             if (splashScreen is not null && !splashScreen.Finished) {
                 splashScreen.Percentage = ResourceManager.GetLoadProgress();
@@ -68,12 +70,38 @@ namespace CardGame {
             else if (splashScreen is not null) {
                 splashScreen.Dispose();
                 splashScreen = null;
-                bg = new BackGround();
-                fg = new ForeGround(bg);
+                menu = new();
             }
             else {
-                bg.Update(gameTime);
-                fg.Update(gameTime);
+                if (menu.CurrentMenuState == MainMenu.MenuState.None)
+                    menu.Update(gameTime);
+                else {
+                    switch (menu.CurrentMenuState) {
+                        case MainMenu.MenuState.SinglePlayer:
+                            if (fg is null || bg is null) {
+                                bg = new BackGround();
+                                fg = new ForeGround(bg);
+                                MusicPlayer.SetAlbum(bg.Type);
+                            }
+                            bg.Update(gameTime);
+                            fg.Update(gameTime);
+                            if (fg.WINNER != ForeGround.GameWinner.InProgress) {
+                                menu.ResetMenuState();
+                                fg = null;
+                                bg = null;
+                                MusicPlayer.SetAlbum();
+                            }
+                            break;
+                        case MainMenu.MenuState.MultiPlayer:
+                            menu.ResetMenuState();
+                            break;
+                        case MainMenu.MenuState.Exit:
+                            Exit();
+                            break;
+                        default:
+                            break;
+                    }
+                }
             }
 
             // TODO: Add your update logic here
@@ -90,8 +118,12 @@ namespace CardGame {
                 splashScreen.Draw(gameTime, _spriteBatch);
             }
             else {
-                bg.Draw(gameTime, _spriteBatch);
-                fg.Draw(gameTime, _spriteBatch);
+                if (menu.CurrentMenuState == MainMenu.MenuState.None)
+                    menu.Draw(gameTime, _spriteBatch);
+                else {
+                    bg?.Draw(gameTime, _spriteBatch);
+                    fg?.Draw(gameTime, _spriteBatch);
+                }
             }
             _spriteBatch.End();
 

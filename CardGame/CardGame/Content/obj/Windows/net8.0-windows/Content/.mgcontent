@@ -3133,6 +3133,14 @@
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_7.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_8.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/LOAD/loadingCards_9.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MANUAL/MANUAL_IMG1.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MENU/ManualButton0.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MENU/ManualButton1.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MENU/PlayButton0.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MENU/PlayButton1.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MENU/PlayButton2.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MENU/SettingsButton0.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MENU/SettingsButton1.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/BUTTON1.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/BUTTON2.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/Defeat.png</File>
@@ -6336,6 +6344,14 @@
     <File>TEXTURES/LOAD_UI/loadingCards_7.png</File>
     <File>TEXTURES/LOAD_UI/loadingCards_8.png</File>
     <File>TEXTURES/LOAD_UI/loadingCards_9.png</File>
+    <File>TEXTURES/MANUAL/MANUAL_IMG1.png</File>
+    <File>TEXTURES/UI/ManualButton0.png</File>
+    <File>TEXTURES/UI/ManualButton1.png</File>
+    <File>TEXTURES/UI/PlayButton0.png</File>
+    <File>TEXTURES/UI/PlayButton1.png</File>
+    <File>TEXTURES/UI/PlayButton2.png</File>
+    <File>TEXTURES/UI/SettingsButton0.png</File>
+    <File>TEXTURES/UI/SettingsButton1.png</File>
     <File>TEXTURES/UI/BUTTON1.png</File>
     <File>TEXTURES/UI/BUTTON2.png</File>
     <File>TEXTURES/UI/Defeat.png</File>

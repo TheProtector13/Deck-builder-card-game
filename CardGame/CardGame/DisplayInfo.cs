@@ -105,12 +105,25 @@ namespace CardGame {
         public static Rectangle FitRectBottom(Rectangle image, Rectangle target)
         {
             double imageRatio = (double)image.Width / image.Height;
-            int fittedHeight = (int)(target.Width / imageRatio);
-            return new Rectangle(
-                target.X,
-                target.Y + target.Height - fittedHeight,
-                target.Width,
-                fittedHeight);
+            double targetRatio = (double)target.Width / target.Height;
+
+            int width, height;
+
+            if (targetRatio > imageRatio) {
+                // Fit by height
+                height = target.Height;
+                width = (int)(height * imageRatio);
+            }
+            else {
+                // Fit by width
+                width = target.Width;
+                height = (int)(width / imageRatio);
+            }
+
+            int x = target.X + ((target.Width - width) / 2);
+            int y = target.Y + target.Height - height;
+
+            return new Rectangle(x, y, width, height);
         }
     }
 }

@@ -877,10 +877,11 @@ namespace CardGame {
             if (endingScreen != null) {
                 cardMouseControlEnabled = false;
                 endingScreen.Update(gameTime);
+                KeyboardState keyboardState = Keyboard.GetState();
                 if ((mouse.Previous.LeftButton == ButtonState.Released && mouse.Current.LeftButton == ButtonState.Pressed) ||
                     (mouse.Previous.RightButton == ButtonState.Released && mouse.Current.RightButton == ButtonState.Pressed) ||
                     (mouse.Previous.MiddleButton == ButtonState.Released && mouse.Current.MiddleButton == ButtonState.Pressed) ||
-                    Keyboard.GetState().IsKeyDown(Keys.Enter)) {
+                    keyboardState.IsKeyDown(Keys.Enter) || keyboardState.IsKeyDown(Keys.Escape)) {
                     WINNER = PlayerHealth <= 0 ? GameWinner.Enemy : GameWinner.Player;
                 }
             }
@@ -904,6 +905,10 @@ namespace CardGame {
                         GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
                         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
                         LastGC = gameTime.TotalGameTime;
+                    }
+                    //ESC Check
+                    if (Keyboard.GetState().IsKeyDown(Keys.Escape)) {
+                        WINNER = GameWinner.Enemy;
                     }
                     //EndingCheck
                     if (PlayerHealth <= 0) {

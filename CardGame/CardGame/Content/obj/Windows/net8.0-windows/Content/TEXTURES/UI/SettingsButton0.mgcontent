@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <SourceFile>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/Victory_A.png</SourceFile>
-  <SourceTime>2025-12-11T12:35:58.6534029+01:00</SourceTime>
-  <DestFile>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/bin/Windows/Content/TEXTURES/UI/Victory_A.xnb</DestFile>
-  <DestTime>2026-01-22T18:54:30.1867367+01:00</DestTime>
+  <SourceFile>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MENU/SettingsButton0.png</SourceFile>
+  <SourceTime>2024-08-19T18:50:15.099885+02:00</SourceTime>
+  <DestFile>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/bin/Windows/Content/TEXTURES/UI/SettingsButton0.xnb</DestFile>
+  <DestTime>2026-01-22T18:54:27.8655675+01:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2024-08-16T19:05:56+02:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

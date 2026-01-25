@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <SourceFile>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/Victory_A.png</SourceFile>
-  <SourceTime>2025-12-11T12:35:58.6534029+01:00</SourceTime>
-  <DestFile>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/bin/Windows/Content/TEXTURES/UI/Victory_A.xnb</DestFile>
-  <DestTime>2026-01-22T18:54:30.1867367+01:00</DestTime>
+  <SourceFile>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MANUAL/MANUAL_IMG1.png</SourceFile>
+  <SourceTime>2025-12-15T20:44:31.7620514+01:00</SourceTime>
+  <DestFile>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/bin/Windows/Content/TEXTURES/MANUAL/MANUAL_IMG1.xnb</DestFile>
+  <DestTime>2026-01-24T21:46:13.3791244+01:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2024-08-16T19:05:56+02:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
@@ -26,7 +26,7 @@
   </Parameters>
   <Parameters>
     <Key>ResizeToPowerOfTwo</Key>
-    <Value>False</Value>
+    <Value>True</Value>
   </Parameters>
   <Parameters>
     <Key>MakeSquare</Key>
