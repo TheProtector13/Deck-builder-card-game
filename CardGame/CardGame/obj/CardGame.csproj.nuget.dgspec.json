@@ -52,7 +52,11 @@
           "dependencies": {
             "FontStashSharp.MonoGame": {
               "target": "Package",
-              "version": "[1.5.2, )"
+              "version": "[1.5.3, )"
+            },
+            "Microsoft.Data.Sqlite": {
+              "target": "Package",
+              "version": "[10.0.2, )"
             },
             "Microsoft.ML": {
               "target": "Package",
@@ -72,15 +76,15 @@
             },
             "Microsoft.NETCore.DotNetAppHost": {
               "target": "Package",
-              "version": "[10.0.1, )"
+              "version": "[10.0.2, )"
             },
             "Microsoft.NETCore.DotNetHostPolicy": {
               "target": "Package",
-              "version": "[8.0.22, )"
+              "version": "[8.0.23, )"
             },
             "Microsoft.NETCore.DotNetHostResolver": {
               "target": "Package",
-              "version": "[8.0.22, )"
+              "version": "[8.0.23, )"
             },
             "Microsoft.NETCore.Jit": {
               "target": "Package",
@@ -124,7 +128,7 @@
             },
             "System.Diagnostics.DiagnosticSource": {
               "target": "Package",
-              "version": "[10.0.1, )"
+              "version": "[10.0.2, )"
             },
             "System.Diagnostics.Tracing": {
               "target": "Package",

@@ -8,11 +8,20 @@ namespace CardGame {
         public static event EventHandler? OnSFXVolumeChanged;
         public static event EventHandler? OnMusicVolumeChanged;
 
+        static GameSettings()
+        {
+            float? SFX = DatabaseConnector.GetSetting("SFX");
+            float? Music = DatabaseConnector.GetSetting("MUSIC");
+            sFXVolume = SFX ?? sFXVolume;
+            musicVolume = Music ?? musicVolume;
+        }
+
         public static float MusicVolume
         {
             get => musicVolume;
             set {
                 musicVolume = value;
+                DatabaseConnector.SetSetting("MUSIC", musicVolume);
                 OnMusicVolumeChanged?.Invoke(null, EventArgs.Empty);
             }
         }
@@ -21,6 +30,7 @@ namespace CardGame {
             get => sFXVolume;
             set {
                 sFXVolume = value;
+                DatabaseConnector.SetSetting("SFX", sFXVolume);
                 OnSFXVolumeChanged?.Invoke(null, EventArgs.Empty);
             }
         }

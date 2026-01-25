@@ -47,6 +47,7 @@ namespace CardGame {
             ResourceManagerLoading = Task.Run(() => {
                 ResourceManager.Init(Content);
                 MLController.Init();
+                DatabaseConnector.Init();
                 MusicPlayer.Init();
             });
             // ******* //
@@ -130,6 +131,13 @@ namespace CardGame {
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+        }
+
+        protected override void OnExiting(object sender, ExitingEventArgs args)
+        {
+            DatabaseConnector.CloseConnection();
+            ResourceManager.Dispose();
+            base.OnExiting(sender, args);
         }
     }
 }

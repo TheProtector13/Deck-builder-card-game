@@ -30,7 +30,7 @@
           "lib/netstandard2.0/FontStashSharp.Base.dll": {}
         }
       },
-      "FontStashSharp.MonoGame/1.5.2": {
+      "FontStashSharp.MonoGame/1.5.3": {
         "type": "package",
         "dependencies": {
           "Cyotek.Drawing.BitmapFont": "2.0.4",
@@ -100,6 +100,36 @@
         },
         "build": {
           "buildTransitive/net8.0/_._": {}
+        }
+      },
+      "Microsoft.Data.Sqlite/10.0.2": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Data.Sqlite.Core": "10.0.2",
+          "SQLitePCLRaw.bundle_e_sqlite3": "2.1.11",
+          "SQLitePCLRaw.core": "2.1.11"
+        },
+        "compile": {
+          "lib/netstandard2.0/_._": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/_._": {}
+        }
+      },
+      "Microsoft.Data.Sqlite.Core/10.0.2": {
+        "type": "package",
+        "dependencies": {
+          "SQLitePCLRaw.core": "2.1.11"
+        },
+        "compile": {
+          "lib/net8.0/Microsoft.Data.Sqlite.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.Data.Sqlite.dll": {
+            "related": ".xml"
+          }
         }
       },
       "Microsoft.ML/5.0.0": {
@@ -710,19 +740,19 @@
           "build/netcoreapp2.1/_._": {}
         }
       },
-      "Microsoft.NETCore.DotNetAppHost/10.0.1": {
+      "Microsoft.NETCore.DotNetAppHost/10.0.2": {
         "type": "package"
       },
-      "Microsoft.NETCore.DotNetHostPolicy/8.0.22": {
+      "Microsoft.NETCore.DotNetHostPolicy/8.0.23": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.DotNetHostResolver": "8.0.22"
+          "Microsoft.NETCore.DotNetHostResolver": "8.0.23"
         }
       },
-      "Microsoft.NETCore.DotNetHostResolver/8.0.22": {
+      "Microsoft.NETCore.DotNetHostResolver/8.0.23": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.DotNetAppHost": "8.0.22"
+          "Microsoft.NETCore.DotNetAppHost": "8.0.23"
         }
       },
       "Microsoft.NETCore.Jit/2.0.8": {
@@ -1193,6 +1223,149 @@
           }
         }
       },
+      "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
+        "type": "package",
+        "dependencies": {
+          "SQLitePCLRaw.lib.e_sqlite3": "2.1.11",
+          "SQLitePCLRaw.provider.e_sqlite3": "2.1.11"
+        },
+        "compile": {
+          "lib/netstandard2.0/SQLitePCLRaw.batteries_v2.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SQLitePCLRaw.batteries_v2.dll": {}
+        }
+      },
+      "SQLitePCLRaw.core/2.1.11": {
+        "type": "package",
+        "dependencies": {
+          "System.Memory": "4.5.3"
+        },
+        "compile": {
+          "lib/netstandard2.0/SQLitePCLRaw.core.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/SQLitePCLRaw.core.dll": {}
+        }
+      },
+      "SQLitePCLRaw.lib.e_sqlite3/2.1.11": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/_._": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/_._": {}
+        },
+        "build": {
+          "buildTransitive/net8.0/SQLitePCLRaw.lib.e_sqlite3.targets": {}
+        },
+        "runtimeTargets": {
+          "runtimes/browser-wasm/nativeassets/net8.0/e_sqlite3.a": {
+            "assetType": "native",
+            "rid": "browser-wasm"
+          },
+          "runtimes/linux-arm/native/libe_sqlite3.so": {
+            "assetType": "native",
+            "rid": "linux-arm"
+          },
+          "runtimes/linux-arm64/native/libe_sqlite3.so": {
+            "assetType": "native",
+            "rid": "linux-arm64"
+          },
+          "runtimes/linux-armel/native/libe_sqlite3.so": {
+            "assetType": "native",
+            "rid": "linux-armel"
+          },
+          "runtimes/linux-mips64/native/libe_sqlite3.so": {
+            "assetType": "native",
+            "rid": "linux-mips64"
+          },
+          "runtimes/linux-musl-arm/native/libe_sqlite3.so": {
+            "assetType": "native",
+            "rid": "linux-musl-arm"
+          },
+          "runtimes/linux-musl-arm64/native/libe_sqlite3.so": {
+            "assetType": "native",
+            "rid": "linux-musl-arm64"
+          },
+          "runtimes/linux-musl-riscv64/native/libe_sqlite3.so": {
+            "assetType": "native",
+            "rid": "linux-musl-riscv64"
+          },
+          "runtimes/linux-musl-s390x/native/libe_sqlite3.so": {
+            "assetType": "native",
+            "rid": "linux-musl-s390x"
+          },
+          "runtimes/linux-musl-x64/native/libe_sqlite3.so": {
+            "assetType": "native",
+            "rid": "linux-musl-x64"
+          },
+          "runtimes/linux-ppc64le/native/libe_sqlite3.so": {
+            "assetType": "native",
+            "rid": "linux-ppc64le"
+          },
+          "runtimes/linux-riscv64/native/libe_sqlite3.so": {
+            "assetType": "native",
+            "rid": "linux-riscv64"
+          },
+          "runtimes/linux-s390x/native/libe_sqlite3.so": {
+            "assetType": "native",
+            "rid": "linux-s390x"
+          },
+          "runtimes/linux-x64/native/libe_sqlite3.so": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/linux-x86/native/libe_sqlite3.so": {
+            "assetType": "native",
+            "rid": "linux-x86"
+          },
+          "runtimes/maccatalyst-arm64/native/libe_sqlite3.dylib": {
+            "assetType": "native",
+            "rid": "maccatalyst-arm64"
+          },
+          "runtimes/maccatalyst-x64/native/libe_sqlite3.dylib": {
+            "assetType": "native",
+            "rid": "maccatalyst-x64"
+          },
+          "runtimes/osx-arm64/native/libe_sqlite3.dylib": {
+            "assetType": "native",
+            "rid": "osx-arm64"
+          },
+          "runtimes/osx-x64/native/libe_sqlite3.dylib": {
+            "assetType": "native",
+            "rid": "osx-x64"
+          },
+          "runtimes/win-arm/native/e_sqlite3.dll": {
+            "assetType": "native",
+            "rid": "win-arm"
+          },
+          "runtimes/win-arm64/native/e_sqlite3.dll": {
+            "assetType": "native",
+            "rid": "win-arm64"
+          },
+          "runtimes/win-x64/native/e_sqlite3.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x86/native/e_sqlite3.dll": {
+            "assetType": "native",
+            "rid": "win-x86"
+          }
+        }
+      },
+      "SQLitePCLRaw.provider.e_sqlite3/2.1.11": {
+        "type": "package",
+        "dependencies": {
+          "SQLitePCLRaw.core": "2.1.11"
+        },
+        "compile": {
+          "lib/net6.0-windows7.0/SQLitePCLRaw.provider.e_sqlite3.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0-windows7.0/SQLitePCLRaw.provider.e_sqlite3.dll": {}
+        }
+      },
       "StbImageSharp/2.30.15": {
         "type": "package",
         "compile": {
@@ -1301,7 +1474,7 @@
           }
         }
       },
-      "System.Diagnostics.DiagnosticSource/10.0.1": {
+      "System.Diagnostics.DiagnosticSource/10.0.2": {
         "type": "package",
         "compile": {
           "lib/net8.0/System.Diagnostics.DiagnosticSource.dll": {
@@ -2114,14 +2287,14 @@
         "lib/netstandard2.0/FontStashSharp.Base.dll"
       ]
     },
-    "FontStashSharp.MonoGame/1.5.2": {
-      "sha512": "+bhbAZ52L2fIWTRrHnSCNccB7ArKVH6Wa7c/kzO4YybrzXxgmDbLjuOwS49FgN9qsEp/7/Xqalc3YyquXs9uwA==",
+    "FontStashSharp.MonoGame/1.5.3": {
+      "sha512": "kDP2hV+D/RiHm16Su4+hnI0lqq0tBNtQjXUWOJA3X6QKqCiUUkwLgZMAwrs/yNVYJ6NYxm5dztJFqlqZPr8OSQ==",
       "type": "package",
-      "path": "fontstashsharp.monogame/1.5.2",
+      "path": "fontstashsharp.monogame/1.5.3",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "fontstashsharp.monogame.1.5.2.nupkg.sha512",
+        "fontstashsharp.monogame.1.5.3.nupkg.sha512",
         "fontstashsharp.monogame.nuspec",
         "lib/netstandard2.0/FontStashSharp.MonoGame.dll"
       ]
@@ -2201,6 +2374,37 @@
         "microsoft.bcl.asyncinterfaces.9.0.4.nupkg.sha512",
         "microsoft.bcl.asyncinterfaces.nuspec",
         "useSharedDesignerContext.txt"
+      ]
+    },
+    "Microsoft.Data.Sqlite/10.0.2": {
+      "sha512": "kST8oJAIM1GBKZ9kpzqy+U7DAZ50m3whANKVc9NpL7PYFHmPRM1qIHjG99BsmhvUMwku+imJHWWi3kcG4OCs7Q==",
+      "type": "package",
+      "path": "microsoft.data.sqlite/10.0.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "PACKAGE.md",
+        "lib/netstandard2.0/_._",
+        "microsoft.data.sqlite.10.0.2.nupkg.sha512",
+        "microsoft.data.sqlite.nuspec"
+      ]
+    },
+    "Microsoft.Data.Sqlite.Core/10.0.2": {
+      "sha512": "/8ubtRdyED4qyxmL1CAu3UZZUEgc9l0dPCItW5tlOkYlKOb3QNhjGuEeb7uTKAqm8L7kwFOx1fCsndiylrzZAg==",
+      "type": "package",
+      "path": "microsoft.data.sqlite.core/10.0.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "PACKAGE.md",
+        "lib/net8.0/Microsoft.Data.Sqlite.dll",
+        "lib/net8.0/Microsoft.Data.Sqlite.xml",
+        "lib/netstandard2.0/Microsoft.Data.Sqlite.dll",
+        "lib/netstandard2.0/Microsoft.Data.Sqlite.xml",
+        "microsoft.data.sqlite.core.10.0.2.nupkg.sha512",
+        "microsoft.data.sqlite.core.nuspec"
       ]
     },
     "Microsoft.ML/5.0.0": {
@@ -2577,46 +2781,46 @@
         "runtime.json"
       ]
     },
-    "Microsoft.NETCore.DotNetAppHost/10.0.1": {
-      "sha512": "RI8xec/4KmMOtdK9Cb1BfUuwnBaQd57KiCSm4HT+bauVMzn1CToQgqD8bx5nZSConXc/EqbbUIT1+KIQojn9YQ==",
+    "Microsoft.NETCore.DotNetAppHost/10.0.2": {
+      "sha512": "5zsJbI621rqNm8tLGgtznzl2QSqhg9i4muKv1DLh/awVOWNS3mHQkXuseLeukjuBCGiR8HYdHKmy3C9l4TZYIw==",
       "type": "package",
-      "path": "microsoft.netcore.dotnetapphost/10.0.1",
+      "path": "microsoft.netcore.dotnetapphost/10.0.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Icon.png",
         "THIRD-PARTY-NOTICES.TXT",
-        "microsoft.netcore.dotnetapphost.10.0.1.nupkg.sha512",
+        "microsoft.netcore.dotnetapphost.10.0.2.nupkg.sha512",
         "microsoft.netcore.dotnetapphost.nuspec",
         "runtime.json"
       ]
     },
-    "Microsoft.NETCore.DotNetHostPolicy/8.0.22": {
-      "sha512": "bflRKx62wByu/3IKy8JzhT18aQbHrPrxPsti8qjOFASysdsUXj5e3w35/lqiI5XpBJUK/KFFtF6/k64oV5xtuw==",
+    "Microsoft.NETCore.DotNetHostPolicy/8.0.23": {
+      "sha512": "m744eKqenfi/rZrEd7YDnNulKZ5HEtQL6MS4hc6k1/3jL3HM6oTEg87ISg14rhhKn6ptfbeY2DcdNxWq/JDj7Q==",
       "type": "package",
-      "path": "microsoft.netcore.dotnethostpolicy/8.0.22",
+      "path": "microsoft.netcore.dotnethostpolicy/8.0.23",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Icon.png",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
-        "microsoft.netcore.dotnethostpolicy.8.0.22.nupkg.sha512",
+        "microsoft.netcore.dotnethostpolicy.8.0.23.nupkg.sha512",
         "microsoft.netcore.dotnethostpolicy.nuspec",
         "runtime.json"
       ]
     },
-    "Microsoft.NETCore.DotNetHostResolver/8.0.22": {
-      "sha512": "Kt87LI0WYfWiQhRoM36BSloRwIdOvMNDatNqRcpAk7Vt13a8Oe+iB67v0qryNQ+HBM5dUsBxiNADPCcVENpuow==",
+    "Microsoft.NETCore.DotNetHostResolver/8.0.23": {
+      "sha512": "wQGLvBrqXHBCUB7W1m7Xx6pTZ/YZCQvuvGOIMFgu97Z+x5gUJ73zIEKR0iE2VWfRYdrImWvSpp/Rm8zmqnSe7w==",
       "type": "package",
-      "path": "microsoft.netcore.dotnethostresolver/8.0.22",
+      "path": "microsoft.netcore.dotnethostresolver/8.0.23",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Icon.png",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
-        "microsoft.netcore.dotnethostresolver.8.0.22.nupkg.sha512",
+        "microsoft.netcore.dotnethostresolver.8.0.23.nupkg.sha512",
         "microsoft.netcore.dotnethostresolver.nuspec",
         "runtime.json"
       ]
@@ -3339,6 +3543,100 @@
         "sharpdx.xinput.nuspec"
       ]
     },
+    "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
+      "sha512": "DC4nA7yWnf4UZdgJDF+9Mus4/cb0Y3Sfgi3gDnAoKNAIBwzkskNAbNbyu+u4atT0ruVlZNJfwZmwiEwE5oz9LQ==",
+      "type": "package",
+      "path": "sqlitepclraw.bundle_e_sqlite3/2.1.11",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/monoandroid90/SQLitePCLRaw.batteries_v2.dll",
+        "lib/net461/SQLitePCLRaw.batteries_v2.dll",
+        "lib/net6.0-android31.0/SQLitePCLRaw.batteries_v2.dll",
+        "lib/net6.0-android31.0/SQLitePCLRaw.batteries_v2.xml",
+        "lib/net6.0-ios14.0/SQLitePCLRaw.batteries_v2.dll",
+        "lib/net6.0-ios14.2/SQLitePCLRaw.batteries_v2.dll",
+        "lib/net6.0-tvos10.0/SQLitePCLRaw.batteries_v2.dll",
+        "lib/netstandard2.0/SQLitePCLRaw.batteries_v2.dll",
+        "lib/xamarinios10/SQLitePCLRaw.batteries_v2.dll",
+        "sqlitepclraw.bundle_e_sqlite3.2.1.11.nupkg.sha512",
+        "sqlitepclraw.bundle_e_sqlite3.nuspec"
+      ]
+    },
+    "SQLitePCLRaw.core/2.1.11": {
+      "sha512": "PK0GLFkfhZzLQeR3PJf71FmhtHox+U3vcY6ZtswoMjrefkB9k6ErNJEnwXqc5KgXDSjige2XXrezqS39gkpQKA==",
+      "type": "package",
+      "path": "sqlitepclraw.core/2.1.11",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.0/SQLitePCLRaw.core.dll",
+        "sqlitepclraw.core.2.1.11.nupkg.sha512",
+        "sqlitepclraw.core.nuspec"
+      ]
+    },
+    "SQLitePCLRaw.lib.e_sqlite3/2.1.11": {
+      "sha512": "Ev2ytaXiOlWZ4b3R67GZBsemTINslLD1DCJr2xiacpn4tbapu0Q4dHEzSvZSMnVWeE5nlObU3VZN2p81q3XOYQ==",
+      "type": "package",
+      "path": "sqlitepclraw.lib.e_sqlite3/2.1.11",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "buildTransitive/net461/SQLitePCLRaw.lib.e_sqlite3.targets",
+        "buildTransitive/net6.0/SQLitePCLRaw.lib.e_sqlite3.targets",
+        "buildTransitive/net7.0/SQLitePCLRaw.lib.e_sqlite3.targets",
+        "buildTransitive/net8.0/SQLitePCLRaw.lib.e_sqlite3.targets",
+        "buildTransitive/net9.0/SQLitePCLRaw.lib.e_sqlite3.targets",
+        "lib/net461/_._",
+        "lib/netstandard2.0/_._",
+        "runtimes/browser-wasm/nativeassets/net6.0/e_sqlite3.a",
+        "runtimes/browser-wasm/nativeassets/net7.0/e_sqlite3.a",
+        "runtimes/browser-wasm/nativeassets/net8.0/e_sqlite3.a",
+        "runtimes/browser-wasm/nativeassets/net9.0/e_sqlite3.a",
+        "runtimes/linux-arm/native/libe_sqlite3.so",
+        "runtimes/linux-arm64/native/libe_sqlite3.so",
+        "runtimes/linux-armel/native/libe_sqlite3.so",
+        "runtimes/linux-mips64/native/libe_sqlite3.so",
+        "runtimes/linux-musl-arm/native/libe_sqlite3.so",
+        "runtimes/linux-musl-arm64/native/libe_sqlite3.so",
+        "runtimes/linux-musl-riscv64/native/libe_sqlite3.so",
+        "runtimes/linux-musl-s390x/native/libe_sqlite3.so",
+        "runtimes/linux-musl-x64/native/libe_sqlite3.so",
+        "runtimes/linux-ppc64le/native/libe_sqlite3.so",
+        "runtimes/linux-riscv64/native/libe_sqlite3.so",
+        "runtimes/linux-s390x/native/libe_sqlite3.so",
+        "runtimes/linux-x64/native/libe_sqlite3.so",
+        "runtimes/linux-x86/native/libe_sqlite3.so",
+        "runtimes/maccatalyst-arm64/native/libe_sqlite3.dylib",
+        "runtimes/maccatalyst-x64/native/libe_sqlite3.dylib",
+        "runtimes/osx-arm64/native/libe_sqlite3.dylib",
+        "runtimes/osx-x64/native/libe_sqlite3.dylib",
+        "runtimes/win-arm/native/e_sqlite3.dll",
+        "runtimes/win-arm64/native/e_sqlite3.dll",
+        "runtimes/win-x64/native/e_sqlite3.dll",
+        "runtimes/win-x86/native/e_sqlite3.dll",
+        "runtimes/win10-arm/nativeassets/uap10.0/e_sqlite3.dll",
+        "runtimes/win10-arm64/nativeassets/uap10.0/e_sqlite3.dll",
+        "runtimes/win10-x64/nativeassets/uap10.0/e_sqlite3.dll",
+        "runtimes/win10-x86/nativeassets/uap10.0/e_sqlite3.dll",
+        "sqlitepclraw.lib.e_sqlite3.2.1.11.nupkg.sha512",
+        "sqlitepclraw.lib.e_sqlite3.nuspec"
+      ]
+    },
+    "SQLitePCLRaw.provider.e_sqlite3/2.1.11": {
+      "sha512": "Y/0ZkR+r0Cg3DQFuCl1RBnv/tmxpIZRU3HUvelPw6MVaKHwYYR8YNvgs0vuNuXCMvlyJ+Fh88U1D4tah1tt6qw==",
+      "type": "package",
+      "path": "sqlitepclraw.provider.e_sqlite3/2.1.11",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net6.0-windows7.0/SQLitePCLRaw.provider.e_sqlite3.dll",
+        "lib/net6.0/SQLitePCLRaw.provider.e_sqlite3.dll",
+        "lib/netstandard2.0/SQLitePCLRaw.provider.e_sqlite3.dll",
+        "sqlitepclraw.provider.e_sqlite3.2.1.11.nupkg.sha512",
+        "sqlitepclraw.provider.e_sqlite3.nuspec"
+      ]
+    },
     "StbImageSharp/2.30.15": {
       "sha512": "7QqbupVhz2kcFUPTgMw4iHR9rYDHGundzzee19Mwmd1typ2Lnv8EVJcLJxlkeBM2+4ex0NwsMtdbGSJctp1XCQ==",
       "type": "package",
@@ -3646,10 +3944,10 @@
         "system.diagnostics.debug.nuspec"
       ]
     },
-    "System.Diagnostics.DiagnosticSource/10.0.1": {
-      "sha512": "wVYO4/71Pk177uQ3TG8ZQFS3Pnmr98cF9pYxnpuIb/bMnbEWsdZZoLU/euv29mfSi2/Iuypj0TRUchPk7aqBGg==",
+    "System.Diagnostics.DiagnosticSource/10.0.2": {
+      "sha512": "lYWBy8fKkJHaRcOuw30d67PrtVjR5754sz5Wl76s8P+vJ9FSThh9b7LIcTSODx1LY7NB3Srvg+JMnzd67qNZOw==",
       "type": "package",
-      "path": "system.diagnostics.diagnosticsource/10.0.1",
+      "path": "system.diagnostics.diagnosticsource/10.0.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3669,7 +3967,7 @@
         "lib/net9.0/System.Diagnostics.DiagnosticSource.xml",
         "lib/netstandard2.0/System.Diagnostics.DiagnosticSource.dll",
         "lib/netstandard2.0/System.Diagnostics.DiagnosticSource.xml",
-        "system.diagnostics.diagnosticsource.10.0.1.nupkg.sha512",
+        "system.diagnostics.diagnosticsource.10.0.2.nupkg.sha512",
         "system.diagnostics.diagnosticsource.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -5574,14 +5872,15 @@
   },
   "projectFileDependencyGroups": {
     "net8.0-windows7.0": [
-      "FontStashSharp.MonoGame >= 1.5.2",
+      "FontStashSharp.MonoGame >= 1.5.3",
+      "Microsoft.Data.Sqlite >= 10.0.2",
       "Microsoft.ML >= 5.0.0",
       "Microsoft.ML.CpuMath >= 5.0.0",
       "Microsoft.ML.DataView >= 5.0.0",
       "Microsoft.ML.TensorFlow >= 5.0.0",
-      "Microsoft.NETCore.DotNetAppHost >= 10.0.1",
-      "Microsoft.NETCore.DotNetHostPolicy >= 8.0.22",
-      "Microsoft.NETCore.DotNetHostResolver >= 8.0.22",
+      "Microsoft.NETCore.DotNetAppHost >= 10.0.2",
+      "Microsoft.NETCore.DotNetHostPolicy >= 8.0.23",
+      "Microsoft.NETCore.DotNetHostResolver >= 8.0.23",
       "Microsoft.NETCore.Jit >= 2.0.8",
       "Microsoft.NETCore.Platforms >= 7.0.4",
       "Microsoft.NETCore.Targets >= 5.0.0",
@@ -5592,7 +5891,7 @@
       "System.Collections >= 4.3.0",
       "System.Collections.Concurrent >= 4.3.0",
       "System.Diagnostics.Debug >= 4.3.0",
-      "System.Diagnostics.DiagnosticSource >= 10.0.1",
+      "System.Diagnostics.DiagnosticSource >= 10.0.2",
       "System.Diagnostics.Tracing >= 4.3.0",
       "System.Globalization >= 4.3.0",
       "System.IO >= 4.3.0",
@@ -5658,7 +5957,11 @@
         "dependencies": {
           "FontStashSharp.MonoGame": {
             "target": "Package",
-            "version": "[1.5.2, )"
+            "version": "[1.5.3, )"
+          },
+          "Microsoft.Data.Sqlite": {
+            "target": "Package",
+            "version": "[10.0.2, )"
           },
           "Microsoft.ML": {
             "target": "Package",
@@ -5678,15 +5981,15 @@
           },
           "Microsoft.NETCore.DotNetAppHost": {
             "target": "Package",
-            "version": "[10.0.1, )"
+            "version": "[10.0.2, )"
           },
           "Microsoft.NETCore.DotNetHostPolicy": {
             "target": "Package",
-            "version": "[8.0.22, )"
+            "version": "[8.0.23, )"
           },
           "Microsoft.NETCore.DotNetHostResolver": {
             "target": "Package",
-            "version": "[8.0.22, )"
+            "version": "[8.0.23, )"
           },
           "Microsoft.NETCore.Jit": {
             "target": "Package",
@@ -5730,7 +6033,7 @@
           },
           "System.Diagnostics.DiagnosticSource": {
             "target": "Package",
-            "version": "[10.0.1, )"
+            "version": "[10.0.2, )"
           },
           "System.Diagnostics.Tracing": {
             "target": "Package",

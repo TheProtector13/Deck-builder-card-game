@@ -41,7 +41,7 @@ namespace CardGame {
         /// </summary>
         public static Int64 LoadedResources { get; private set; } = 0;
 
-        private static HashSet<FontSystem> toReset = [];
+        private static readonly HashSet<FontSystem> toReset = [];
 
         /// <summary>
         /// Gets the collection of textures grouped by their associated keys. The key is derived from the texture file name without its extension and any trailing digits or numbering.
@@ -278,7 +278,7 @@ namespace CardGame {
                     return tex;
                 }
             }
-            Texture2D newTex = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+            Texture2D newTex = new(spriteBatch.GraphicsDevice, 1, 1);
             newTex.SetData([color]);
             SingleColorTextures.Add(newTex);
             return newTex;
@@ -291,5 +291,28 @@ namespace CardGame {
         /// resources to load.</returns>
         public static double GetLoadProgress() => TotalResources == 0 ? 1.0 : (double)LoadedResources / (double)TotalResources;
 
+        public static void Dispose()
+        {
+            foreach (Texture2D tex in SingleColorTextures) {
+                tex.Dispose();
+            }
+            SingleColorTextures.Clear();
+            foreach (FontSystem font in Fonts.Values) {
+                font.Reset();
+                font.Dispose();
+            }
+            foreach (Texture2D[] texArray in Textures.Values) {
+                foreach (Texture2D tex in texArray) {
+                    tex.Dispose();
+                }
+            }
+            Textures.Clear();
+            foreach (SoundEffect sfx in SoundEffects.Values) {
+                sfx.Dispose();
+            }
+            SoundEffects.Clear();
+            Songs.Clear();
+            Fonts.Clear();
+        }
     }
 }

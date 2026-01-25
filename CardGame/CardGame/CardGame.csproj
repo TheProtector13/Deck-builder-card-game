@@ -14,14 +14,15 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="FontStashSharp.MonoGame" Version="1.5.2" />
+    <PackageReference Include="FontStashSharp.MonoGame" Version="1.5.3" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.2" />
     <PackageReference Include="Microsoft.ML" Version="5.0.0" />
     <PackageReference Include="Microsoft.ML.CpuMath" Version="5.0.0" />
     <PackageReference Include="Microsoft.ML.DataView" Version="5.0.0" />
     <PackageReference Include="Microsoft.ML.TensorFlow" Version="5.0.0" />
-    <PackageReference Include="Microsoft.NETCore.DotNetAppHost" Version="10.0.1" />
-    <PackageReference Include="Microsoft.NETCore.DotNetHostPolicy" Version="8.0.22" />
-    <PackageReference Include="Microsoft.NETCore.DotNetHostResolver" Version="8.0.22" />
+    <PackageReference Include="Microsoft.NETCore.DotNetAppHost" Version="10.0.2" />
+    <PackageReference Include="Microsoft.NETCore.DotNetHostPolicy" Version="8.0.23" />
+    <PackageReference Include="Microsoft.NETCore.DotNetHostResolver" Version="8.0.23" />
     <PackageReference Include="Microsoft.NETCore.Jit" Version="2.0.8" />
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
     <PackageReference Include="Microsoft.NETCore.Targets" Version="5.0.0" />
@@ -34,7 +35,7 @@
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
     <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.1" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.2" />
     <PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0" />
     <PackageReference Include="System.Globalization" Version="4.3.0" />
     <PackageReference Include="System.IO" Version="4.3.0" />
@@ -49,6 +50,7 @@
   <ItemGroup>
     <Folder Include="Content\bin\Windows\" />
     <Folder Include="Content\FONTS\" />
+    <Folder Include="TCP\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Content\FONTS\FONT_A.ttf">
