@@ -721,11 +721,23 @@
 /processorParam:Quality=Best
 /build:../../../ASSETS/CC0/SOUND/SFX/BGCrack.wav;SFX/BGCrack.wav
 
+#begin ../../../ASSETS/CC0/SOUND/SFX/Buy.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:../../../ASSETS/CC0/SOUND/SFX/Buy.wav;SFX/Buy.wav
+
 #begin ../../../ASSETS/CC0/SOUND/SFX/Defeat.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:../../../ASSETS/CC0/SOUND/SFX/Defeat.wav;SFX/Defeat.wav
+
+#begin ../../../ASSETS/CC0/SOUND/SFX/Dropcard.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:../../../ASSETS/CC0/SOUND/SFX/Dropcard.wav;SFX/Dropcard.wav
 
 #begin ../../../ASSETS/CC0/SOUND/SFX/Explode.wav
 /importer:WavImporter
@@ -739,11 +751,23 @@
 /processorParam:Quality=Best
 /build:../../../ASSETS/CC0/SOUND/SFX/Flip.wav;SFX/Flip.wav
 
+#begin ../../../ASSETS/CC0/SOUND/SFX/Scrap.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:../../../ASSETS/CC0/SOUND/SFX/Scrap.mp3;SFX/Scrap.mp3
+
 #begin ../../../ASSETS/CC0/SOUND/SFX/Shuffle.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:../../../ASSETS/CC0/SOUND/SFX/Shuffle.wav;SFX/Shuffle.wav
+
+#begin ../../../ASSETS/CC0/SOUND/SFX/Steal.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:../../../ASSETS/CC0/SOUND/SFX/Steal.mp3;SFX/Steal.mp3
 
 #begin ../../../ASSETS/CC0/SOUND/SFX/Victory.wav
 /importer:WavImporter
@@ -37530,6 +37554,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/UI/MENU/PlayButton2.png;TEXTURES/UI/PlayButton2.png
+
+#begin ../../../ASSETS/CC0/UI/MENU/SelectButton0.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=DxtCompressed
+/build:../../../ASSETS/CC0/UI/MENU/SelectButton0.png;TEXTURES/UI/SelectButton0.png
+
+#begin ../../../ASSETS/CC0/UI/MENU/SelectButton1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=DxtCompressed
+/build:../../../ASSETS/CC0/UI/MENU/SelectButton1.png;TEXTURES/UI/SelectButton1.png
 
 #begin ../../../ASSETS/CC0/UI/MENU/SettingsButton0.png
 /importer:TextureImporter

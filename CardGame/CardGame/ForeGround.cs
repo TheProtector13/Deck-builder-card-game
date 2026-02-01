@@ -5,6 +5,7 @@ using System.Runtime;
 using System.Security.Cryptography;
 using FontStashSharp;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Tensorflow;
@@ -87,6 +88,10 @@ namespace CardGame {
         private bool ShowPlayedPile = false;
         private bool ShowPlayerHand = false;
 
+        //SFX
+        private readonly SoundEffect flipSFX, shuffleSFX, explodeSFX, explodeEXT_SFX, defeatSFX, victorySFX;
+        private readonly SoundEffect buySFX, scrapSFX, stealSFX, dropcardSFX;
+
         private ForeGround() => throw new NotImplementedException();
         public ForeGround(BackGround bg)
         {
@@ -144,6 +149,17 @@ namespace CardGame {
                 Enabled = false
             };
             EndTurnButton.Click += EndTurnEventHandler;
+            //SFX load
+            flipSFX = ResourceManager.SoundEffects["Flip"];
+            shuffleSFX = ResourceManager.SoundEffects["Shuffle"];
+            explodeSFX = ResourceManager.SoundEffects["Explode"];
+            explodeEXT_SFX = ResourceManager.SoundEffects["BGCrack"];
+            defeatSFX = ResourceManager.SoundEffects["Defeat"];
+            victorySFX = ResourceManager.SoundEffects["Victory"];
+            buySFX = ResourceManager.SoundEffects["Buy"];
+            scrapSFX = ResourceManager.SoundEffects["Scrap"];
+            stealSFX = ResourceManager.SoundEffects["Steal"];
+            dropcardSFX = ResourceManager.SoundEffects["Dropcard"];
             CalculateLayout();
             RefillShop();
             RefillPlayerHand();
@@ -153,6 +169,8 @@ namespace CardGame {
 
         private void AddToPlayedPile(Card card, ObjectTransform cardTrans, bool player = true)
         {
+            if (!player)
+                flipSFX.Play(GameSettings.SFXVolume, 0, 0);
             int pileCardWidth = (int)MathF.Round(PlayedPileLoc.Height * CARD_WIDTH_SCALE);
             int divnum = PlayedPile.Count + 1;
             int pileWidthOffset = (PlayedPileLoc.Width - (divnum * pileCardWidth)) / divnum;
@@ -220,6 +238,7 @@ namespace CardGame {
                 }
                 switch (card.CardEffect) {
                     case Card.Effect.SelfDestruct:
+                        scrapSFX.Play(GameSettings.SFXVolume, 0, 0);
                         PlayedPileTarget.RemoveAt(PlayedPile.IndexOf(card));
                         PlayedPile.Remove(card);
                         break;
@@ -286,6 +305,7 @@ namespace CardGame {
                                     if (EnemyScrap[scrapindex].CardFraction != Card.Fraction.None)
                                         GameDeck.Add(EnemyScrap[scrapindex]);
                                     EnemyScrap.RemoveAt(scrapindex);
+                                    scrapSFX.Play(GameSettings.SFXVolume, 0, 0);
                                     scrapped++;
                                     changed = true;
                                     //AI LOGIC KELL IDE !!! (done)
@@ -362,6 +382,7 @@ namespace CardGame {
                                 if (Shop[scrapindex] != null) {
                                     if (Shop[scrapindex]!.CardFraction != Card.Fraction.None)
                                         GameDeck.Add(Shop[scrapindex]!);
+                                    scrapSFX.Play(GameSettings.SFXVolume, 0, 0);
                                     Shop[scrapindex] = null;
                                 }
                                 RefillShop();
@@ -420,6 +441,7 @@ namespace CardGame {
                             }
                             Card stolen = DeckGenerator.GetCard(cards3);
                             stolenCards.Add(stolen);
+                            stealSFX.Play(GameSettings.SFXVolume, 0, 0);
                             AddToPlayedPile(stolen, player ? EnemyHandTarget[EnemyHand.IndexOf(stolen)] : PlayerHandTarget[PlayerHand.IndexOf(stolen)], !player);
                         }
                         break;
@@ -428,6 +450,7 @@ namespace CardGame {
                             EnemyCard2ScrapThisTurn += card.EffectAmount;
                         else
                             PlayerCard2ScrapThisTurn += card.EffectAmount;
+                        dropcardSFX.Play(GameSettings.SFXVolume, 0, 0);
                         break;
                     case Card.Effect.DrawCard:
                         if (player)
@@ -472,6 +495,7 @@ namespace CardGame {
             foreach (Card card in selectedCards) {
                 if (card.CardFraction != Card.Fraction.None)
                     GameDeck.Add(card);
+                scrapSFX.Play(GameSettings.SFXVolume, 0, 0);
                 PlayerScrap.Remove(card);
             }
             changed = true;
@@ -485,6 +509,7 @@ namespace CardGame {
                 card.Flipped = true;
                 PlayerHandTarget.RemoveAt(PlayerHand.IndexOf(card));
                 PlayerHand.Remove(card);
+                flipSFX.Play(GameSettings.SFXVolume, 0, 0);
             }
             changed = true;
         }
@@ -498,6 +523,7 @@ namespace CardGame {
                         if (card.CardFraction != Card.Fraction.None)
                             GameDeck.Add(Shop[i]!);
                         Shop[i] = null;
+                        scrapSFX.Play(GameSettings.SFXVolume, 0, 0);
                         break;
                     }
                 }
@@ -511,6 +537,8 @@ namespace CardGame {
             RefillPlayerHand();
             PlayerMoney = 0;
             EnemyHealth -= PlayerAttack;
+            if (PlayerAttack > 0)
+                explodeSFX.Play(GameSettings.SFXVolume, 0, 0);
             PlayerAttack = 0;
             playerTurn = false;
             EndTurnButton.Enabled = false;
@@ -602,6 +630,7 @@ namespace CardGame {
             }
             card.Flipped = true;
             card.RenderPrice = false;
+            buySFX.Play(GameSettings.SFXVolume, 0, 0);
             RefillShop();
         }
 
@@ -626,6 +655,7 @@ namespace CardGame {
                         handCardWidth,
                         PlayerHandLoc.Height)));
             }
+            shuffleSFX.Play(GameSettings.SFXVolume, 0, 0);
             changed = true;
         }
 
@@ -655,6 +685,7 @@ namespace CardGame {
                     handCardWidth,
                     PlayerHandLoc.Height);
             }
+            flipSFX.Play(GameSettings.SFXVolume, 0, 0);
             changed = true;
         }
 
@@ -678,6 +709,7 @@ namespace CardGame {
                         handCardWidth,
                         EnemyHandLoc.Height)));
             }
+            shuffleSFX.Play(GameSettings.SFXVolume, 0, 0);
             changed = true;
         }
 
@@ -706,6 +738,7 @@ namespace CardGame {
                     handCardWidth,
                     EnemyHandLoc.Height);
             }
+            flipSFX.Play(GameSettings.SFXVolume, 0, 0);
             changed = true;
         }
 
@@ -915,6 +948,8 @@ namespace CardGame {
                         endingScreen = new(ResourceManager.Textures["Defeat"][0], null, ResourceManager.Fonts["FONT_C"]) {
                             Title = "Vereség!"
                         };
+                        MusicPlayer.Mute();
+                        defeatSFX.Play(GameSettings.SFXVolume, 0, 0);
                         endingScreen.Update(gameTime);
                     }
                     else if (EnemyHealth <= 0) {
@@ -935,6 +970,8 @@ namespace CardGame {
                             _ => new(ResourceManager.Textures["Victory_C"][0], null, ResourceManager.Fonts["FONT_C"]),
                         };
                         endingScreen.Title = "Győzelem!";
+                        MusicPlayer.Mute();
+                        victorySFX.Play(GameSettings.SFXVolume, 0, 0);
                         endingScreen.Update(gameTime);
                     }
                     //
@@ -1068,6 +1105,11 @@ namespace CardGame {
                             RefillEnemyHand();
                             EnemyMoney = 0;
                             PlayerHealth -= EnemyAttack;
+                            if (EnemyAttack > 0) {
+                                explodeSFX.Play(GameSettings.SFXVolume, 0, 0);
+                                if (EnemyAttack > 10)
+                                    explodeEXT_SFX.Play(GameSettings.SFXVolume, 0, 0);
+                            }
                             EnemyAttack = 0;
                             playerTurn = true;
                         }
@@ -1172,6 +1214,7 @@ namespace CardGame {
                                 previewThisCard = PlayedPileTarget[i];
                                 previewThisCardOTarget = previewThisCard.MoveTarget;
                                 previewThisCard.StartLocation = previewThisCard.CurrentLocation;
+                                flipSFX.Play(GameSettings.SFXVolume, 0, 0);
                                 break;
                             }
                         }
@@ -1183,6 +1226,7 @@ namespace CardGame {
                                     previewThisCard = ShopTarget[i];
                                     previewThisCardOTarget = previewThisCard.MoveTarget;
                                     previewThisCard.StartLocation = previewThisCard.CurrentLocation;
+                                    flipSFX.Play(GameSettings.SFXVolume, 0, 0);
                                     break;
                                 }
                             }
@@ -1194,6 +1238,7 @@ namespace CardGame {
                                     previewThisCard = PlayerHandTarget[i];
                                     previewThisCardOTarget = previewThisCard.MoveTarget;
                                     previewThisCard.StartLocation = previewThisCard.CurrentLocation;
+                                    flipSFX.Play(GameSettings.SFXVolume, 0, 0);
                                     break;
                                 }
                             }
@@ -1205,6 +1250,7 @@ namespace CardGame {
                                     previewThisCard = EnemyHandTarget[i];
                                     previewThisCardOTarget = previewThisCard.MoveTarget;
                                     previewThisCard.StartLocation = previewThisCard.CurrentLocation;
+                                    flipSFX.Play(GameSettings.SFXVolume, 0, 0);
                                     break;
                                 }
                             }
@@ -1246,6 +1292,7 @@ namespace CardGame {
                                 selectedCard = Shop[i];
                                 previewThis.Add(new(Shop[i]!, ShopTarget[i]));
                                 ShowPlayerHand = true;
+                                flipSFX.Play(GameSettings.SFXVolume, 0, 0);
                                 break;
                             }
                         }
@@ -1255,6 +1302,7 @@ namespace CardGame {
                                     selectedCard = PlayerHand[i];
                                     previewThis.Add(new(PlayerHand[i], PlayerHandTarget[i]));
                                     ShowPlayedPile = true;
+                                    flipSFX.Play(GameSettings.SFXVolume, 0, 0);
                                     break;
                                 }
                             }
@@ -1271,6 +1319,7 @@ namespace CardGame {
                             previewThisCard.StartLocation = previewThisCard.CurrentLocation;
                             previewThisCard.MoveTarget = previewThisCardOTarget;
                             previewThisCard = null;
+                            flipSFX.Play(GameSettings.SFXVolume, 0, 0);
                         }
                         else {
                             if (previewThisCard.MoveTarget != previewRect) {

@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using CardGame.TCP;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using static CardGame.TCP.MessagePackHelper;
 
+#nullable enable
 namespace CardGame {
     internal class MainMenu : IDrawable {
         private readonly Texture2D backgroundTexture;
@@ -15,9 +20,23 @@ namespace CardGame {
         private readonly TextBox menuTitle;
         private readonly TextBox[] settingsmenuLabels;
         private readonly Slider[] settingsmenuSliders;
+        private readonly Button[] multiselectorbuttons;
+        private readonly TextBox[] multiselectorlabels;
+        private readonly TextInput[] multiselectorInputs;
+        private readonly Button[] hostbuttons;
+        private readonly TextBox[] hostlabels;
+        private readonly Button[] clientButtons;
+        private readonly TextBox[] clientlabels;
+        private readonly TextInput[] clientInputs;
+        private readonly ListView clientList;
+        private Tuple<DiscoveryPayload, byte[], byte[]>[] currentdisclist = [];
         private readonly MouseInfo mouseInfo;
         private bool settingsmenuopen = false;
         private bool manualopen = false;
+        private bool multiselectoropen = false;
+        private bool hostopen = false;
+        private bool clientopen = false;
+        private Task<bool>? joinTask = null;
         private readonly Button[] manualbuttons;
         private readonly Slider manualslider;
         private readonly object[] manualcontent = [
@@ -27,7 +46,7 @@ namespace CardGame {
                 "egérgombot használd az ablakokban és menükben található opciók kiválasztásához.\n", //
                 "Tartsd lenyomva a bal egérgombot a kártyák felett a mozgatáshoz. Engedd el a\n" +
                 "kijelölt narancssárga területek felett a következő műveletekhez: Kártya vásárlása\n" +
-                "a boltban, Kártya kijátszása!", //
+                "a boltból, Kártya kijátszása!", //
                 "A játékos és az ellenfél a következő tulajdonságokkal rendelkezik:\n" +
                 "Piros kör - Támadás ebben a körben\nSárga kör - Pénz ebben a körben\nKék szív - Játékos/ellenfél életereje", //
                 ResourceManager.Textures["MANUAL_IMG"][0], //
@@ -196,41 +215,143 @@ namespace CardGame {
             }
             drawablemanualcontent = darwablelist.ToArray();
             manualcontentlocs = locs.ToArray();
+            //
+            multiselectorbuttons = [
+                new([ResourceManager.Textures["SettingsButton"][0],ResourceManager.Textures["SettingsButton"][1]], mouseInfo) {
+                    Text = "Létrehozás",
+                    Location = new(contentbackgroundRectangle.X, menubackgroundRectangle.Y + (height/2) - (bSize.Y/2)),
+                    Size = bSize,
+                    SetTextOffsetY = bSize.Y / 2
+                },
+                new([ResourceManager.Textures["SettingsButton"][0],ResourceManager.Textures["SettingsButton"][1]], mouseInfo) {
+                    Text = "Csatlakozás",
+                    Location = new(menubackgroundRectangle.X + width - col1xy - bSize.X, menubackgroundRectangle.Y + (height/2) - (bSize.Y/2)),
+                    Size = bSize,
+                    SetTextOffsetY = bSize.Y / 2
+                },
+                new([ResourceManager.Textures["BUTTON"][0],ResourceManager.Textures["BUTTON"][1]], mouseInfo) {
+                    Text = "Vissza",
+                    Location = new(menubackgroundRectangle.X + (width/2) - (bSize.X/2), menubackgroundRectangle.Y + height - col1xy - bSize.Y),
+                    Size = bSize,
+                    SetTextOffsetY = bSize.Y / 4,
+                    SetTextOffsetW = bSize.Y / 4
+                } ];
+            multiselectorbuttons[0].Click += HostModeEventHandler;
+            multiselectorbuttons[1].Click += ClientModeEventHandler;
+            multiselectorbuttons[2].Click += MultiBackEventHandler;
+            multiselectorlabels = [
+                new(new(mainmenubuttons[0].Location, bSize),
+                    ResourceManager.Fonts["FONT_DEF_B"]) { Text = "Felhasználónév:" } ];
+            multiselectorInputs = [
+                new(new(mainmenubuttons[1].Location, bSize),
+                    ResourceManager.Fonts["FONT_DEF_B"], mouseInfo, 16) {Text = UDP_Broadcast_Helper.UserName, BGColor = Color.Silver} ];
+            hostbuttons = [
+                new([ResourceManager.Textures["BUTTON"][0],ResourceManager.Textures["BUTTON"][1]], mouseInfo) {
+                    Text = "Vissza",
+                    Location = new(menubackgroundRectangle.X + (width/2) - (bSize.X/2), menubackgroundRectangle.Y + height - col1xy - bSize.Y),
+                    Size = bSize,
+                    SetTextOffsetY = bSize.Y / 4,
+                    SetTextOffsetW = bSize.Y / 4
+                } ];
+            hostbuttons[0].Click += MultiBackEventHandler;
+            hostlabels = [
+                new(new(mainmenubuttons[0].Location, bSize),
+                    ResourceManager.Fonts["FONT_DEF_B"]) { Text = "Felhasználónév:", Alignment = TextBox.TextAlignment.Right },
+                new(new(mainmenubuttons[1].Location, bSize),
+                    ResourceManager.Fonts["FONT_DEF_B"]) { Text = UDP_Broadcast_Helper.UserName, Alignment = TextBox.TextAlignment.Left },
+                new(new(mainmenubuttons[2].Location, bSize),
+                    ResourceManager.Fonts["FONT_DEF_B"]) { Text = "Jelszó:", Alignment = TextBox.TextAlignment.Right },
+                new(new(mainmenubuttons[3].Location, bSize),
+                    ResourceManager.Fonts["FONT_DEF_B"]) { Text = "UDP_Broadcast_Helper.Secret", Alignment = TextBox.TextAlignment.Left } ];
+            clientButtons = [
+                new([ResourceManager.Textures["BUTTON"][0],ResourceManager.Textures["BUTTON"][1]], mouseInfo) {
+                    Text = "Vissza",
+                    Location = new(menubackgroundRectangle.X + (width/2) - (mbSize.X/2), menubackgroundRectangle.Bottom - framexy - mbSize.Y),
+                    Size = mbSize
+                } ];
+            clientButtons[0].Click += MultiBackEventHandler;
+            clientlabels = [
+                new(new(new(contentbackgroundRectangle.X + (((contentbackgroundRectangle.Width/2)-bSize.X)/2), contentbackgroundRectangle.Y), bSize),
+                    ResourceManager.Fonts["FONT_DEF_B"]) { Text = "Felhasználónév:", Alignment = TextBox.TextAlignment.Right },
+                new(new(new(contentbackgroundRectangle.Right - (((contentbackgroundRectangle.Width / 2) - bSize.X) / 2) - bSize.X, contentbackgroundRectangle.Y), bSize),
+                    ResourceManager.Fonts["FONT_DEF_B"]) { Text = UDP_Broadcast_Helper.UserName, Alignment = TextBox.TextAlignment.Left },
+                new(new(new(contentbackgroundRectangle.X + (((contentbackgroundRectangle.Width/2)-bSize.X)/2), contentbackgroundRectangle.Y + bSize.Y), bSize),
+                    ResourceManager.Fonts["FONT_DEF_B"]) { Text = "Add meg a jelszót:", Alignment = TextBox.TextAlignment.Right },
+                ];
+            clientInputs = [
+                new(new(new(clientlabels[1].Rect.X, contentbackgroundRectangle.Y + bSize.Y), bSize),
+                    ResourceManager.Fonts["FONT_DEF_B"], mouseInfo, 8) {Text = "*", BGColor = Color.Silver} ];
+            clientList = new(new(contentbackgroundRectangle.X, contentbackgroundRectangle.Y + (bSize.Y * 2), contentbackgroundRectangle.Width, contentbackgroundRectangle.Height - (bSize.Y * 2)),
+                mouseInfo);
         }
 
-        private void SinglePlayerEventHandler(object sender, EventArgs e) => CurrentMenuState = MenuState.SinglePlayer;
-        private void MultiPlayerEventHandler(object sender, EventArgs e) => CurrentMenuState = MenuState.MultiPlayer;
-        private void ManualEventHandler(object sender, EventArgs e)
+        private void ClientModeEventHandler(object? sender, EventArgs e)
+        {
+            if (multiselectorInputs[0].Text == string.Empty) return;
+            clientopen = true;
+            multiselectoropen = false;
+            UDP_Broadcast_Helper.StartClient(multiselectorInputs[0].Text);
+            clientlabels[1].Text = UDP_Broadcast_Helper.UserName;
+        }
+
+        private void HostModeEventHandler(object? sender, EventArgs e)
+        {
+            if (multiselectorInputs[0].Text == string.Empty) return;
+            hostopen = true;
+            multiselectoropen = false;
+            UDP_Broadcast_Helper.StartHosting(multiselectorInputs[0].Text);
+            hostlabels[1].Text = UDP_Broadcast_Helper.UserName;
+            hostlabels[3].Text = UDP_Broadcast_Helper.Secret;
+        }
+
+        private void MultiBackEventHandler(object? sender, EventArgs e)
+        {
+            multiselectoropen = false;
+            hostopen = false;
+            clientopen = false;
+            UDP_Broadcast_Helper.StopAsync().Wait();
+        }
+        private void SinglePlayerEventHandler(object? sender, EventArgs e) => CurrentMenuState = MenuState.SinglePlayer;
+        private void MultiPlayerEventHandler(object? sender, EventArgs e) => multiselectoropen = true;
+        private void ManualEventHandler(object? sender, EventArgs e)
         {
             manualopen = true;
             menuTitle.Text = "Útmutató";
         }
-        private void SettingsEventHandler(object sender, EventArgs e)
+        private void SettingsEventHandler(object? sender, EventArgs e)
         {
             settingsmenuopen = true;
             menuTitle.Text = "Beállítások";
         }
-        private void ExitEventHandler(object sender, EventArgs e) => CurrentMenuState = MenuState.Exit;
-        private void SettingsBackEventHandler(object sender, EventArgs e)
+        private void ExitEventHandler(object? sender, EventArgs e) => CurrentMenuState = MenuState.Exit;
+        private void SettingsBackEventHandler(object? sender, EventArgs e)
         {
             settingsmenuopen = false;
             manualopen = false;
             menuTitle.Text = "A Kozmosz Lapjai";
         }
 
-        private void MusicVolumeChangedEventHandler(object sender, EventArgs e)
+        private void MusicVolumeChangedEventHandler(object? sender, EventArgs e)
         {
-            Slider slider = (Slider)sender;
+            Slider slider = (Slider)sender!;
             GameSettings.MusicVolume = slider.Value;
         }
 
-        private void SFXVolumeChangedEventHandler(object sender, EventArgs e)
+        private void SFXVolumeChangedEventHandler(object? sender, EventArgs e)
         {
-            Slider slider = (Slider)sender;
+            Slider slider = (Slider)sender!;
             GameSettings.SFXVolume = slider.Value;
         }
 
-        public void ResetMenuState() => CurrentMenuState = MenuState.None;
+        public void ResetMenuState()
+        {
+            CurrentMenuState = MenuState.None;
+            clientopen = false;
+            hostopen = false;
+            multiselectoropen = false;
+            settingsmenuopen = false;
+            manualopen = false;
+        }
 
         public void Update(GameTime gameTime)
         {
@@ -269,6 +390,79 @@ namespace CardGame {
                     }
                 }
             }
+            else if (multiselectoropen) {
+                foreach (var button in multiselectorbuttons) {
+                    button.Update(gameTime);
+                }
+                foreach (var input in multiselectorInputs) {
+                    input.Update(gameTime);
+                }
+                foreach (var label in multiselectorlabels) {
+                    label.Update(gameTime);
+                }
+            }
+            else if (hostopen) {
+                foreach (var button in hostbuttons) {
+                    button.Update(gameTime);
+                }
+                foreach (var label in hostlabels) {
+                    label.Update(gameTime);
+                }
+                if (UDP_Broadcast_Helper.Connection is not null && UDP_Broadcast_Helper.Connection.IsCompleted) {
+                    if (UDP_Broadcast_Helper.Connection.Result.IsConnected) {
+                        // !!! set to multiplayer mode (in game1 stop UDPHELPER)
+                        CurrentMenuState = MenuState.MultiPlayer;
+                        // !!! add button to change to braodcast mode from multicast
+                    }
+                }
+            }
+            else if (clientopen) {
+                foreach (var button in clientButtons) { button.Update(gameTime); }
+                foreach (var input in clientInputs) { input.Update(gameTime); }
+                foreach (var label in clientlabels) { label.Update(gameTime); }
+                if (clientList.Selected is not null) {
+                    if (joinTask is not null) {
+                        if (joinTask.IsCompleted) {
+                            if (joinTask.Result) {
+                                if (UDP_Broadcast_Helper.Connection is not null && UDP_Broadcast_Helper.Connection.IsCompleted) {
+                                    if (UDP_Broadcast_Helper.Connection.Result.IsConnected) {
+                                        // !!! set to multiplayer mode (in game1 stop UDPHELPER)
+                                        CurrentMenuState = MenuState.MultiPlayer;
+                                    }
+                                    else {
+                                        joinTask = null;
+                                        clientList.ResetSelected();
+                                    }
+                                }
+                            }
+                            else {
+                                joinTask = null;
+                                clientList.ResetSelected();
+                            }
+                        }
+                    }
+                    else {
+                        if (clientInputs[0].Text != string.Empty) {
+                            joinTask = UDP_Broadcast_Helper.SendJoinAsync((Tuple<DiscoveryPayload, byte[], byte[]>)clientList.Selected.Item2, clientInputs[0].Text);
+                        }
+                        else {
+                            clientList.ResetSelected();
+                        }
+                    }
+                }
+                else {
+                    if (!UDP_Broadcast_Helper.GetDiscovered().SequenceEqual(currentdisclist)) {
+                        List<Tuple<string, object>> replacelist = [];
+                        currentdisclist = UDP_Broadcast_Helper.GetDiscovered();
+                        foreach (var element in currentdisclist) {
+                            string str = $"{element.Item1.Username} || {element.Item1.IP.ToString()}";
+                            replacelist.Add(new(str, element));
+                        }
+                        clientList.ReplaceOptions(replacelist.ToArray());
+                    }
+                }
+                clientList.Update(gameTime);
+            }
             else {
                 foreach (var button in mainmenubuttons) {
                     button.Update(gameTime);
@@ -305,6 +499,37 @@ namespace CardGame {
                 foreach (var button in manualbuttons) {
                     button.Draw(gameTime, spriteBatch);
                 }
+            }
+            else if (multiselectoropen) {
+                foreach (var button in multiselectorbuttons) {
+                    button.Draw(gameTime, spriteBatch);
+                }
+                foreach (var input in multiselectorInputs) {
+                    input.Draw(gameTime, spriteBatch);
+                }
+                foreach (var label in multiselectorlabels) {
+                    label.Draw(gameTime, spriteBatch);
+                }
+            }
+            else if (hostopen) {
+                foreach (var button in hostbuttons) {
+                    button.Draw(gameTime, spriteBatch);
+                }
+                foreach (var label in hostlabels) {
+                    label.Draw(gameTime, spriteBatch);
+                }
+            }
+            else if (clientopen) {
+                foreach (var button in clientButtons) {
+                    button.Draw(gameTime, spriteBatch);
+                }
+                foreach (var input in clientInputs) {
+                    input.Draw(gameTime, spriteBatch);
+                }
+                foreach (var label in clientlabels) {
+                    label.Draw(gameTime, spriteBatch);
+                }
+                clientList.Draw(gameTime, spriteBatch);
             }
             else {
                 foreach (var button in mainmenubuttons) {

@@ -3336,3 +3336,10 @@ E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\ne
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\runtimes\win-arm64\native\e_sqlite3.dll
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\runtimes\win-x64\native\e_sqlite3.dll
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\runtimes\win-x86\native\e_sqlite3.dll
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\Content\SFX\Buy.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\Content\SFX\Dropcard.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\Content\SFX\Scrap.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\Content\SFX\Steal.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\MessagePack.dll
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\MessagePack.Annotations.dll
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\Microsoft.NET.StringTools.dll

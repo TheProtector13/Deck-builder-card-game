@@ -1,7 +1,9 @@
 ﻿using System.Runtime;
 using System.Threading.Tasks;
+using CardGame.TCP;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using static CardGame.TCP.MessagePackHelper;
 
 #nullable enable
 namespace CardGame {
@@ -10,7 +12,7 @@ namespace CardGame {
         private SpriteBatch _spriteBatch;
         //TEST
         private BackGround? bg;
-        private ForeGround? fg;
+        private IDrawable? fg;
         private MainMenu menu;
         private SplashScreen? splashScreen;
         private Task ResourceManagerLoading;
@@ -44,15 +46,14 @@ namespace CardGame {
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            splashScreen = new SplashScreen(Content);
             ResourceManagerLoading = Task.Run(() => {
                 ResourceManager.Init(Content);
                 MLController.Init();
                 DatabaseConnector.Init();
                 MusicPlayer.Init();
             });
-            // ******* //
-            // TESTING //            
-            splashScreen = new SplashScreen(Content);
+
             // TODO: use this.Content to load your game content here
         }
 
@@ -86,15 +87,62 @@ namespace CardGame {
                             }
                             bg.Update(gameTime);
                             fg.Update(gameTime);
-                            if (fg.WINNER != ForeGround.GameWinner.InProgress) {
+                            if (((ForeGround)fg).WINNER != ForeGround.GameWinner.InProgress) {
                                 menu.ResetMenuState();
                                 fg = null;
                                 bg = null;
+                                MusicPlayer.Unmute();
                                 MusicPlayer.SetAlbum();
                             }
                             break;
                         case MainMenu.MenuState.MultiPlayer:
-                            menu.ResetMenuState();
+                            if (fg is null || bg is null) {
+                                TcpTlsPeer peer = UDP_Broadcast_Helper.Connection!.Result;
+                                peer.StartReceiving();
+                                UDP_Broadcast_Helper.StopAsync().Wait();
+                                if (peer.IsHost) {
+                                    bg = new BackGround();
+                                    ActionType type = bg.Type switch {
+                                        BackGround.BackGroundType.Forest => ActionType.ForestPlanet,
+                                        BackGround.BackGroundType.Ice => ActionType.IcePlanet,
+                                        BackGround.BackGroundType.Desert => ActionType.DesertPlanet,
+                                        _ => ActionType.ForestPlanet,
+                                    };
+                                    peer.SendAsync(new ActionPayload(type, null, CryptographyHelper.NowMs()));
+                                }
+                                else {
+                                    Task.Delay(500).Wait();
+                                    BackGround.BackGroundType type;
+                                    if (peer.TryDequeueOldest() is ReceivedPacket packet && packet.Payload is ActionPayload payload) {
+                                        type = payload.Action switch {
+                                            ActionType.ForestPlanet => BackGround.BackGroundType.Forest,
+                                            ActionType.IcePlanet => BackGround.BackGroundType.Ice,
+                                            ActionType.DesertPlanet => BackGround.BackGroundType.Desert,
+                                            _ => BackGround.BackGroundType.Forest,
+                                        };
+                                    }
+                                    else {
+                                        menu.ResetMenuState();
+                                        peer.Dispose();
+                                        MusicPlayer.Unmute();
+                                        MusicPlayer.SetAlbum();
+                                        break;
+                                    }
+                                    bg = new BackGround(type);
+                                }
+                                fg = new ForeGround_Multi(bg, peer);
+                                MusicPlayer.SetAlbum(bg.Type);
+                            }
+                            bg.Update(gameTime);
+                            fg.Update(gameTime);
+                            if (((ForeGround_Multi)fg).WINNER != ForeGround_Multi.GameWinner.InProgress) {
+                                menu.ResetMenuState();
+                                ((ForeGround_Multi)fg).Dispose();
+                                fg = null;
+                                bg = null;
+                                MusicPlayer.Unmute();
+                                MusicPlayer.SetAlbum();
+                            }
                             break;
                         case MainMenu.MenuState.Exit:
                             Exit();
@@ -137,6 +185,8 @@ namespace CardGame {
         {
             DatabaseConnector.CloseConnection();
             ResourceManager.Dispose();
+            UDP_Broadcast_Helper.StopAsync().Wait(5000);
+            UDP_Broadcast_Helper.Dispose();
             base.OnExiting(sender, args);
         }
     }

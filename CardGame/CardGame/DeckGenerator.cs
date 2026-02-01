@@ -44,6 +44,23 @@ namespace CardGame {
             return list[RandomNumberGenerator.GetInt32(list.Count)];
         }
 
+        public static Card[] GetMoneyCards()
+        {
+            var rect = new Rectangle(100, 100, 200, 400);
+            var list = new List<Card>();
+
+            list.Add(new Card(rect,
+                ResourceManager.Textures["Money"][1],
+                null,
+                D(Card.Fraction.None, "Gyémánt", "Kijátszás után elpusztul!", "'Ha nagyon kívánunk valamit,\nritkán kapjuk meg.'", 0, 0, 2, 2, false, Vector3.Zero, Card.Effect.SelfDestruct, 1, Card.Fraction.None)));
+            list.Add(new Card(rect,
+                ResourceManager.Textures["Money"][2],
+                null,
+                D(Card.Fraction.None, "Igazgyöngy", "Kijátszás után elpusztul!", "'Mindaz, ami hasznos, az csúf.'", 0, 0, 3, 3, false, Vector3.Zero, Card.Effect.SelfDestruct, 1, Card.Fraction.None)));
+
+            return list.ToArray();
+        }
+
         public static List<Card> GenDeck(BackGroundType terrainType)
         {
             TerrainType = terrainType;

@@ -7,6 +7,11 @@
     <TieredCompilation>false</TieredCompilation>
     <UseWindowsForms>true</UseWindowsForms>
     <ServerGarbageCollection>true</ServerGarbageCollection>
+    <SelfContained>true</SelfContained>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <TieredCompilation>false</TieredCompilation>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -15,6 +20,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FontStashSharp.MonoGame" Version="1.5.3" />
+    <PackageReference Include="MessagePack" Version="3.1.4" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.2" />
     <PackageReference Include="Microsoft.ML" Version="5.0.0" />
     <PackageReference Include="Microsoft.ML.CpuMath" Version="5.0.0" />
@@ -45,12 +51,12 @@
     <PackageReference Include="System.Runtime" Version="4.3.1" />
     <PackageReference Include="System.Runtime.Extensions" Version="4.3.1" />
     <PackageReference Include="System.Runtime.Numerics" Version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
     <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\bin\Windows\" />
     <Folder Include="Content\FONTS\" />
-    <Folder Include="TCP\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Content\FONTS\FONT_A.ttf">

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <SourceFile>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/Flip.wav</SourceFile>
-  <SourceTime>2026-01-08T20:47:53.3631161+01:00</SourceTime>
+  <SourceTime>2026-01-26T14:58:16.7465468+01:00</SourceTime>
   <DestFile>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/bin/Windows/Content/SFX/Flip.xnb</DestFile>
-  <DestTime>2026-01-10T20:21:43.119491+01:00</DestTime>
+  <DestTime>2026-01-26T15:09:43.1562224+01:00</DestTime>
   <Importer>WavImporter</Importer>
   <ImporterTime>2024-08-16T19:05:56+02:00</ImporterTime>
   <Processor>SoundEffectProcessor</Processor>

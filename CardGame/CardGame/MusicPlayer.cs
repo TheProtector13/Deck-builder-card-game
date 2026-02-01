@@ -12,15 +12,15 @@ namespace CardGame {
             ResourceManager.Songs["1Oboro-Mysterious_Lights"]
         ];
         private readonly static Song[] DesertPlanet = [
+            ResourceManager.Songs["3 glass-wind"],
+            ResourceManager.Songs["3Adding_the_Sun"],
+            ResourceManager.Songs["3beauty-of-nature"]
+        ];
+        private readonly static Song[] IcePlanet = [
             ResourceManager.Songs["2Floating_Cities"],
             ResourceManager.Songs["2GoOn"],
             ResourceManager.Songs["2Rynos_Theme"],
             ResourceManager.Songs["2wind-peter-bamitale"]
-        ];
-        private readonly static Song[] IcePlanet = [
-            ResourceManager.Songs["3 glass-wind"],
-            ResourceManager.Songs["3Adding_the_Sun"],
-            ResourceManager.Songs["3beauty-of-nature"]
         ];
 
         static MusicPlayer()
@@ -41,6 +41,10 @@ namespace CardGame {
         }
 
         public static void Init() => MediaPlayer.Play(CurrentAlbum[Random.Shared.Next(0, CurrentAlbum.Length)]);
+
+        public static void Mute() => MediaPlayer.Volume = 0f;
+
+        public static void Unmute() => MediaPlayer.Volume = GameSettings.MusicVolume;
 
         public static void SetAlbum(BackGround.BackGroundType? type = null)
         {

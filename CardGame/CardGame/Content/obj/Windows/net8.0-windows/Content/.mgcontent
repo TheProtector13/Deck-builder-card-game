@@ -69,10 +69,14 @@
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/MUSIC/3beauty-of-nature.mp3</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/MUSIC/MAIN.wav</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/BGCrack.wav</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/Buy.wav</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/Defeat.wav</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/Dropcard.wav</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/Explode.wav</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/Flip.wav</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/Scrap.mp3</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/Shuffle.wav</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/Steal.mp3</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/Victory.wav</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/BG/DesertPlanet/DesertPlanet0000.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/BG/DesertPlanet/DesertPlanet0001.png</File>
@@ -3139,6 +3143,8 @@
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MENU/PlayButton0.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MENU/PlayButton1.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MENU/PlayButton2.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MENU/SelectButton0.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MENU/SelectButton1.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MENU/SettingsButton0.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/MENU/SettingsButton1.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/BUTTON1.png</File>
@@ -3280,10 +3286,14 @@
     <File>MUSIC/3beauty-of-nature.mp3</File>
     <File>MUSIC/MAIN.wav</File>
     <File>SFX/BGCrack.wav</File>
+    <File>SFX/Buy.wav</File>
     <File>SFX/Defeat.wav</File>
+    <File>SFX/Dropcard.wav</File>
     <File>SFX/Explode.wav</File>
     <File>SFX/Flip.wav</File>
+    <File>SFX/Scrap.mp3</File>
     <File>SFX/Shuffle.wav</File>
+    <File>SFX/Steal.mp3</File>
     <File>SFX/Victory.wav</File>
     <File>TEXTURES/GAME_BG/DesertPlanet/DesertPlanet0000.png</File>
     <File>TEXTURES/GAME_BG/DesertPlanet/DesertPlanet0001.png</File>
@@ -6350,6 +6360,8 @@
     <File>TEXTURES/UI/PlayButton0.png</File>
     <File>TEXTURES/UI/PlayButton1.png</File>
     <File>TEXTURES/UI/PlayButton2.png</File>
+    <File>TEXTURES/UI/SelectButton0.png</File>
+    <File>TEXTURES/UI/SelectButton1.png</File>
     <File>TEXTURES/UI/SettingsButton0.png</File>
     <File>TEXTURES/UI/SettingsButton1.png</File>
     <File>TEXTURES/UI/BUTTON1.png</File>

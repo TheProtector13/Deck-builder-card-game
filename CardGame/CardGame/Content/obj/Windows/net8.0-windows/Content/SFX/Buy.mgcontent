@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <SourceFile>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/SOUND/SFX/Buy.wav</SourceFile>
+  <SourceTime>2026-01-26T15:20:45.3539263+01:00</SourceTime>
+  <DestFile>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/bin/Windows/Content/SFX/Buy.xnb</DestFile>
+  <DestTime>2026-01-26T15:22:49.8729546+01:00</DestTime>
+  <Importer>WavImporter</Importer>
+  <ImporterTime>2024-08-16T19:05:56+02:00</ImporterTime>
+  <Processor>SoundEffectProcessor</Processor>
+  <ProcessorTime>2024-08-16T19:05:56+02:00</ProcessorTime>
+  <Parameters>
+    <Key>Quality</Key>
+    <Value>Best</Value>
+  </Parameters>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput />
+</PipelineBuildEvent>
