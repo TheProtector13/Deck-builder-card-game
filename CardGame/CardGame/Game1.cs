@@ -10,7 +10,6 @@ namespace CardGame {
     public class Game1 : Game {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        //TEST
         private BackGround? bg;
         private IDrawable? fg;
         private MainMenu menu;
@@ -48,9 +47,9 @@ namespace CardGame {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             splashScreen = new SplashScreen(Content);
             ResourceManagerLoading = Task.Run(() => {
-                ResourceManager.Init(Content);
                 MLController.Init();
                 DatabaseConnector.Init();
+                ResourceManager.Init(Content);
                 MusicPlayer.Init();
             });
 
@@ -62,7 +61,7 @@ namespace CardGame {
             //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             //    if (splashScreen is null && (fg is null || fg.WINNER != ForeGround.GameWinner.InProgress))
             //        Exit();
-
+            DisplayInfo.IsFocused = this.IsActive;
             if (splashScreen is not null && !splashScreen.Finished) {
                 splashScreen.Percentage = ResourceManager.GetLoadProgress();
                 splashScreen.Update(gameTime);

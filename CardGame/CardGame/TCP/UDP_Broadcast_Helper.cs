@@ -379,6 +379,7 @@ namespace CardGame.TCP {
                 try {
                     await tcs.Task;
                     Debug.WriteLine("Client: received CONFIRM from host");
+                    _clientName = selected.Item1.Username;
                     Connection = TcpTlsPeer.CreateAsync(selected.Item1.IP, Port - 1, _hmac, false);
                     return true;
                 }

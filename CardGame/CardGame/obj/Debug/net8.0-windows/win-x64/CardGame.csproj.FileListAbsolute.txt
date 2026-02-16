@@ -3827,3 +3827,5 @@ E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\obj\Debug\ne
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\obj\Debug\net8.0-windows\win-x64\ref\CardGame.dll
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\SelectButton0.xnb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\SelectButton1.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\PlayAll_00.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\PlayAll_01.xnb

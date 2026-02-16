@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 #nullable enable
 namespace CardGame {
     internal class TextBox(Rectangle rect, FontSystem fontSystem) : IDrawable {
+        private static object _threadLock = new();
         private const float minFontSize = 2f;
         private readonly FontSystem _fontSystem = fontSystem ?? throw new ArgumentNullException(nameof(fontSystem));
         private Vector2[] _positions = [];
@@ -126,7 +127,9 @@ namespace CardGame {
 
             if (_forcedFontSize.HasValue) {
                 float forced = MathF.Max(minFontSize, _forcedFontSize.Value);
-                _font = _fontSystem.GetFont(forced);
+                lock (_threadLock) {
+                    _font = _fontSystem.GetFont(forced);
+                }
                 return;
             }
 
@@ -138,15 +141,21 @@ namespace CardGame {
             if (MathF.Abs(low - high) > 0.3f) {
                 while (MathF.Abs(best - prevBest) > 0.3f && low != high) {
                     float mid = MathF.Floor((low + high) / 2f * 10) / 10;
-                    var font = _fontSystem.GetFont(mid);
-                    Vector2 m = font.MeasureString("Aj");
+                    DynamicSpriteFont font;
+                    Vector2 m;
+                    lock (_threadLock) {
+                        font = _fontSystem.GetFont(mid);
+                        m = font.MeasureString("Aj");
+                    }
                     m = new Vector2(m.X + _sizeoffset, m.Y + _verticalsizeoffset);
                     float lineHeight = m.Y;
                     bool fitsHeight = lineHeight * _lines.Count <= _rect.Height;
                     bool fitsWidth = true;
                     if (fitsHeight) {
                         foreach (var line in _lines) {
-                            m = font.MeasureString(line);
+                            lock (_threadLock) {
+                                m = font.MeasureString(line);
+                            }
                             m = new Vector2(m.X + _sizeoffset, m.Y + _verticalsizeoffset);
                             if (m.X > _rect.Width) {
                                 fitsWidth = false;
@@ -165,8 +174,9 @@ namespace CardGame {
                     }
                 }
             }
-
-            _font = _fontSystem.GetFont(best);
+            lock (_threadLock) {
+                _font = _fontSystem.GetFont(best);
+            }
         }
 
         public void Update(GameTime gameTime)
@@ -177,9 +187,15 @@ namespace CardGame {
             }
             if (_changed || _locChanged) {
                 List<Vector2> positions = [];
-                float y = VerticalCentering ? _rect.Y + MathF.Max(0, (_rect.Height - (_font.MeasureString("Aj").Y * _lines.Count)) / 2f) : _rect.Y;
+                float y;
+                lock (_threadLock) {
+                    y = VerticalCentering ? _rect.Y + MathF.Max(0, (_rect.Height - (_font.MeasureString("Aj").Y * _lines.Count)) / 2f) : _rect.Y;
+                }
                 foreach (var line in _lines) {
-                    Vector2 measured = _font.MeasureString(line);
+                    Vector2 measured;
+                    lock (_threadLock) {
+                        measured = _font.MeasureString(line);
+                    }
                     float x = _rect.X;
                     switch (_alignment) {
                         case TextAlignment.Left:

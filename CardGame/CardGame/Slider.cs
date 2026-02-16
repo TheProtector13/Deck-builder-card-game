@@ -14,6 +14,7 @@ namespace CardGame {
         private Point ballLocation = Point.Zero;
         private Point size = new(192, 32);
         private Point ballSize;
+        private float _value = 1.0f;
 
         public Point Location { get; set; } = Point.Zero;
         public Point Size
@@ -25,7 +26,11 @@ namespace CardGame {
             }
         }
         public event EventHandler? OnChange;
-        public float Value { get; set; } = 1.0f;
+        public float Value
+        {
+            get => _value;
+            set => _value = Math.Clamp(value, 0f, 1f);
+        }
         public bool IsVertical { get; set; } = false;
 
         public Slider(MouseInfo mouseInfo)

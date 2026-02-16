@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Input;
 #nullable enable
 namespace CardGame {
     internal class TextInput(Rectangle rect, FontSystem fontSystem, MouseInfo mouseInfo, int maxLength = 8) : IDrawable {
+        private static object _threadLock = new();
         private const float minFontSize = 2f;
         private float _sizeoffset = 0f;
         private float _verticalsizeoffset = 2f;
@@ -139,7 +140,9 @@ namespace CardGame {
         {
             if (ForcedFontSize.HasValue) {
                 float f = MathF.Max(minFontSize, ForcedFontSize.Value);
-                _font = _fontSystem.GetFont(f);
+                lock (_threadLock) {
+                    _font = _fontSystem.GetFont(f);
+                }
                 return;
             }
 
@@ -151,14 +154,19 @@ namespace CardGame {
             if (MathF.Abs(low - high) > 0.3f) {
                 while (MathF.Abs(best - prevBest) > 0.3f && low != high) {
                     float mid = MathF.Floor((low + high) / 2f * 10) / 10;
-                    var font = _fontSystem.GetFont(mid);
-                    Vector2 m = font.MeasureString("Aj");
+                    DynamicSpriteFont font; Vector2 m;
+                    lock (_threadLock) {
+                        font = _fontSystem.GetFont(mid);
+                        m = font.MeasureString("Aj");
+                    }
                     m = new Vector2(m.X + _sizeoffset, m.Y + _verticalsizeoffset);
                     float lineHeight = m.Y;
                     bool fitsHeight = lineHeight <= _rect.Height;
                     bool fitsWidth = true;
                     if (fitsHeight) {
-                        m = font.MeasureString(_inputText);
+                        lock (_threadLock) {
+                            m = font.MeasureString(_inputText);
+                        }
                         m = new Vector2(m.X + _sizeoffset, m.Y + _verticalsizeoffset);
                         if (m.X > _rect.Width) {
                             fitsWidth = false;
@@ -175,7 +183,9 @@ namespace CardGame {
                     }
                 }
             }
-            _font = _fontSystem.GetFont(best);
+            lock (_threadLock) {
+                _font = _fontSystem.GetFont(best);
+            }
         }
 
         public void Update(GameTime gameTime)

@@ -91,19 +91,23 @@ namespace CardGame {
             int width = height / 3 * 4;
             _rect = DisplayInfo.CenterRect(new(0, 0, width, height), DisplayInfo.ScreenRect);
             int boxheight = DisplayInfo.GetPXfromHeight(0.05);
-            _titleBox = new TextBox(new(_rect.X, _rect.Top - boxheight, _rect.Width, boxheight), ResourceManager.Fonts["FONT_DEF_B"]);
-            _titleBox.BGColor = Color.GhostWhite;
-            _warningBox = new TextBox(new(_rect.X, _rect.Center.Y - (boxheight / 2), _rect.Width, boxheight), ResourceManager.Fonts["FONT_DEF_B"]);
-            _warningBox.BGColor = Color.Red;
-            _warningBox.Color = Color.White;
-            _warningBox.Text = "Túl kevés kártyát választottál!";
+            _titleBox = new TextBox(new(_rect.X, _rect.Top - boxheight, _rect.Width, boxheight), ResourceManager.Fonts["FONT_DEF_B"]) {
+                BGColor = Color.GhostWhite
+            };
+            _warningBox = new TextBox(new(_rect.X, _rect.Center.Y - (boxheight / 2), _rect.Width, boxheight), ResourceManager.Fonts["FONT_DEF_B"]) {
+                BGColor = Color.Red,
+                Color = Color.White,
+                Text = "Túl kevés kártyát választottál!"
+            };
             Point buttonSize = new((int)Math.Round(height * 0.148148148));
-            _cancelButton = new(ResourceManager.Textures["NOK_Button"], mouse);
-            _cancelButton.Location = new(_rect.X + buttonSize.X, _rect.Bottom - (buttonSize.Y / 2));
-            _cancelButton.Size = buttonSize;
-            _okButton = new(ResourceManager.Textures["OK_Button"], mouse);
-            _okButton.Location = new(_rect.Right - (buttonSize.X * 2), _rect.Bottom - (buttonSize.Y / 2));
-            _okButton.Size = buttonSize;
+            _cancelButton = new(ResourceManager.Textures["NOK_Button"], mouse) {
+                Location = new(_rect.X + buttonSize.X, _rect.Bottom - (buttonSize.Y / 2)),
+                Size = buttonSize
+            };
+            _okButton = new(ResourceManager.Textures["OK_Button"], mouse) {
+                Location = new(_rect.Right - (buttonSize.X * 2), _rect.Bottom - (buttonSize.Y / 2)),
+                Size = buttonSize
+            };
             this.selectionCount = selectionCount;
             cardList = new Tuple<Card, Card>[cards.Count];
             for (int i = 0; i < cards.Count; i++) {
@@ -138,6 +142,9 @@ namespace CardGame {
             }
             _cancelButton.Click += OnCancelButtonClicked;
             _okButton.Click += OnOkButtonClicked;
+            int totalRows = (int)Math.Ceiling(cardList.Length / 5f);
+            int visibleRows = 2;
+            offsetStep = 1f / (totalRows - (visibleRows - 1));
         }
 
         private void OnCancelButtonClicked(object? sender, EventArgs e)
@@ -181,15 +188,13 @@ namespace CardGame {
                 if (_prevSliderValue != _slider.Value) {
                     _prevSliderValue = _slider.Value;
                 }
+                _slider.Value += _mouse.WheelDelta * -offsetStep;
                 _slider.Update(gameTime);
             }
             //Cards
             foreach (var cardPair in cardList) {
                 var card = cardPair.Item1;
                 if (_slider != null && _prevSliderValue != _slider.Value) {
-                    int totalRows = (int)Math.Ceiling(cardList.Length / 5f);
-                    int visibleRows = 2;
-                    offsetStep = 1f / (totalRows - (visibleRows - 1));
                     int yOffset = (int)(MathF.Round(_slider.Value / offsetStep) * (cardHeight + padding));
                     int row = Array.IndexOf(cardList, cardPair) / 5;
                     card.Rect = new Rectangle(

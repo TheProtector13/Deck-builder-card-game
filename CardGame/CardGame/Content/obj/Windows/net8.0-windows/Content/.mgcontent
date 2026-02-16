@@ -3154,6 +3154,8 @@
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/NOK_Button2.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/OK_Button1.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/OK_Button2.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/PlayAll_00.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/PlayAll_01.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/SelectWindow.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/Slider1.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/Slider2.png</File>
@@ -6371,6 +6373,8 @@
     <File>TEXTURES/UI/NOK_Button2.png</File>
     <File>TEXTURES/UI/OK_Button1.png</File>
     <File>TEXTURES/UI/OK_Button2.png</File>
+    <File>TEXTURES/UI/PlayAll_00.png</File>
+    <File>TEXTURES/UI/PlayAll_01.png</File>
     <File>TEXTURES/UI/SelectWindow.png</File>
     <File>TEXTURES/UI/Slider1.png</File>
     <File>TEXTURES/UI/Slider2.png</File>

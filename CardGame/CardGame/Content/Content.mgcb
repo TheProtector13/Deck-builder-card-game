@@ -37687,6 +37687,30 @@
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/UI/UI_OBJ/OK_Button2.png;TEXTURES/UI/OK_Button2.png
 
+#begin ../../../ASSETS/CC0/UI/UI_OBJ/PlayAll_00.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=DxtCompressed
+/build:../../../ASSETS/CC0/UI/UI_OBJ/PlayAll_00.png;TEXTURES/UI/PlayAll_00.png
+
+#begin ../../../ASSETS/CC0/UI/UI_OBJ/PlayAll_01.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=DxtCompressed
+/build:../../../ASSETS/CC0/UI/UI_OBJ/PlayAll_01.png;TEXTURES/UI/PlayAll_01.png
+
 #begin ../../../ASSETS/CC0/UI/UI_OBJ/SelectWindow.png
 /importer:TextureImporter
 /processor:TextureProcessor

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime;
+using System.Threading.Tasks;
 using CardGame.TCP;
 using FontStashSharp;
 using Microsoft.Xna.Framework;
@@ -43,9 +44,14 @@ namespace CardGame {
         private readonly TextBox[] EIconboxes;
         private readonly Rectangle[] EIconsLoc;
         private readonly Button EndTurnButton;
+        private readonly Button PlayAllCardsButton;
+        private Texture2D? TurnIndicatorColor;
+        private readonly Rectangle[] TurnIndicatorLocs;
         private CardSelectorWindow? cardSelector = null;
         private EndingScreen? endingScreen = null;
         private bool changed = true;
+
+        private readonly ParallelOptions ParallelOptions = new() { MaxDegreeOfParallelism = Environment.ProcessorCount };
 
         //variables for layout calculation
         private int groupingOffset = 2;
@@ -62,6 +68,7 @@ namespace CardGame {
         public string PlayerName { get; set; } = "Játékos";
         public string EnemyName { get; set; } = "AI";
         private bool playerTurn = true;
+        private bool playAllCards = false;
         private int PlayerCard2ScrapThisTurn = 0;
         private int EnemyCard2ScrapThisTurn = 0;
         private readonly List<Card> stolenCards = [];
@@ -148,6 +155,7 @@ namespace CardGame {
                 ResourceManager.Textures["MoneyBGI"][0],
                 ResourceManager.Textures["MoneyFGI"][0],
                 ResourceManager.Textures["HPIcon"][0]];
+            TurnIndicatorLocs = new Rectangle[2];
             EIconsLoc = new Rectangle[Icons.Length];
             PIconsLoc = new Rectangle[Icons.Length];
             ShopTarget = new ObjectTransform[6];
@@ -159,6 +167,10 @@ namespace CardGame {
                 Enabled = false
             };
             EndTurnButton.Click += EndTurnEventHandler;
+            PlayAllCardsButton = new Button(ResourceManager.Textures["PlayAll_"], mouse) {
+                Enabled = false
+            };
+            PlayAllCardsButton.Click += PlayAllEventHandler;
             //SFX load
             flipSFX = ResourceManager.SoundEffects["Flip"];
             shuffleSFX = ResourceManager.SoundEffects["Shuffle"];
@@ -204,6 +216,20 @@ namespace CardGame {
                     pileCardWidth,
                     PlayedPileLoc.Height);
             }
+        }
+
+        private void PlayNext(bool player = true)
+        {
+            if (player) {
+                for (int i = 0; i <= (int)Card.Effect.None; i++) {
+                    foreach (var card in PlayerHand.Where(card => card.CardEffect == (Card.Effect)i)) {
+                        AddToPlayedPile(card, PlayerHandTarget[PlayerHand.IndexOf(card)], true);
+                        peer.SendAsync(new ActionPayload(ActionType.Play, card.GetCardDetails(), CryptographyHelper.NowMs()));
+                        return;
+                    }
+                }
+            }
+            return;
         }
 
         private void PlayCard(Card card, bool player = true)
@@ -428,6 +454,12 @@ namespace CardGame {
             PlayerAttack = 0;
             playerTurn = false;
             EndTurnButton.Enabled = false;
+        }
+
+        private void PlayAllEventHandler(object? sender, EventArgs e)
+        {
+            playAllCards = true;
+            PlayAllCardsButton.Enabled = false;
         }
 
         //######## END ####################
@@ -869,12 +901,14 @@ namespace CardGame {
             EIconsLoc[2] = new(startIconX + iconheight + 5 + groupingOffset, startEIconY, iconheight, iconheight);
             EIconsLoc[3] = new(EIconsLoc[2].X - 5, startEIconY + iconheighthalf, iconheighthalf + 5, iconheighthalf + 5);
             EIconsLoc[4] = new(EIconsLoc[2].Right + groupingOffset, startEIconY + iconheighthalf - (hpiconHeight / 2), hpiconWidth, hpiconHeight);
+            TurnIndicatorLocs[1] = new(EIconsLoc[4].Right + 5, EIconsLoc[4].Y, 10, EIconsLoc[4].Height);
             int startPIconY = PlayedPileLoc.Y + (PlayedPileLoc.Height / 2) - iconheighthalf;
             PIconsLoc[0] = new(startIconX, startPIconY, iconheight, iconheight);
             PIconsLoc[1] = new(startIconX - 5, startPIconY - 5, iconheight + 10, iconheight + 10);
             PIconsLoc[2] = new(startIconX + iconheight + 5 + groupingOffset, startPIconY, iconheight, iconheight);
             PIconsLoc[3] = new(PIconsLoc[2].X - 5, startPIconY + iconheighthalf, iconheighthalf + 5, iconheighthalf + 5);
             PIconsLoc[4] = new(PIconsLoc[2].Right + groupingOffset, startPIconY + iconheighthalf - (hpiconHeight / 2), hpiconWidth, hpiconHeight);
+            TurnIndicatorLocs[0] = new(PIconsLoc[4].Right + 5, PIconsLoc[4].Y, 10, PIconsLoc[4].Height);
             //textboxes
             int hpiconHOffset = (int)MathF.Round(hpiconHeight * 0.105263158f);
             int offset = (int)MathF.Round(iconheight * 0.5f);
@@ -921,6 +955,8 @@ namespace CardGame {
             int ETHeight = (int)MathF.Round(ETWidth * (EndTurnButton.Size.Y / (float)EndTurnButton.Size.X));
             EndTurnButton.Size = new(ETWidth, ETHeight);
             EndTurnButton.Location = new(PlayerScrapLoc.X - (groupingOffset * 4), PlayerScrapLoc.Y - ETHeight - (groupingOffset * 18));
+            PlayAllCardsButton.Size = new(ETHeight);
+            PlayAllCardsButton.Location = new(EndTurnButton.Location.X - groupingOffset - ETHeight, EndTurnButton.Location.Y);
         }
 
         public void Update(GameTime gameTime)
@@ -1336,6 +1372,20 @@ namespace CardGame {
                             cardSelector.HasCancelButton = false;
                             PlayerCard2ScrapThisTurn = 0;
                         }
+                        //PlayAllCards
+                        if (PlayerHand.Count != 0) {
+                            if (playAllCards) {
+                                cardMouseControlEnabled = false;
+                                flipSFX.Play(GameSettings.SFXVolume, 0, 0);
+                                PlayNext(true);
+                            }
+                            else {
+                                PlayAllCardsButton.Enabled = true;
+                            }
+                        }
+                        else {
+                            playAllCards = false;
+                        }
                         //PlayCards
                         if (PlayedPile.Any(card => !card.BaseApplied)) {
                             for (int i = 0; i < PlayedPile.Count; i++) {
@@ -1382,65 +1432,65 @@ namespace CardGame {
             //deck and scrap grouping
             if (changed) {
                 //set whole deck to same location without offset
-                for (int i = 0; i < PlayerDeck.Count; i++) {
+                Parallel.For(0, PlayerDeck.Count, ParallelOptions, i => {
                     PlayerDeck[i].Rect = PlayerDeckLoc;
-                }
+                });
                 //set offset for first X cards
-                for (int i = 0; i < Pdeckshowcount; i++) {
+                Parallel.For(0, Pdeckshowcount, ParallelOptions, i => {
                     PlayerDeck[i].Rect = new Rectangle(
                         PlayerDeck[i].Rect.X - (groupingOffset * i),
                         PlayerDeck[i].Rect.Y - (groupingOffset * i),
                         PlayerDeck[i].Rect.Width,
                         PlayerDeck[i].Rect.Height);
-                }
+                });
                 //P_Scrap
-                for (int i = 0; i < PlayerScrap.Count; i++) {
+                Parallel.For(0, PlayerScrap.Count, ParallelOptions, i => {
                     PlayerScrap[i].Rect = PlayerScrapLoc;
-                }
-                for (int i = 0; i < Pscrapshowcount; i++) {
+                });
+                Parallel.For(0, Pscrapshowcount, ParallelOptions, i => {
                     PlayerScrap[i].Rect = new Rectangle(
                         PlayerScrap[i].Rect.X - (groupingOffset * i),
                         PlayerScrap[i].Rect.Y - (groupingOffset * i),
                         PlayerScrap[i].Rect.Width,
                         PlayerScrap[i].Rect.Height);
-                }
+                });
                 //E_Deck
-                for (int i = 0; i < EnemyDeck.Count; i++) {
+                Parallel.For(0, EnemyDeck.Count, ParallelOptions, i => {
                     EnemyDeck[i].Rect = EnemyDeckLoc;
-                }
-                for (int i = 0; i < Edeckshowcount; i++) {
+                });
+                Parallel.For(0, Edeckshowcount, ParallelOptions, i => {
                     EnemyDeck[i].Rect = new Rectangle(
                         EnemyDeck[i].Rect.X - (groupingOffset * i),
                         EnemyDeck[i].Rect.Y - (groupingOffset * i),
                         EnemyDeck[i].Rect.Width,
                         EnemyDeck[i].Rect.Height);
-                }
+                });
                 //E_Scrap
-                for (int i = 0; i < EnemyScrap.Count; i++) {
+                Parallel.For(0, EnemyScrap.Count, ParallelOptions, i => {
                     EnemyScrap[i].Rect = EnemyScrapLoc;
-                }
-                for (int i = 0; i < Escrapshowcount; i++) {
+                });
+                Parallel.For(0, Escrapshowcount, ParallelOptions, i => {
                     EnemyScrap[i].Rect = new Rectangle(
                         EnemyScrap[i].Rect.X - (groupingOffset * i),
                         EnemyScrap[i].Rect.Y - (groupingOffset * i),
                         EnemyScrap[i].Rect.Width,
                         EnemyScrap[i].Rect.Height);
-                }
+                });
                 changed = false;
             }
             //regular updates
-            for (int i = 0; i < Pdeckshowcount; i++) {
+            Parallel.For(0, Pdeckshowcount, ParallelOptions, i => {
                 PlayerDeck[i].Update(gameTime);
-            }
-            for (int i = 0; i < Pscrapshowcount; i++) {
+            });
+            Parallel.For(0, Pscrapshowcount, ParallelOptions, i => {
                 PlayerScrap[i].Update(gameTime);
-            }
-            for (int i = 0; i < Edeckshowcount; i++) {
+            });
+            Parallel.For(0, Edeckshowcount, ParallelOptions, i => {
                 EnemyDeck[i].Update(gameTime);
-            }
-            for (int i = 0; i < Escrapshowcount; i++) {
+            });
+            Parallel.For(0, Escrapshowcount, ParallelOptions, i => {
                 EnemyScrap[i].Update(gameTime);
-            }
+            });
             //icons update
             PIconboxes[0].Text = PlayerAttack.ToString();
             PIconboxes[1].Text = PlayerMoney.ToString();
@@ -1619,43 +1669,44 @@ namespace CardGame {
                     }
                 }
                 EndTurnButton.Update(gameTime);
+                PlayAllCardsButton.Update(gameTime);
             }
             //CARDS with targets
             //TARGETS
-            foreach (ObjectTransform item in ShopTarget) {
+            Parallel.ForEach(ShopTarget, ParallelOptions, item => {
                 item.NextStep(gameTime);
-            }
-            foreach (ObjectTransform item in PlayerHandTarget) {
+            });
+            Parallel.ForEach(PlayerHandTarget, ParallelOptions, item => {
                 item.NextStep(gameTime);
-            }
-            foreach (ObjectTransform item in EnemyHandTarget) {
+            });
+            Parallel.ForEach(EnemyHandTarget, ParallelOptions, item => {
                 item.NextStep(gameTime);
-            }
-            foreach (ObjectTransform item in PlayedPileTarget) {
+            });
+            Parallel.ForEach(PlayedPileTarget, ParallelOptions, item => {
                 item.NextStep(gameTime);
-            }
+            });
             //CARDS
             //hand cards
-            for (int i = 0; i < PlayerHand.Count; i++) {
+            Parallel.For(0, PlayerHand.Count, ParallelOptions, i => {
                 if (selectedCard != PlayerHand[i])
                     PlayerHand[i].Rect = PlayerHandTarget[i].CurrentLocation;
-            }
-            for (int i = 0; i < EnemyHand.Count; i++) {
+            });
+            Parallel.For(0, EnemyHand.Count, ParallelOptions, i => {
                 EnemyHand[i].Rect = EnemyHandTarget[i].CurrentLocation;
-            }
+            });
             //shop cards
-            for (int i = 0; i < Shop.Length; i++) {
+            Parallel.For(0, Shop.Length, ParallelOptions, i => {
                 if (Shop[i] != null && selectedCard != Shop[i]) {
                     Shop[i]!.Rect = ShopTarget[i].CurrentLocation;
                 }
-            }
+            });
             //played pile
-            for (int i = 0; i < PlayedPile.Count; i++) {
+            Parallel.For(0, PlayedPile.Count, ParallelOptions, i => {
                 PlayedPile[i].Rect = PlayedPileTarget[i].CurrentLocation;
-            }
+            });
             //preview
             if (previewThis.Count > 0 && selectedCard == null) {
-                for (int i = 0; i < previewThis.Count; i++) {
+                for (int i = previewThis.Count - 1; i >= 0; i--) {
                     if (!previewThis[i].Item2.IsTransforming &&
                         previewThis[i].Item2.MoveTarget != previewRect) {
                         previewThis.RemoveAt(i);
@@ -1664,22 +1715,22 @@ namespace CardGame {
             }
             //CARDS UPDATE
             //hand cards
-            for (int i = 0; i < PlayerHand.Count; i++) {
+            Parallel.For(0, PlayerHand.Count, ParallelOptions, i => {
                 PlayerHand[i].Update(gameTime);
-            }
-            for (int i = 0; i < EnemyHand.Count; i++) {
+            });
+            Parallel.For(0, EnemyHand.Count, ParallelOptions, i => {
                 EnemyHand[i].Update(gameTime);
-            }
+            });
             //shop cards
-            for (int i = 0; i < Shop.Length; i++) {
+            Parallel.For(0, Shop.Length, ParallelOptions, i => {
                 if (Shop[i] != null) {
                     Shop[i]!.Update(gameTime);
                 }
-            }
+            });
             //played pile
-            for (int i = 0; i < PlayedPile.Count; i++) {
+            Parallel.For(0, PlayedPile.Count, ParallelOptions, i => {
                 PlayedPile[i].Update(gameTime);
-            }
+            });
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -1689,6 +1740,7 @@ namespace CardGame {
             int Edeckshowcount = EnemyDeck.Count > MAX_OFFSET_CARDS ? MAX_OFFSET_CARDS : EnemyDeck.Count;
             int Escrapshowcount = EnemyScrap.Count > MAX_OFFSET_CARDS ? MAX_OFFSET_CARDS : EnemyScrap.Count;
             overlay ??= ResourceManager.GetColor(Color.Orange, spriteBatch);
+            TurnIndicatorColor ??= ResourceManager.GetColor(Color.OrangeRed, spriteBatch);
             //player icons
             spriteBatch.Draw(Icons[0], PIconsLoc[0], Color.White);
             spriteBatch.Draw(Icons[1], PIconsLoc[1], Color.White);
@@ -1709,6 +1761,13 @@ namespace CardGame {
             spriteBatch.Draw(Icons[4], EIconsLoc[4], Color.White);
             EIconboxes[2].Draw(gameTime, spriteBatch);
             EIconboxes[3].Draw(gameTime, spriteBatch);
+            //turnindicator
+            if (playerTurn) {
+                spriteBatch.Draw(TurnIndicatorColor, TurnIndicatorLocs[0], Color.White);
+            }
+            else {
+                spriteBatch.Draw(TurnIndicatorColor, TurnIndicatorLocs[1], Color.White);
+            }
             //deck and scrap
             for (int i = 0; i < Pdeckshowcount; i++) {
                 PlayerDeck[i].Draw(gameTime, spriteBatch);
@@ -1723,6 +1782,7 @@ namespace CardGame {
                 EnemyScrap[i].Draw(gameTime, spriteBatch);
             }
             EndTurnButton.Draw(gameTime, spriteBatch);
+            PlayAllCardsButton.Draw(gameTime, spriteBatch);
             //hand cards
             if (ShowPlayerHand) {
                 spriteBatch.Draw(overlay, PlayerHandLoc, new(255, 255, 255, 64));

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using FontStashSharp;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -16,6 +17,9 @@ namespace CardGame {
         /// Specifies the maximum number of atlases that can be used per fontsystem.
         /// </summary>
         public static byte MaxAtlasCount = 3;
+        private static long loadedResources = 0;
+        private static long totalResources = 0;
+
         /// <summary>
         /// Gets or sets the file path to the texture resources. Relative to the Content root directory.
         /// </summary>
@@ -35,12 +39,19 @@ namespace CardGame {
         /// <summary>
         /// Gets the total number of resources currently available for the application. Including textures, sound effects, songs, and fonts.
         /// </summary>
-        public static Int64 TotalResources { get; private set; } = 0;
+        public static Int64 TotalResources
+        {
+            get => Interlocked.Read(ref totalResources);
+            private set => Interlocked.Exchange(ref totalResources, value);
+        }
         /// <summary>
         /// Gets the total number of resources that have been loaded by the application.
         /// </summary>
-        public static Int64 LoadedResources { get; private set; } = 0;
-
+        public static Int64 LoadedResources
+        {
+            get => Interlocked.Read(ref loadedResources);
+            private set => Interlocked.Exchange(ref loadedResources, value);
+        }
         private static readonly HashSet<FontSystem> toReset = [];
 
         /// <summary>
@@ -118,10 +129,10 @@ namespace CardGame {
             string[] filesS = Directory.GetFiles(currentpath_S, "*.xnb", SearchOption.AllDirectories);
             string currentpath_E = Path.Combine(currentpath, SoundPath);
             string[] filesSFX = Directory.GetFiles(currentpath_E, "*.xnb", SearchOption.AllDirectories);
-            TotalResources += filesT.Length; //set resource count
-            TotalResources += filesF.Length;
-            TotalResources += filesS.Length;
-            TotalResources += filesSFX.Length;
+            Interlocked.Add(ref totalResources, filesT.Length); //set resource count
+            Interlocked.Add(ref totalResources, filesF.Length);
+            Interlocked.Add(ref totalResources, filesS.Length);
+            Interlocked.Add(ref totalResources, filesSFX.Length);
             List<string> piplinepaths = [];
             foreach (string file in filesT) {
                 string relativePath = Path.GetRelativePath(currentpath, file);
@@ -157,7 +168,7 @@ namespace CardGame {
                 List<Texture2D> textureseq = [];
                 foreach (Tuple<string, int> item in sequence) {
                     textureseq.Add(Content.Load<Texture2D>(item.Item1));
-                    LoadedResources++;
+                    Interlocked.Increment(ref loadedResources);
                 }
                 string newkey = key.Split("/").Last();
                 if (!textures.ContainsKey(newkey)) {
@@ -171,7 +182,7 @@ namespace CardGame {
                 string key = path.Split("/").Last();
                 if (!textures.ContainsKey(key)) {
                     textures.Add(key, [Content.Load<Texture2D>(path)]);
-                    LoadedResources++;
+                    Interlocked.Increment(ref loadedResources);
                 }
                 else {
                     throw new Exception($"Duplicate texture key: {key} ! Texture names MUST be unique!");
@@ -190,7 +201,7 @@ namespace CardGame {
                     string key = path.Split("/").Last();
                     if (!songs.ContainsKey(key)) {
                         songs.Add(key, Content.Load<Song>(path));
-                        LoadedResources++;
+                        Interlocked.Increment(ref loadedResources);
                     }
                     else {
                         throw new Exception($"Duplicate song key: {key} ! Song names MUST be unique!");
@@ -210,7 +221,7 @@ namespace CardGame {
                     string key = path.Split("/").Last();
                     if (!soundeffects.ContainsKey(key)) {
                         soundeffects.Add(key, Content.Load<SoundEffect>(path));
-                        LoadedResources++;
+                        Interlocked.Increment(ref loadedResources);
                     }
                     else {
                         throw new Exception($"Duplicate sound effect key: {key} ! Sound effect names MUST be unique!");
@@ -234,7 +245,7 @@ namespace CardGame {
                         fontSystem.CurrentAtlasFull += ClearFonts;
                         fontSystem.AddFont(File.ReadAllBytes(relativepaths[i]));
                         fonts.Add(piplinepaths[i], fontSystem);
-                        LoadedResources++;
+                        Interlocked.Increment(ref loadedResources);
                     }
                     else {
                         throw new Exception($"Duplicate font key: {piplinepaths[i]} ! Font names MUST be unique!");
@@ -289,7 +300,7 @@ namespace CardGame {
         /// </summary>
         /// <returns>A double value representing the proportion of resources that have been loaded. Returns 1.0 if there are no
         /// resources to load.</returns>
-        public static double GetLoadProgress() => TotalResources == 0 ? 1.0 : (double)LoadedResources / (double)TotalResources;
+        public static double GetLoadProgress() => TotalResources == 0 ? 0.0 : (double)LoadedResources / (double)TotalResources;
 
         public static void Dispose()
         {

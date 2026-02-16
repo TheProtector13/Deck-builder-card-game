@@ -23,6 +23,11 @@ namespace CardGame {
         /// </summary>
         public static Rectangle ScreenRect { get; private set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the game itself has focus.
+        /// </summary>
+        public static bool IsFocused { get; set; } = true;
+
         static DisplayInfo()
         {
             ScreenWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;

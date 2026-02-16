@@ -117,4 +117,4 @@ history2 = leaky_model.fit(
 loss, acc = leaky_model.evaluate(X_eval, Y_eval)
 print("Test leaky loss:", loss, "Test acc:", acc)
 
-leaky_model.export("D:\\MC\\TENSORS")
+#leaky_model.export("D:\\MC\\TENSORS")

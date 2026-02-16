@@ -369,6 +369,7 @@ namespace CardGame {
                 }
             }
             else if (manualopen) {
+                manualslider.Value += mouseInfo.WheelDelta * -0.02f;
                 manualslider.Update(gameTime);
                 foreach (var button in manualbuttons) {
                     button.Update(gameTime);
@@ -412,7 +413,6 @@ namespace CardGame {
                     if (UDP_Broadcast_Helper.Connection.Result.IsConnected) {
                         // !!! set to multiplayer mode (in game1 stop UDPHELPER)
                         CurrentMenuState = MenuState.MultiPlayer;
-                        // !!! add button to change to braodcast mode from multicast
                     }
                 }
             }
