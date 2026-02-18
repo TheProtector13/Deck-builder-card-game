@@ -3209,6 +3209,8 @@ E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Release\
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Release\net8.0-windows\win-x64\Content\TEXTURES\UI\NOK_Button2.xnb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Release\net8.0-windows\win-x64\Content\TEXTURES\UI\OK_Button1.xnb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Release\net8.0-windows\win-x64\Content\TEXTURES\UI\OK_Button2.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Release\net8.0-windows\win-x64\Content\TEXTURES\UI\PlayAll_00.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Release\net8.0-windows\win-x64\Content\TEXTURES\UI\PlayAll_01.xnb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Release\net8.0-windows\win-x64\Content\TEXTURES\UI\PlayButton0.xnb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Release\net8.0-windows\win-x64\Content\TEXTURES\UI\PlayButton1.xnb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Release\net8.0-windows\win-x64\Content\TEXTURES\UI\PlayButton2.xnb

@@ -45,6 +45,8 @@ namespace CardGame {
         private readonly Rectangle[] EIconsLoc;
         private readonly Button EndTurnButton;
         private readonly Button PlayAllCardsButton;
+        private readonly TextBox ToolTipsBox;
+        private Card.HoveredObject? PrevHObject = null;
         private Texture2D? TurnIndicatorColor;
         private readonly Rectangle[] TurnIndicatorLocs;
         private CardSelectorWindow? cardSelector = null;
@@ -146,6 +148,7 @@ namespace CardGame {
                 ResourceManager.Textures["MoneyFGI"][0],
                 ResourceManager.Textures["HPIcon"][0]];
             TurnIndicatorLocs = new Rectangle[2];
+            ToolTipsBox = new(rect, font) { BGColor = new(191, 191, 191, 192) };
             EIconsLoc = new Rectangle[Icons.Length];
             PIconsLoc = new Rectangle[Icons.Length];
             ShopTarget = new ObjectTransform[6];
@@ -630,6 +633,42 @@ namespace CardGame {
             return distribution;
         }
 
+        private Tuple<float[], int[]> GetFractionDistribution()
+        {
+            int allcards = 0;
+            int[] cards = new int[6];
+            float[] distribution = new float[6];
+            foreach (var card in PlayerHand) {
+                cards[(int)card.CardFraction]++;
+                allcards++;
+            }
+            foreach (var card in PlayerDeck) {
+                cards[(int)card.CardFraction]++;
+                allcards++;
+            }
+            foreach (var card in PlayerScrap) {
+                cards[(int)card.CardFraction]++;
+                allcards++;
+            }
+            foreach (var card in PlayedPile) {
+                if (stolenCards.Contains(card))
+                    continue;
+                cards[(int)card.CardFraction]++;
+                allcards++;
+            }
+            if (allcards > 0) {
+                for (int i = 0; i < distribution.Length; i++) {
+                    distribution[i] = (float)cards[i] / allcards;
+                }
+            }
+            else {
+                for (int i = 0; i < distribution.Length; i++) {
+                    distribution[i] = 0f;
+                }
+            }
+            return new(distribution, cards);
+        }
+
         private void BuyFromShop(Card card, bool player = true)
         {
             for (int i = 0; i < Shop.Length; i++) {
@@ -765,6 +804,7 @@ namespace CardGame {
                 Shop[0]!.Flipped = false;
                 Shop[0]!.RenderPrice = true;
                 ShopTarget[0].StartLocation = globalCardStart;
+                previewThis.Add(new(Shop[0]!, ShopTarget[0]));
             }
             for (int i = 1; i < Shop.Length; i++) {
                 if (Shop[i] == null) {
@@ -774,12 +814,14 @@ namespace CardGame {
                         Shop[i]!.Flipped = false;
                         Shop[i]!.RenderPrice = true;
                         ShopTarget[i].StartLocation = globalCardStart;
+                        previewThis.Add(new(Shop[i]!, ShopTarget[i]));
                     }
                     else {
                         Shop[i] = DeckGenerator.GetMoneyCard();
                         Shop[i]!.Flipped = false;
                         Shop[i]!.RenderPrice = true;
                         ShopTarget[i].StartLocation = globalCardStart;
+                        previewThis.Add(new(Shop[i]!, ShopTarget[i]));
                     }
                 }
             }
@@ -828,6 +870,11 @@ namespace CardGame {
                               startX,
                               previewWidth,
                               previewHeight);
+            ToolTipsBox.Rect = new(previewRect.Right + startX,
+                              startX,
+                              DisplayInfo.ScreenWidth - previewRect.Right - (2 * startX),
+                              previewHeight / 2);
+            ToolTipsBox.SizeOffset = (DisplayInfo.ScreenWidth - previewRect.Right - (2f * startX)) * 0.05f;
             groupingOffset = (int)MathF.Round(enemydeckHeight * 0.0138696255f);
             int startEDeckX = startX + (groupingOffset * 4);
             int startEDeckY = startY + (groupingOffset * 4);
@@ -948,10 +995,10 @@ namespace CardGame {
             }
             //GamePlay Logic Here
             else {
-                if (PlayedPileTarget.All(i => i.IsTransforming == false) &&
-                    ShopTarget.All(i => i.IsTransforming == false) &&
-                    EnemyHandTarget.All(i => i.IsTransforming == false) &&
-                    PlayerHandTarget.All(i => i.IsTransforming == false)) {
+                if (PlayedPileTarget.TrueForAll(i => i.IsTransforming == false) &&
+                    Array.TrueForAll(ShopTarget, i => i.IsTransforming == false) &&
+                    EnemyHandTarget.TrueForAll(i => i.IsTransforming == false) &&
+                    PlayerHandTarget.TrueForAll(i => i.IsTransforming == false)) {
                     //GC
                     if (gameTime.TotalGameTime - LastGC > TimeSpan.FromSeconds(5) && selectedCard is null) {
                         ResourceManager.ResetFonts();
@@ -1364,11 +1411,71 @@ namespace CardGame {
                             previewThisCard.StartLocation = previewThisCard.CurrentLocation;
                             previewThisCard.MoveTarget = previewThisCardOTarget;
                             previewThisCard = null;
+                            PrevHObject = null;
                             flipSFX.Play(GameSettings.SFXVolume, 0, 0);
                         }
                         else {
                             if (previewThisCard.MoveTarget != previewRect) {
                                 previewThisCard.MoveTarget = previewRect;
+                            }
+                            else {
+                                //ToolTips
+                                Card prevw = previewThis[^1].Item1;
+                                Card.HoveredObject hobj = prevw.GetHoveredState(mouse);
+                                if (PrevHObject != hobj) {
+                                    PrevHObject = hobj;
+                                    string fname = prevw.CardFraction switch {
+                                        Card.Fraction.Alliance => "'Szövetség'",
+                                        Card.Fraction.CollectorCult => "'Kuratórium'",
+                                        Card.Fraction.Empire => "'Birodalom'",
+                                        Card.Fraction.Machines => "'Gépek'",
+                                        Card.Fraction.TheEye => "'A szem'",
+                                        Card.Fraction.None => "frakciómentes lapok",
+                                        _ => string.Empty
+                                    };
+                                    string reqname = prevw.EffectRequirement switch {
+                                        Card.Fraction.Alliance => "'Szövetség'",
+                                        Card.Fraction.CollectorCult => "'Kuratórium'",
+                                        Card.Fraction.Empire => "'Birodalom'",
+                                        Card.Fraction.Machines => "'Gépek'",
+                                        Card.Fraction.TheEye => "'A szem'",
+                                        Card.Fraction.None => "frakciómentes lapok",
+                                        _ => string.Empty
+                                    };
+                                    string specEffect = prevw.CardEffect switch {
+                                        Card.Effect.ScrapEnemyCard => "A következő kör kezdetén az ellenfél eldob egy lapot,\n mielőtt azt kijátszhatná.",
+                                        Card.Effect.ScrapFromShop => "Eltávolít egy lapot a boltból.",
+                                        Card.Effect.AntiShow => "Az ellenfél nem fedheti fel a lapjaid ebben a körben.",
+                                        Card.Effect.StealCard => "Ellopja az ellenfél egy kártyáját és kijátsza azt.",
+                                        Card.Effect.DrawCard => "Húz még egy kártyát.",
+                                        Card.Effect.ScrapOwnCard => "Véglegesen eltávolít egy lapot az aldobott halmodból.",
+                                        Card.Effect.AttackBonus => "Támadási bónusz.",
+                                        Card.Effect.HealthBonus => "Életerő/Autoritás növelése.",
+                                        Card.Effect.MoneyBonus => "Játékpénz bónusz.",
+                                        Card.Effect.ShowHand => "Ellenfél kezében lévő lapok felfedése.",
+                                        Card.Effect.ShowDeck => "Ellenfél paklijának felfedése. Megmutatja, hogy milyen lapokat\nfog húzni az ellenfél a következő körben.",
+                                        Card.Effect.SelfDestruct => "A lap kijátszásakor elpusztítja önmagát.",
+                                        Card.Effect.None => "Nincs speciális képesség!",
+                                        _ => string.Empty,
+                                    };
+                                    var distribution = GetFractionDistribution();
+                                    ToolTipsBox.Text = hobj switch {
+                                        Card.HoveredObject.None => $"Ez a kártya a {fname} lapjaihoz tartozik,\n" +
+                                                                   $"melyből jelenleg {distribution.Item2[(int)prevw.CardFraction]} db van a tulajdonodban.\n" +
+                                                                   $"Ez a paklid {distribution.Item1[(int)prevw.CardFraction].ToString("P2")}-ának felel meg.",
+                                        Card.HoveredObject.Price => $"A lap ára {prevw.Price} játékpénz!\nEzt a lapot jelenleg {(PlayerMoney >= prevw.Price ? "meg tudod vásárolni" : "NEM tudod megvásárolni")}!",
+                                        Card.HoveredObject.Fraction => $"Ez a kártya frakciójele.\nMeghatározza, hogy az adott lap\nmelyik frakcióhoz tartozik.\nEz a kártya a {fname} lapjai közé tartozik.",
+                                        Card.HoveredObject.BaseAbilities => $"Ez a mező a lap alapképességeit határozza meg.\n" +
+                                                                            $"Ezeket a képességeket nem köti feltétel,\n" +
+                                                                            $"értékeiket kijátszásuk mindig megadja a játékosnak.\n\n" +
+                                                                            $"Ez a lap {prevw.Money} pénzt, {prevw.Health} életerőt és {prevw.GetTrueAttack()} támadást biztosít.",
+                                        Card.HoveredObject.SpecialAbility => $"Ez a mező a lap speciális képességeit határozza meg.\n" +
+                                                                             $"A lap képessége {(prevw.EffectRequirement != Card.Fraction.None ? $"feltételhez kötött.\nA speciális feltétel kihasználásához legalább egy\n{reqname} lapot ki kell játszani a jelenlegi körben!\n" : "NEM kötött feltételhez,\naz alapképességekkel egyszerre kijátszható.\n")}" +
+                                                                             $"A lap speciális képessége {prevw.EffectAmount} alkalommal biztosítja:\n{specEffect}",
+                                        Card.HoveredObject.Unknown => "A lap adatai ismeretlenek!",
+                                        _ => string.Empty
+                                    };
+                                }
                             }
                         }
                     }
@@ -1409,6 +1516,7 @@ namespace CardGame {
                 EndTurnButton.Update(gameTime);
                 PlayAllCardsButton.Update(gameTime);
             }
+            ToolTipsBox.Update(gameTime);
             //CARDS with targets
             //TARGETS
             Parallel.ForEach(ShopTarget, ParallelOptions, item => {
@@ -1479,86 +1587,91 @@ namespace CardGame {
             int Escrapshowcount = EnemyScrap.Count > MAX_OFFSET_CARDS ? MAX_OFFSET_CARDS : EnemyScrap.Count;
             overlay ??= ResourceManager.GetColor(Color.Orange, spriteBatch);
             TurnIndicatorColor ??= ResourceManager.GetColor(Color.OrangeRed, spriteBatch);
-            //player icons
-            spriteBatch.Draw(Icons[0], PIconsLoc[0], Color.White);
-            spriteBatch.Draw(Icons[1], PIconsLoc[1], Color.White);
-            PIconboxes[0].Draw(gameTime, spriteBatch);
-            spriteBatch.Draw(Icons[2], PIconsLoc[2], Color.White);
-            spriteBatch.Draw(Icons[3], PIconsLoc[3], Color.White);
-            PIconboxes[1].Draw(gameTime, spriteBatch);
-            spriteBatch.Draw(Icons[4], PIconsLoc[4], Color.White);
-            PIconboxes[2].Draw(gameTime, spriteBatch);
-            PIconboxes[3].Draw(gameTime, spriteBatch);
-            //enemy icons
-            spriteBatch.Draw(Icons[0], EIconsLoc[0], Color.White);
-            spriteBatch.Draw(Icons[1], EIconsLoc[1], Color.White);
-            EIconboxes[0].Draw(gameTime, spriteBatch);
-            spriteBatch.Draw(Icons[2], EIconsLoc[2], Color.White);
-            spriteBatch.Draw(Icons[3], EIconsLoc[3], Color.White);
-            EIconboxes[1].Draw(gameTime, spriteBatch);
-            spriteBatch.Draw(Icons[4], EIconsLoc[4], Color.White);
-            EIconboxes[2].Draw(gameTime, spriteBatch);
-            EIconboxes[3].Draw(gameTime, spriteBatch);
-            //turnindicator
-            if (playerTurn) {
-                spriteBatch.Draw(TurnIndicatorColor, TurnIndicatorLocs[0], Color.White);
-            }
-            else {
-                spriteBatch.Draw(TurnIndicatorColor, TurnIndicatorLocs[1], Color.White);
-            }
-            //deck and scrap
-            for (int i = 0; i < Pdeckshowcount; i++) {
-                PlayerDeck[i].Draw(gameTime, spriteBatch);
-            }
-            for (int i = 0; i < Pscrapshowcount; i++) {
-                PlayerScrap[i].Draw(gameTime, spriteBatch);
-            }
-            for (int i = 0; i < Edeckshowcount; i++) {
-                EnemyDeck[i].Draw(gameTime, spriteBatch);
-            }
-            for (int i = 0; i < Escrapshowcount; i++) {
-                EnemyScrap[i].Draw(gameTime, spriteBatch);
-            }
-            EndTurnButton.Draw(gameTime, spriteBatch);
-            PlayAllCardsButton.Draw(gameTime, spriteBatch);
-            //hand cards
-            if (ShowPlayerHand) {
-                spriteBatch.Draw(overlay, PlayerHandLoc, new(255, 255, 255, 64));
-            }
-            for (int i = 0; i < PlayerHand.Count; i++) {
-                if (previewThis.All(item => item.Item1 != PlayerHand[i]))
-                    PlayerHand[i].Draw(gameTime, spriteBatch);
-            }
-            for (int i = 0; i < EnemyHand.Count; i++) {
-                if (previewThis.All(item => item.Item1 != EnemyHand[i]))
-                    EnemyHand[i].Draw(gameTime, spriteBatch);
-            }
-            //shop cards
-            for (int i = 0; i < Shop.Length; i++) {
-                if (Shop[i] != null) {
-                    if (previewThis.All(item => item.Item1 != Shop[i]))
-                        Shop[i]!.Draw(gameTime, spriteBatch);
+            if (endingScreen is null) {
+                //player icons
+                spriteBatch.Draw(Icons[0], PIconsLoc[0], Color.White);
+                spriteBatch.Draw(Icons[1], PIconsLoc[1], Color.White);
+                PIconboxes[0].Draw(gameTime, spriteBatch);
+                spriteBatch.Draw(Icons[2], PIconsLoc[2], Color.White);
+                spriteBatch.Draw(Icons[3], PIconsLoc[3], Color.White);
+                PIconboxes[1].Draw(gameTime, spriteBatch);
+                spriteBatch.Draw(Icons[4], PIconsLoc[4], Color.White);
+                PIconboxes[2].Draw(gameTime, spriteBatch);
+                PIconboxes[3].Draw(gameTime, spriteBatch);
+                //enemy icons
+                spriteBatch.Draw(Icons[0], EIconsLoc[0], Color.White);
+                spriteBatch.Draw(Icons[1], EIconsLoc[1], Color.White);
+                EIconboxes[0].Draw(gameTime, spriteBatch);
+                spriteBatch.Draw(Icons[2], EIconsLoc[2], Color.White);
+                spriteBatch.Draw(Icons[3], EIconsLoc[3], Color.White);
+                EIconboxes[1].Draw(gameTime, spriteBatch);
+                spriteBatch.Draw(Icons[4], EIconsLoc[4], Color.White);
+                EIconboxes[2].Draw(gameTime, spriteBatch);
+                EIconboxes[3].Draw(gameTime, spriteBatch);
+                //turnindicator
+                if (playerTurn) {
+                    spriteBatch.Draw(TurnIndicatorColor, TurnIndicatorLocs[0], Color.White);
                 }
-            }
-            //played pile
-            if (ShowPlayedPile) {
-                spriteBatch.Draw(overlay, PlayedPileLoc, new(255, 255, 255, 64));
-            }
-            for (int i = 0; i < PlayedPile.Count; i++) {
-                if (previewThis.All(item => item.Item1 != PlayedPile[i]))
-                    PlayedPile[i].Draw(gameTime, spriteBatch);
-            }
-            //preview
-            if (previewThis.Count > 0) {
+                else {
+                    spriteBatch.Draw(TurnIndicatorColor, TurnIndicatorLocs[1], Color.White);
+                }
+                //deck and scrap
+                for (int i = 0; i < Pdeckshowcount; i++) {
+                    PlayerDeck[i].Draw(gameTime, spriteBatch);
+                }
+                for (int i = 0; i < Pscrapshowcount; i++) {
+                    PlayerScrap[i].Draw(gameTime, spriteBatch);
+                }
+                for (int i = 0; i < Edeckshowcount; i++) {
+                    EnemyDeck[i].Draw(gameTime, spriteBatch);
+                }
+                for (int i = 0; i < Escrapshowcount; i++) {
+                    EnemyScrap[i].Draw(gameTime, spriteBatch);
+                }
+                EndTurnButton.Draw(gameTime, spriteBatch);
+                PlayAllCardsButton.Draw(gameTime, spriteBatch);
+                //hand cards
+                if (ShowPlayerHand) {
+                    spriteBatch.Draw(overlay, PlayerHandLoc, new(255, 255, 255, 64));
+                }
+                for (int i = 0; i < PlayerHand.Count; i++) {
+                    if (previewThis.TrueForAll(item => item.Item1 != PlayerHand[i]))
+                        PlayerHand[i].Draw(gameTime, spriteBatch);
+                }
+                for (int i = 0; i < EnemyHand.Count; i++) {
+                    if (previewThis.TrueForAll(item => item.Item1 != EnemyHand[i]))
+                        EnemyHand[i].Draw(gameTime, spriteBatch);
+                }
+                //shop cards
+                for (int i = 0; i < Shop.Length; i++) {
+                    if (Shop[i] != null) {
+                        if (previewThis.TrueForAll(item => item.Item1 != Shop[i]))
+                            Shop[i]!.Draw(gameTime, spriteBatch);
+                    }
+                }
+                //played pile
+                if (ShowPlayedPile) {
+                    spriteBatch.Draw(overlay, PlayedPileLoc, new(255, 255, 255, 64));
+                }
+                for (int i = 0; i < PlayedPile.Count; i++) {
+                    if (previewThis.TrueForAll(item => item.Item1 != PlayedPile[i]))
+                        PlayedPile[i].Draw(gameTime, spriteBatch);
+                }
+                //preview
                 foreach (var item in previewThis) {
                     item.Item1.Draw(gameTime, spriteBatch);
                 }
-            }
-            //selector
-            if (endingScreen is null)
+                //ToolTips
+                if (previewThisCard is not null) {
+                    ToolTipsBox.Draw(gameTime, spriteBatch);
+                }
+                //selector
                 cardSelector?.Draw(gameTime, spriteBatch);
-            //ending
-            endingScreen?.Draw(gameTime, spriteBatch);
+            }
+            else {
+                //ending
+                endingScreen.Draw(gameTime, spriteBatch);
+            }
         }
     }
 }

@@ -59,7 +59,7 @@ namespace CardGame {
         /// Returns a Texture2D array. If a texture is part of a sequence (e.g., texture1, texture2, texture3), all related textures are grouped into an array under the same key.
         /// </summary>
         public static ImmutableDictionary<string, Texture2D[]> Textures { get; private set; } = ImmutableDictionary<string, Texture2D[]>.Empty;
-        private static readonly List<Texture2D> SingleColorTextures = [];
+        private static readonly Dictionary<Color, Texture2D> SingleColorTextures = new(10);
         /// <summary>
         /// Gets the collection of sound effects available in the application, indexed by unique string keys. The key is derived from the sound effect file name without its extension.
         /// </summary>
@@ -111,14 +111,6 @@ namespace CardGame {
             SongPath = songpath ?? SongPath;
             SoundPath = soundpath ?? SoundPath;
             FontPath = fontpath ?? FontPath;
-            Textures = ImmutableDictionary<string, Texture2D[]>.Empty;
-            SoundEffects = ImmutableDictionary<string, SoundEffect>.Empty;
-            Songs = ImmutableDictionary<string, Song>.Empty;
-            Fonts = ImmutableDictionary<string, FontSystem>.Empty;
-            Dictionary<string, Texture2D[]> textures = [];
-            Dictionary<string, SoundEffect> soundeffects = [];
-            Dictionary<string, Song> songs = [];
-            Dictionary<string, FontSystem> fonts = [];
             string currentpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Content.RootDirectory);
             // Load Textures
             string currentpath_T = Path.Combine(currentpath, TexturePath);
@@ -133,6 +125,10 @@ namespace CardGame {
             Interlocked.Add(ref totalResources, filesF.Length);
             Interlocked.Add(ref totalResources, filesS.Length);
             Interlocked.Add(ref totalResources, filesSFX.Length);
+            Dictionary<string, Texture2D[]> textures = new(filesT.Length);
+            Dictionary<string, SoundEffect> soundeffects = new(filesSFX.Length);
+            Dictionary<string, Song> songs = new(filesS.Length);
+            Dictionary<string, FontSystem> fonts = new(filesF.Length);
             List<string> piplinepaths = [];
             foreach (string file in filesT) {
                 string relativePath = Path.GetRelativePath(currentpath, file);
@@ -282,16 +278,12 @@ namespace CardGame {
         /// created, the cached instance is returned.</returns>
         public static Texture2D GetColor(Color color, SpriteBatch spriteBatch)
         {
-            foreach (Texture2D tex in SingleColorTextures) {
-                Color[] data = new Color[1];
-                tex.GetData(data);
-                if (data[0] == color) {
-                    return tex;
-                }
+            if (SingleColorTextures.TryGetValue(color, out Texture2D tex)) {
+                return tex;
             }
             Texture2D newTex = new(spriteBatch.GraphicsDevice, 1, 1);
             newTex.SetData([color]);
-            SingleColorTextures.Add(newTex);
+            SingleColorTextures.Add(color, newTex);
             return newTex;
         }
 
@@ -304,7 +296,7 @@ namespace CardGame {
 
         public static void Dispose()
         {
-            foreach (Texture2D tex in SingleColorTextures) {
+            foreach (Texture2D tex in SingleColorTextures.Values) {
                 tex.Dispose();
             }
             SingleColorTextures.Clear();

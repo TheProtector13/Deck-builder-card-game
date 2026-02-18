@@ -14,6 +14,7 @@ namespace CardGame {
         private static readonly Texture2D[] otherIcons;
         private readonly Texture2D cardIMG;
         private readonly Texture2D? cardIMG_FG;
+        private Texture2D? coloroverlay = null;
         private readonly TextBox NameBox;
         private readonly TextBox DescriptionBox;
         private readonly TextBox QuoteBox;
@@ -94,6 +95,15 @@ namespace CardGame {
             Machines,
             TheEye,
             None
+        }
+
+        public enum HoveredObject {
+            None,
+            Price,
+            Fraction,
+            BaseAbilities,
+            SpecialAbility,
+            Unknown
         }
 
         static Card()
@@ -326,6 +336,28 @@ namespace CardGame {
             }
         }
 
+        public HoveredObject GetHoveredState(MouseInfo mouse)
+        {
+            if (_flipped)
+                return HoveredObject.Unknown;
+            Point pos = mouse.GetMousePosition();
+            if (FRACTION_rect.Contains(pos) && CardFraction != Fraction.None) {
+                return HoveredObject.Fraction;
+            }
+            else if (PRICE_rect.Contains(pos) && RenderPrice) {
+                return HoveredObject.Price;
+            }
+            else if (pos.Y > NameBox.Rect.Bottom && pos.Y < DESCRIPTION_rect.Top
+                && pos.X > NameBox.Rect.Left && pos.X < NameBox.Rect.Right
+                && OBJrects.Length > 0) {
+                return HoveredObject.BaseAbilities;
+            }
+            else if (DESCRIPTION_rect.Contains(pos) && CardEffect != Effect.None)
+                return HoveredObject.SpecialAbility;
+            else
+                return HoveredObject.None;
+        }
+
         public object Clone()
         {
             return new Card(new(_rect.X, _rect.Y, _rect.Width, _rect.Height), cardIMG, cardIMG_FG, GetCardDetails()) {
@@ -361,6 +393,7 @@ namespace CardGame {
                 return;
             }
             else {
+                coloroverlay ??= ResourceManager.GetColor(new Color(191, 191, 191), spriteBatch);
                 spriteBatch.Draw(cardIMG, IMG_rect, Color.White);
                 if (cardIMG_FG != null) {
                     spriteBatch.Draw(cardIMG_FG, IMG_rect_FG, Color.White);
@@ -388,8 +421,7 @@ namespace CardGame {
                     spriteBatch.Draw(otherIcons[2], OBJrects[index], Color.White);
                     OBJBox[index].Draw(gameTime, spriteBatch);
                 }
-                Texture2D rectTexture = ResourceManager.GetColor(new Color(191, 191, 191), spriteBatch);
-                spriteBatch.Draw(rectTexture, DESCRIPTION_rect, Color.White);
+                spriteBatch.Draw(coloroverlay, DESCRIPTION_rect, Color.White);
                 int erectIndex = 0;
                 if (EffectRequirement != Fraction.None) {
                     spriteBatch.Draw(fractionIcons[(int)EffectRequirement], EffectRects[0], Color.White);

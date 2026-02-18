@@ -35,11 +35,11 @@ namespace CardGame {
             list.Add(new Card(rect,
                 ResourceManager.Textures["Money"][1],
                 null,
-                D(Card.Fraction.None, "Gyémánt", "Kijátszás után elpusztul!", "'Ha nagyon kívánunk valamit,\nritkán kapjuk meg.'", 0, 0, 2, 2, false, Vector3.Zero, Card.Effect.SelfDestruct, 1, Card.Fraction.None)));
+                D(Card.Fraction.None, "Gyémánt", "Kijátszás után megsemmisül!", "'Ha nagyon kívánunk valamit,\nritkán kapjuk meg.'", 0, 0, 2, 2, false, Vector3.Zero, Card.Effect.SelfDestruct, 1, Card.Fraction.None)));
             list.Add(new Card(rect,
                 ResourceManager.Textures["Money"][2],
                 null,
-                D(Card.Fraction.None, "Igazgyöngy", "Kijátszás után elpusztul!", "'Mindaz, ami hasznos, az csúf.'", 0, 0, 3, 3, false, Vector3.Zero, Card.Effect.SelfDestruct, 1, Card.Fraction.None)));
+                D(Card.Fraction.None, "Igazgyöngy", "Kijátszás után megsemmisül!", "'Mindaz, ami hasznos, az csúf.'", 0, 0, 3, 3, false, Vector3.Zero, Card.Effect.SelfDestruct, 1, Card.Fraction.None)));
 
             return list[RandomNumberGenerator.GetInt32(list.Count)];
         }
@@ -52,11 +52,11 @@ namespace CardGame {
             list.Add(new Card(rect,
                 ResourceManager.Textures["Money"][1],
                 null,
-                D(Card.Fraction.None, "Gyémánt", "Kijátszás után elpusztul!", "'Ha nagyon kívánunk valamit,\nritkán kapjuk meg.'", 0, 0, 2, 2, false, Vector3.Zero, Card.Effect.SelfDestruct, 1, Card.Fraction.None)));
+                D(Card.Fraction.None, "Gyémánt", "Kijátszás után megsemmisül!", "'Ha nagyon kívánunk valamit,\nritkán kapjuk meg.'", 0, 0, 2, 2, false, Vector3.Zero, Card.Effect.SelfDestruct, 1, Card.Fraction.None)));
             list.Add(new Card(rect,
                 ResourceManager.Textures["Money"][2],
                 null,
-                D(Card.Fraction.None, "Igazgyöngy", "Kijátszás után elpusztul!", "'Mindaz, ami hasznos, az csúf.'", 0, 0, 3, 3, false, Vector3.Zero, Card.Effect.SelfDestruct, 1, Card.Fraction.None)));
+                D(Card.Fraction.None, "Igazgyöngy", "Kijátszás után megsemmisül!", "'Mindaz, ami hasznos, az csúf.'", 0, 0, 3, 3, false, Vector3.Zero, Card.Effect.SelfDestruct, 1, Card.Fraction.None)));
 
             return list.ToArray();
         }
@@ -300,7 +300,7 @@ namespace CardGame {
                 D(Card.Fraction.Machines, "A flotta", string.Empty, "'Nincs ember, aki útját állhatná.'", 9, 0, 0, 8, false, Vector3.Zero, Card.Effect.AttackBonus, 7, Card.Fraction.Machines)));
 
             list.Add(new Card(rect, ResourceManager.Textures["The_inteligence"][0], null,
-                D(Card.Fraction.Machines, "Az inteligencia", string.Empty, "'Van, hogy még a csoda sem segíthet.'", 9, 5, 0, 8, false, Vector3.Zero, Card.Effect.AttackBonus, 9, Card.Fraction.Machines)));
+                D(Card.Fraction.Machines, "Az intelligencia", string.Empty, "'Van, hogy még a csoda sem segíthet.'", 9, 5, 0, 8, false, Vector3.Zero, Card.Effect.AttackBonus, 9, Card.Fraction.Machines)));
 
             // COLLECTORCULT
             for (int i = 0; i < 3; i++)
@@ -359,7 +359,7 @@ namespace CardGame {
         {
             TerrainType = terrainType;
             var rect = new Rectangle(100, 100, 200, 400);
-            var list = new List<Card>();
+            var list = new List<Card>(130);
 
             Texture2D[] skytexture = ResourceManager.Textures["Sky"];
             Texture2D[] bgtextures;
@@ -556,7 +556,7 @@ namespace CardGame {
                 D(Card.Fraction.Machines, "A flotta", string.Empty, "'Nincs ember, aki útját állhatná.'", 9, 0, 0, 8, false, Vector3.Zero, Card.Effect.AttackBonus, 7, Card.Fraction.Machines)));
 
             list.Add(new Card(rect, ResourceManager.Textures["The_inteligence"][0], null,
-                D(Card.Fraction.Machines, "Az inteligencia", string.Empty, "'Van, hogy még a csoda sem segíthet.'", 9, 5, 0, 8, false, Vector3.Zero, Card.Effect.AttackBonus, 9, Card.Fraction.Machines)));
+                D(Card.Fraction.Machines, "Az intelligencia", string.Empty, "'Van, hogy még a csoda sem segíthet.'", 9, 5, 0, 8, false, Vector3.Zero, Card.Effect.AttackBonus, 9, Card.Fraction.Machines)));
 
             // COLLECTORCULT
             list.Add(new Card(rect, bgtextures[Random.Shared.Next(0, bgtextures.Length)], ResourceManager.Textures["Black_market"][0],

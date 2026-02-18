@@ -92,6 +92,7 @@ namespace CardGame.TCP {
             if (username != string.Empty)
                 UserName = username;
             Secret = CryptographyHelper.GenerateRandomSecret();
+            MulticastEnabled = GameSettings.MultiCastEnabled;
 
             if (_cancellationToken != null && !_cancellationToken.IsCancellationRequested) throw new InvalidOperationException("Already started");
             _cancellationToken = new CancellationTokenSource();

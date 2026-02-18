@@ -149,25 +149,42 @@ namespace CardGame {
             mainmenubuttons[2].Click += ManualEventHandler;
             mainmenubuttons[3].Click += SettingsEventHandler;
             mainmenubuttons[4].Click += ExitEventHandler;
+            int hieght_until_B = height - col1xy - bSize.Y;
             settingsmenubuttons = [
-                new([ResourceManager.Textures["BUTTON"][0],ResourceManager.Textures["BUTTON"][1]], mouseInfo) {
+                new(ResourceManager.Textures["BUTTON"], mouseInfo) {
                     Text = "Vissza",
-                    Location = new(menubackgroundRectangle.X + (width/2) - (bSize.X/2), menubackgroundRectangle.Y + height - col1xy - bSize.Y),
+                    Location = new(menubackgroundRectangle.X + (width/2) - (bSize.X/2), menubackgroundRectangle.Y + hieght_until_B),
+                    Size = bSize,
+                    SetTextOffsetY = bSize.Y / 4,
+                    SetTextOffsetW = bSize.Y / 4
+                },
+                new(ResourceManager.Textures["BUTTON"], mouseInfo) {
+                    Text = GameSettings.MultiCastEnabled ? "MultiCast mód" : "BroadCast mód",
+                    Location = new(contentbackgroundRectangle.X, menubackgroundRectangle.Y + hieght_until_B - (bSize.Y/2*3)),
+                    Size = bSize,
+                    SetTextOffsetY = bSize.Y / 4,
+                    SetTextOffsetW = bSize.Y / 4
+                },
+                new(ResourceManager.Textures["BUTTON"], mouseInfo) {
+                    Text = GameSettings.RandomAIEnabled ? "Random AI" : "Neurálhálós AI",
+                    Location = new(menubackgroundRectangle.X + width - col1xy - bSize.X, menubackgroundRectangle.Y + hieght_until_B - (bSize.Y/2*3)),
                     Size = bSize,
                     SetTextOffsetY = bSize.Y / 4,
                     SetTextOffsetW = bSize.Y / 4
                 } ];
             settingsmenubuttons[0].Click += SettingsBackEventHandler;
+            settingsmenubuttons[1].Click += SetMultiCastEventHandler;
+            settingsmenubuttons[2].Click += SetRandomAIEventHandler;
             settingsmenuLabels = [
                 new(new(new(contentbackgroundRectangle.X, contentbackgroundRectangle.Y), bSize), ResourceManager.Fonts["FONT_DEF_B"]) {
                     Text = "Zene hangereje"
                 },
-                new(new(new(contentbackgroundRectangle.X, menubackgroundRectangle.Y + (height/2) - (bSize.Y/2)), bSize), ResourceManager.Fonts["FONT_DEF_B"]) {
+                new(new(new(contentbackgroundRectangle.X, menubackgroundRectangle.Y + (hieght_until_B/2) - (bSize.Y/2)), bSize), ResourceManager.Fonts["FONT_DEF_B"]) {
                     Text = "Hanghatások hangereje"
                 } ];
             settingsmenuSliders = [
                 new(mouseInfo) {Size = new(bSize.X, 32), Location = new(menubackgroundRectangle.X + width - col1xy - bSize.X, contentbackgroundRectangle.Y + ((bSize.Y - 32)/2)), Value = GameSettings.MusicVolume},
-                new(mouseInfo) {Size = new(bSize.X, 32), Location = new(menubackgroundRectangle.X + width - col1xy - bSize.X, menubackgroundRectangle.Y + (height/2) - (bSize.Y/2) + ((bSize.Y - 32)/2)), Value = GameSettings.SFXVolume}
+                new(mouseInfo) {Size = new(bSize.X, 32), Location = new(menubackgroundRectangle.X + width - col1xy - bSize.X, menubackgroundRectangle.Y + (hieght_until_B/2) - (bSize.Y/2) + ((bSize.Y - 32)/2)), Value = GameSettings.SFXVolume}
                 ];
             settingsmenuSliders[0].OnChange += MusicVolumeChangedEventHandler;
             settingsmenuSliders[1].OnChange += SFXVolumeChangedEventHandler;
@@ -242,9 +259,14 @@ namespace CardGame {
             multiselectorlabels = [
                 new(new(mainmenubuttons[0].Location, bSize),
                     ResourceManager.Fonts["FONT_DEF_B"]) { Text = "Felhasználónév:" } ];
+            string uname = DatabaseConnector.GetUsername();
             multiselectorInputs = [
                 new(new(mainmenubuttons[1].Location, bSize),
-                    ResourceManager.Fonts["FONT_DEF_B"], mouseInfo, 16) {Text = UDP_Broadcast_Helper.UserName, BGColor = Color.Silver} ];
+                    ResourceManager.Fonts["FONT_DEF_B"], mouseInfo, 16) {
+                    Text = uname != string.Empty ? uname : UDP_Broadcast_Helper.UserName,
+                    BGColor = Color.Silver}
+                ];
+            multiselectorInputs[0].OnChange += UserNameChangeEventHandler;
             hostbuttons = [
                 new([ResourceManager.Textures["BUTTON"][0],ResourceManager.Textures["BUTTON"][1]], mouseInfo) {
                     Text = "Vissza",
@@ -283,6 +305,24 @@ namespace CardGame {
                     ResourceManager.Fonts["FONT_DEF_B"], mouseInfo, 8) {Text = "*", BGColor = Color.Silver} ];
             clientList = new(new(contentbackgroundRectangle.X, contentbackgroundRectangle.Y + (bSize.Y * 2), contentbackgroundRectangle.Width, contentbackgroundRectangle.Height - (bSize.Y * 2)),
                 mouseInfo);
+        }
+
+        private void SetRandomAIEventHandler(object? sender, EventArgs e)
+        {
+            GameSettings.RandomAIEnabled = !GameSettings.RandomAIEnabled;
+            settingsmenubuttons[2].Text = GameSettings.RandomAIEnabled ? "Random AI" : "Neurálhálós AI";
+        }
+
+        private void SetMultiCastEventHandler(object? sender, EventArgs e)
+        {
+            GameSettings.MultiCastEnabled = !GameSettings.MultiCastEnabled;
+            settingsmenubuttons[1].Text = GameSettings.MultiCastEnabled ? "MultiCast mód" : "BroadCast mód";
+        }
+
+        private void UserNameChangeEventHandler(object? sender, EventArgs e)
+        {
+            if (multiselectorInputs[0].Text == string.Empty) return;
+            DatabaseConnector.SetUsername(multiselectorInputs[0].Text);
         }
 
         private void ClientModeEventHandler(object? sender, EventArgs e)
@@ -351,6 +391,7 @@ namespace CardGame {
             multiselectoropen = false;
             settingsmenuopen = false;
             manualopen = false;
+            joinTask = null;
         }
 
         public void Update(GameTime gameTime)

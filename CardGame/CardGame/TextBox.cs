@@ -114,7 +114,16 @@ namespace CardGame {
             }
         }
 
-        public Color BGColor { get; set; } = Color.Transparent;
+        private Texture2D? bGColorTexture = null;
+        private Color bGColor = Color.Transparent;
+        public Color BGColor
+        {
+            get => bGColor;
+            set {
+                bGColor = value;
+                bGColorTexture = null;
+            }
+        }
         public bool VerticalCentering { get; set; } = true;
 
         private void RecalculateFontAndLayout()
@@ -223,8 +232,8 @@ namespace CardGame {
             if (_lines.Count == 0) return;
 
             if (BGColor.A != 0) {
-                Texture2D rectTexture = ResourceManager.GetColor(BGColor, spriteBatch);
-                spriteBatch.Draw(rectTexture, _rect, Color.White);
+                bGColorTexture ??= ResourceManager.GetColor(BGColor, spriteBatch);
+                spriteBatch.Draw(bGColorTexture, _rect, Color.White);
             }
 
             for (int i = 0; i < _lines.Count; i++) {

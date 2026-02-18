@@ -3209,9 +3209,13 @@ E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\ne
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\NOK_Button2.xnb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\OK_Button1.xnb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\OK_Button2.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\PlayAll_00.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\PlayAll_01.xnb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\PlayButton0.xnb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\PlayButton1.xnb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\PlayButton2.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\SelectButton0.xnb
+E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\SelectButton1.xnb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\SelectWindow.xnb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\SettingsButton0.xnb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\SettingsButton1.xnb
@@ -3825,7 +3829,3 @@ E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\obj\Debug\ne
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\obj\Debug\net8.0-windows\win-x64\CardGame.pdb
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\obj\Debug\net8.0-windows\win-x64\CardGame.genruntimeconfig.cache
 E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\obj\Debug\net8.0-windows\win-x64\ref\CardGame.dll
-E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\SelectButton0.xnb
-E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\SelectButton1.xnb
-E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\PlayAll_00.xnb
-E:\documents\tanulás\Online Oktatás\Fősuli\MGR\CardGame\CardGame\bin\Debug\net8.0-windows\win-x64\Content\TEXTURES\UI\PlayAll_01.xnb

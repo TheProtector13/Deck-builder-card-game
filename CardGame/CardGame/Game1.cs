@@ -81,7 +81,7 @@ namespace CardGame {
                         case MainMenu.MenuState.SinglePlayer:
                             if (fg is null || bg is null) {
                                 bg = new BackGround();
-                                fg = new ForeGround(bg);
+                                fg = new ForeGround(bg) { RandomAI = GameSettings.RandomAIEnabled };
                                 MusicPlayer.SetAlbum(bg.Type);
                             }
                             bg.Update(gameTime);

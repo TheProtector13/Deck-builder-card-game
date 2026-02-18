@@ -41,6 +41,18 @@ namespace CardGame {
             return value;
         }
 
+        public static bool? GetSetting(string key, bool awaitingBoolean)
+        {
+            SqliteCommand command = connection.CreateCommand();
+            command.CommandText = "SELECT VALUE FROM SETTINGS WHERE KEY = $key;";
+            command.Parameters.AddWithValue("$key", key);
+            float? value = null;
+            using (SqliteDataReader reader = command.ExecuteReader()) {
+                value = reader.Read() ? reader.GetFloat(0) : null;
+            }
+            return value == null ? null : !(value <= 0);
+        }
+
         public static void SetSetting(string key, float value)
         {
             SqliteCommand command = connection.CreateCommand();
@@ -48,6 +60,17 @@ namespace CardGame {
                                   "ON CONFLICT(KEY) DO UPDATE SET VALUE = $value;";
             command.Parameters.AddWithValue("$key", key);
             command.Parameters.AddWithValue("$value", value);
+            command.ExecuteNonQuery();
+        }
+
+        public static void SetSetting(string key, bool value)
+        {
+            SqliteCommand command = connection.CreateCommand();
+            command.CommandText = "INSERT INTO SETTINGS (KEY, VALUE) VALUES ($key, $value) " +
+                                  "ON CONFLICT(KEY) DO UPDATE SET VALUE = $value;";
+            command.Parameters.AddWithValue("$key", key);
+            float val = value ? 1f : 0f;
+            command.Parameters.AddWithValue("$value", val);
             command.ExecuteNonQuery();
         }
 
