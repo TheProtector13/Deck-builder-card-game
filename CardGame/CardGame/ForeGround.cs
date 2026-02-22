@@ -546,6 +546,8 @@ namespace CardGame {
 
         private void EndTurnEventHandler(object? sender, EventArgs e)
         {
+            cardMouseControlEnabled = false;
+            EndTurnButton.Enabled = false;
             ClearPlayedPile(true);
             RefillPlayerHand();
             PlayerMoney = 0;
@@ -554,7 +556,6 @@ namespace CardGame {
                 explodeSFX.Play(GameSettings.SFXVolume, 0, 0);
             PlayerAttack = 0;
             playerTurn = false;
-            EndTurnButton.Enabled = false;
         }
 
         private void PlayAllEventHandler(object? sender, EventArgs e)
@@ -1443,18 +1444,18 @@ namespace CardGame {
                                         _ => string.Empty
                                     };
                                     string specEffect = prevw.CardEffect switch {
-                                        Card.Effect.ScrapEnemyCard => "A következő kör kezdetén az ellenfél eldob egy lapot,\n mielőtt azt kijátszhatná.",
+                                        Card.Effect.ScrapEnemyCard => "A következő kör kezdetén az ellenfél eldob egy lapot,\nmielőtt azt kijátszhatná.",
                                         Card.Effect.ScrapFromShop => "Eltávolít egy lapot a boltból.",
                                         Card.Effect.AntiShow => "Az ellenfél nem fedheti fel a lapjaid ebben a körben.",
                                         Card.Effect.StealCard => "Ellopja az ellenfél egy kártyáját és kijátsza azt.",
                                         Card.Effect.DrawCard => "Húz még egy kártyát.",
-                                        Card.Effect.ScrapOwnCard => "Véglegesen eltávolít egy lapot az aldobott halmodból.",
+                                        Card.Effect.ScrapOwnCard => "Véglegesen eltávolít egy lapot az eldobott halmodból.",
                                         Card.Effect.AttackBonus => "Támadási bónusz.",
                                         Card.Effect.HealthBonus => "Életerő/Autoritás növelése.",
                                         Card.Effect.MoneyBonus => "Játékpénz bónusz.",
                                         Card.Effect.ShowHand => "Ellenfél kezében lévő lapok felfedése.",
                                         Card.Effect.ShowDeck => "Ellenfél paklijának felfedése. Megmutatja, hogy milyen lapokat\nfog húzni az ellenfél a következő körben.",
-                                        Card.Effect.SelfDestruct => "A lap kijátszásakor elpusztítja önmagát.",
+                                        Card.Effect.SelfDestruct => "A lap kijátszásakor megsemmisíti önmagát.",
                                         Card.Effect.None => "Nincs speciális képesség!",
                                         _ => string.Empty,
                                     };
@@ -1470,7 +1471,7 @@ namespace CardGame {
                                                                             $"értékeiket kijátszásuk mindig megadja a játékosnak.\n\n" +
                                                                             $"Ez a lap {prevw.Money} pénzt, {prevw.Health} életerőt és {prevw.GetTrueAttack()} támadást biztosít.",
                                         Card.HoveredObject.SpecialAbility => $"Ez a mező a lap speciális képességeit határozza meg.\n" +
-                                                                             $"A lap képessége {(prevw.EffectRequirement != Card.Fraction.None ? $"feltételhez kötött.\nA speciális feltétel kihasználásához legalább egy\n{reqname} lapot ki kell játszani a jelenlegi körben!\n" : "NEM kötött feltételhez,\naz alapképességekkel egyszerre kijátszható.\n")}" +
+                                                                             $"A lap képessége {(prevw.EffectRequirement != Card.Fraction.None ? $"feltételhez kötött.\nA speciális képesség kihasználásához legalább egy\n{reqname} lapot ki kell játszani a jelenlegi körben!\n" : "NEM kötött feltételhez,\naz alapképességekkel egyszerre kijátszható.\n")}" +
                                                                              $"A lap speciális képessége {prevw.EffectAmount} alkalommal biztosítja:\n{specEffect}",
                                         Card.HoveredObject.Unknown => "A lap adatai ismeretlenek!",
                                         _ => string.Empty
@@ -1513,9 +1514,9 @@ namespace CardGame {
                         }
                     }
                 }
-                EndTurnButton.Update(gameTime);
-                PlayAllCardsButton.Update(gameTime);
             }
+            EndTurnButton.Update(gameTime);
+            PlayAllCardsButton.Update(gameTime);
             ToolTipsBox.Update(gameTime);
             //CARDS with targets
             //TARGETS

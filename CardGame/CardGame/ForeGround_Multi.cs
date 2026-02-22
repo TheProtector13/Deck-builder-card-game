@@ -445,6 +445,8 @@ namespace CardGame {
 
         private void EndTurnEventHandler(object? sender, EventArgs e)
         {
+            cardMouseControlEnabled = false;
+            EndTurnButton.Enabled = false;
             ClearPlayedPile(true);
             // SEND
             peer.SendAsync(new ActionPayload(ActionType.EndTurn, null, CryptographyHelper.NowMs()));
@@ -456,7 +458,6 @@ namespace CardGame {
                 explodeSFX.Play(GameSettings.SFXVolume, 0, 0);
             PlayerAttack = 0;
             playerTurn = false;
-            EndTurnButton.Enabled = false;
         }
 
         private void PlayAllEventHandler(object? sender, EventArgs e)
@@ -728,7 +729,7 @@ namespace CardGame {
         {
             int handCardWidth = (int)MathF.Round(PlayerHandLoc.Height * CARD_WIDTH_SCALE);
             int handWidthOffset = (int)MathF.Round((PlayerHandLoc.Width - (5f * handCardWidth)) / 6);
-            if (PlayerHand.Count == 0) {
+            if (PlayerHand.Count == 0 && PlayedPile.Count == 0) {
                 foreach (CardDetails card in cards) {
                     Card[] deck = PlayerDeck.Where(c => c.GetCardDetails().Equals(card)).ToArray();
                     Card[] deck2 = PlayerUnknownDeck.Where(c => c.GetCardDetails().Equals(card)).ToArray();
@@ -796,7 +797,7 @@ namespace CardGame {
         {
             int handCardWidth = (int)MathF.Round(EnemyHandLoc.Height * CARD_WIDTH_SCALE);
             int handWidthOffset = (int)MathF.Round((EnemyHandLoc.Width - (5f * handCardWidth)) / 6);
-            if (EnemyHand.Count == 0) {
+            if (EnemyHand.Count == 0 && PlayedPile.Count == 0) {
                 foreach (CardDetails card in cards) {
                     Card[] deck = EnemyDeck.Where(c => c.GetCardDetails().Equals(card)).ToArray();
                     Card[] deck2 = EnemyUnknownDeck.Where(c => c.GetCardDetails().Equals(card)).ToArray();
@@ -870,18 +871,18 @@ namespace CardGame {
                 previewThis.Add(new(Shop[0]!, ShopTarget[0]));
             }
             for (int i = 1; i < Shop.Length; i++) {
-                Card[] Deck1 = DeckGenerator.GetMoneyCards().Where(card => card.GetCardDetails().Equals(cards[i])).ToArray();
                 if (Shop[i] == null) {
-                    Shop[i] = Deck1.Length != 0 ? Deck1[0] : GameDeck.Where(card => card.GetCardDetails().Equals(cards[i])).ToArray()[0];
-                    GameDeck.Remove(Shop[i]!);
-                    Shop[i]!.Flipped = false;
-                    Shop[i]!.RenderPrice = true;
-                    ShopTarget[i].StartLocation = globalCardStart;
-                    previewThis.Add(new(Shop[i]!, ShopTarget[i]));
+                    continue;
                 }
                 else if (!Shop[i]!.GetCardDetails().Equals(cards[i])) {
                     if (Shop[i]!.CardFraction != Card.Fraction.None)
                         GameDeck.Add(Shop[i]!);
+                    Shop[i] = null;
+                }
+            }
+            for (int i = 1; i < Shop.Length; i++) {
+                if (Shop[i] == null) {
+                    Card[] Deck1 = DeckGenerator.GetMoneyCards().Where(card => card.GetCardDetails().Equals(cards[i])).ToArray();
                     Shop[i] = Deck1.Length != 0 ? Deck1[0] : GameDeck.Where(card => card.GetCardDetails().Equals(cards[i])).ToArray()[0];
                     GameDeck.Remove(Shop[i]!);
                     Shop[i]!.Flipped = false;
@@ -1099,9 +1100,6 @@ namespace CardGame {
                                         }
                                         AddToPlayedPile(cardtoplay[0], EnemyHandTarget[EnemyHand.IndexOf(cardtoplay[0])], false);
                                         break;
-                                    case ActionType.Draw:
-                                        cheating = RefillEnemyHand([(CardDetails)action.Card!]);
-                                        break;
                                     case ActionType.Scrap:
                                         Card[] cardtoscrap = EnemyScrap.Where((card) => card.GetCardDetails().Equals(action.Card)).ToArray();
                                         if (cardtoscrap.Length == 0) {
@@ -1200,7 +1198,10 @@ namespace CardGame {
                                         AddToPlayedPile(cardtoplay[0], EnemyHandTarget[EnemyHand.IndexOf(cardtoplay[0])], false);
                                         break;
                                     case ActionType.Draw:
-                                        cheating = RefillEnemyHand([(CardDetails)action.Card!]);
+                                        if (playerTurn)
+                                            cheating = RefillPlayerHand([(CardDetails)action.Card!]);
+                                        else
+                                            cheating = RefillEnemyHand([(CardDetails)action.Card!]);
                                         break;
                                     case ActionType.Steal:
                                         //Ez játék közben is lehet
@@ -1764,7 +1765,7 @@ namespace CardGame {
                                 }
                             }
                             else {
-                                if (PlayerHandLoc.Contains(mouse.GetMousePosition())) {
+                                if (PlayerHandLoc.Contains(mouse.GetMousePosition()) && Shop.Contains(selectedCard)) {
                                     if (PlayerMoney >= selectedCard.Price) {
                                         PlayerMoney -= selectedCard.Price;
                                         BuyFromShop(selectedCard, true);
@@ -1788,9 +1789,9 @@ namespace CardGame {
                         }
                     }
                 }
-                EndTurnButton.Update(gameTime);
-                PlayAllCardsButton.Update(gameTime);
             }
+            EndTurnButton.Update(gameTime);
+            PlayAllCardsButton.Update(gameTime);
             ToolTipsBox.Update(gameTime);
             //CARDS with targets
             //TARGETS
