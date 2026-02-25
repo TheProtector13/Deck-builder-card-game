@@ -17,8 +17,47 @@ namespace CardGame {
         /// Specifies the maximum number of atlases that can be used per fontsystem.
         /// </summary>
         public static byte MaxAtlasCount = 3;
+        public static bool IsLoaded { get; private set; } = false;
         private static long loadedResources = 0;
         private static long totalResources = 0;
+        private static bool extCalledTextureLoading = false;
+
+        /// <summary>
+        /// Determines the expected frame rate for the application, which is used to calculate the batch size for loading textures externally with the <see cref="LoadNextTextureBatch(ContentManager)"/> method.
+        /// </summary>
+        /// <remarks> Default value is 60. </remarks>
+        public static int ExceptedFrameRate
+        {
+            get => exceptedFrameRate;
+            set {
+                if (value <= 0) {
+                    throw new ArgumentOutOfRangeException(nameof(ExceptedFrameRate), "Excepted frame rate must be greater than zero.");
+                }
+                exceptedFrameRate = value;
+                batchSize = 0;
+            }
+        }
+        private static int exceptedFrameRate = 60;
+
+        /// <summary>
+        /// Determines the target load time for loading resources externally, with the <see cref="LoadNextTextureBatch(ContentManager)"/> method.
+        /// This value represents the desired time in seconds that the whole batch of textures should take to load when using external loading.
+        /// Adjusting this value can help balance loading performance and responsiveness, allowing for smoother loading experiences by controlling how much work is done in each batch.
+        /// </summary>
+        /// <remarks> Default value is 10 seconds. </remarks>
+        public static int TargetLoadTime
+        {
+            get => targetLoadTime;
+            set {
+                if (value <= 0) {
+                    throw new ArgumentOutOfRangeException(nameof(TargetLoadTime), "Target load time must be greater than zero.");
+                }
+                targetLoadTime = value;
+                batchSize = 0;
+            }
+        }
+        private static int targetLoadTime = 10;
+        private static int batchSize = 0;
 
         /// <summary>
         /// Gets or sets the file path to the texture resources. Relative to the Content root directory.
@@ -59,6 +98,8 @@ namespace CardGame {
         /// Returns a Texture2D array. If a texture is part of a sequence (e.g., texture1, texture2, texture3), all related textures are grouped into an array under the same key.
         /// </summary>
         public static ImmutableDictionary<string, Texture2D[]> Textures { get; private set; } = ImmutableDictionary<string, Texture2D[]>.Empty;
+        private static readonly Queue<Tuple<string, string[], List<Texture2D>>> extTextureLoadQueue = new();
+        private static List<Tuple<string, string[], List<Texture2D>>> extTextureLoadDone;
         private static readonly Dictionary<Color, Texture2D> SingleColorTextures = new(10);
         /// <summary>
         /// Gets the collection of sound effects available in the application, indexed by unique string keys. The key is derived from the sound effect file name without its extension.
@@ -91,10 +132,12 @@ namespace CardGame {
         /// will be used. If 'string.Empty' or its originally was 'string.Empty' and now it is null, then sound effects wont be loaded.</param>
         /// <param name="fontpath">The relative path to the directory containing font assets. If null, the previously set font path will be
         /// used. If 'string.Empty' or its originally was 'string.Empty' and now it is null, then fonts wont be loaded.</param>
+        /// <param name="externallyCalledTextureLoading">Indicates whether the texture loading is being handled externally. 
+        /// If true, the method will not load textures or set the IsLoaded flag to true. Textures can be loaded in steps by another externally callable method.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="texturepath"/> is null and no texture path has been set previously.</exception>
         /// <exception cref="Exception">Thrown if duplicate keys are detected for textures, songs, sound effects, or fonts. Asset names must be
         /// unique.</exception>
-        public static void Init(ContentManager Content, string texturepath = null, string songpath = null, string soundpath = null, string fontpath = null)
+        public static void Init(ContentManager Content, string texturepath = null, string songpath = null, string soundpath = null, string fontpath = null, bool externallyCalledTextureLoading = false)
         {
             if (texturepath is null && TexturePath == string.Empty) {
                 throw new ArgumentNullException(nameof(texturepath), "Texture path cannot be null if it has not been set before.");
@@ -104,8 +147,7 @@ namespace CardGame {
             FontSystemDefaults.FontResolutionFactor = 2.0f;
             FontSystemDefaults.KernelWidth = 2;
             FontSystemDefaults.KernelHeight = 2;
-            FontSystemDefaults.DisableAntialiasing = true;
-            FontSystemDefaults.PremultiplyAlpha = true;
+            FontSystemDefaults.GlyphRenderResult = GlyphRenderResult.NonPremultiplied;
             FontSystemDefaults.UseKernings = true;
             TexturePath = texturepath ?? TexturePath;
             SongPath = songpath ?? SongPath;
@@ -126,6 +168,8 @@ namespace CardGame {
             Interlocked.Add(ref totalResources, filesS.Length);
             Interlocked.Add(ref totalResources, filesSFX.Length);
             Dictionary<string, Texture2D[]> textures = new(filesT.Length);
+            if (externallyCalledTextureLoading)
+                extTextureLoadDone = new(filesT.Length);
             Dictionary<string, SoundEffect> soundeffects = new(filesSFX.Length);
             Dictionary<string, Song> songs = new(filesS.Length);
             Dictionary<string, FontSystem> fonts = new(filesF.Length);
@@ -149,8 +193,8 @@ namespace CardGame {
                     }
                     string key = piplinepaths[i].Substring(0, piplinepaths[i].Length - numlength);
                     int num = int.Parse(piplinepaths[i].Substring(piplinepaths[i].Length - numlength));
-                    if (texture_sequences.ContainsKey(key)) {
-                        texture_sequences[key].Add(new(piplinepaths[i], num));
+                    if (texture_sequences.TryGetValue(key, out List<Tuple<string, int>> value)) {
+                        value.Add(new(piplinepaths[i], num));
                     }
                     else {
                         texture_sequences.Add(key, [new(piplinepaths[i], num)]);
@@ -158,33 +202,53 @@ namespace CardGame {
                     piplinepaths.RemoveAt(i);
                 }
             }
+            HashSet<string> duplicateCheck = new(texture_sequences.Keys.Count);
             foreach (string key in texture_sequences.Keys) {
                 List<Tuple<string, int>> sequence = texture_sequences[key];
                 sequence.Sort((a, b) => a.Item2.CompareTo(b.Item2));
-                List<Texture2D> textureseq = [];
-                foreach (Tuple<string, int> item in sequence) {
-                    textureseq.Add(Content.Load<Texture2D>(item.Item1));
-                    Interlocked.Increment(ref loadedResources);
-                }
                 string newkey = key.Split("/").Last();
-                if (!textures.ContainsKey(newkey)) {
-                    textures.Add(newkey, textureseq.ToArray());
+                if (!externallyCalledTextureLoading) {
+                    List<Texture2D> textureseq = [];
+                    foreach (Tuple<string, int> item in sequence) {
+                        textureseq.Add(Content.Load<Texture2D>(item.Item1));
+                        Interlocked.Increment(ref loadedResources);
+                    }
+                    if (!textures.ContainsKey(newkey)) {
+                        textures.Add(newkey, textureseq.ToArray());
+                    }
+                    else {
+                        throw new Exception($"Duplicate texture key: {newkey} ! Texture names MUST be unique!");
+                    }
                 }
                 else {
-                    throw new Exception($"Duplicate texture key: {newkey} ! Texture names MUST be unique!");
+                    if (duplicateCheck.Contains(newkey))
+                        throw new Exception($"Duplicate texture key: {newkey} ! Texture names MUST be unique!");
+                    extTextureLoadQueue.Enqueue(new(newkey, sequence.Select(t => t.Item1).ToArray(), new(sequence.Count)));
+                    duplicateCheck.Add(newkey);
                 }
             }
             foreach (string path in piplinepaths) {
                 string key = path.Split("/").Last();
-                if (!textures.ContainsKey(key)) {
-                    textures.Add(key, [Content.Load<Texture2D>(path)]);
-                    Interlocked.Increment(ref loadedResources);
+                if (!externallyCalledTextureLoading) {
+                    if (!textures.ContainsKey(key)) {
+                        textures.Add(key, [Content.Load<Texture2D>(path)]);
+                        Interlocked.Increment(ref loadedResources);
+                    }
+                    else {
+                        throw new Exception($"Duplicate texture key: {key} ! Texture names MUST be unique!");
+                    }
                 }
                 else {
-                    throw new Exception($"Duplicate texture key: {key} ! Texture names MUST be unique!");
+                    if (duplicateCheck.Contains(key))
+                        throw new Exception($"Duplicate texture key: {key} ! Texture names MUST be unique!");
+                    extTextureLoadQueue.Enqueue(new(key, [path], new(1)));
+                    duplicateCheck.Add(key);
                 }
             }
-            Textures = textures.ToImmutableDictionary();
+            if (!externallyCalledTextureLoading)
+                Textures = textures.ToImmutableDictionary();
+            else
+                extCalledTextureLoading = true;
             // Load Songs
             if (SongPath != string.Empty) {
                 piplinepaths.Clear();
@@ -248,6 +312,47 @@ namespace CardGame {
                     }
                 }
                 Fonts = fonts.ToImmutableDictionary();
+            }
+            IsLoaded = !externallyCalledTextureLoading;
+        }
+
+        /// <summary>
+        /// If texture loading is being handled externally, this method loads the next batch of textures from the queue.
+        /// The batch size is determined by the expected frame rate and target load time, allowing for smoother loading experiences
+        /// by controlling how much work is done in each batch. Once all textures have been loaded, the method finalizes the texture
+        /// dictionary and sets the IsLoaded flag to true.
+        /// </summary>
+        /// <param name="Content"> Monogame ContentManager </param>
+        public static void LoadNextTextureBatch(ContentManager Content)
+        {
+            if (!extCalledTextureLoading || IsLoaded)
+                return;
+            if (extTextureLoadQueue.Count == 0) {
+                Textures = extTextureLoadDone.ToImmutableDictionary(batch => batch.Item1, batch => batch.Item3.ToArray());
+                extTextureLoadDone = null;
+                IsLoaded = true;
+                return;
+            }
+            if (batchSize == 0) {
+                batchSize = (int)Math.Ceiling((double)extTextureLoadQueue.Sum(batch => batch.Item2.Length) / ExceptedFrameRate / TargetLoadTime);
+            }
+            int loadedCount = 0;
+            while (loadedCount < batchSize && extTextureLoadQueue.Count > 0) {
+                Tuple<string, string[], List<Texture2D>> batch = extTextureLoadQueue.Dequeue();
+                for (int i = batch.Item3.Count; i < batch.Item2.Length; i++) {
+                    batch.Item3.Add(Content.Load<Texture2D>(batch.Item2[i]));
+                    Interlocked.Increment(ref loadedResources);
+                    loadedCount++;
+                    if (loadedCount >= batchSize) {
+                        break;
+                    }
+                }
+                if (batch.Item3.Count == batch.Item2.Length) {
+                    extTextureLoadDone.Add(batch);
+                }
+                else {
+                    extTextureLoadQueue.Enqueue(batch);
+                }
             }
         }
 

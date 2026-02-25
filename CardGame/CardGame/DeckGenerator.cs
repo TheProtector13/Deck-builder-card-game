@@ -164,7 +164,7 @@ namespace CardGame {
 
             for (int i = 0; i < 3; i++)
                 list.Add(new Card(rect, bgtextures[Random.Shared.Next(0, bgtextures.Length)], ResourceManager.Textures["Scout"][0],
-                    D(Card.Fraction.Empire, "Felderítő", "Egy krátyát húz a pakliból", "'A felkészülésre fordított idő\nritkán vész kárba!'", 1, 0, 0, 1, false, Vector3.Zero, Card.Effect.DrawCard, 1, Card.Fraction.Empire)));
+                    D(Card.Fraction.Empire, "Felderítő", "Egy kártyát húz a pakliból", "'A felkészülésre fordított idő\nritkán vész kárba!'", 1, 0, 0, 1, false, Vector3.Zero, Card.Effect.DrawCard, 1, Card.Fraction.Empire)));
 
             for (int i = 0; i < 3; i++)
                 list.Add(new Card(rect, bgtextures[Random.Shared.Next(0, bgtextures.Length)], ResourceManager.Textures["Infantry"][0],
@@ -199,13 +199,13 @@ namespace CardGame {
 
             for (int i = 0; i < 2; i++)
                 list.Add(new Card(rect, skytexture[Random.Shared.Next(0, skytexture.Length)], ResourceManager.Textures["SP"][1],
-                    D(Card.Fraction.Empire, "Romboló", "Egy krátyát húz a pakliból", "'Ne add fel a hajót!'", 7, 0, 2, 7, false, Vector3.Zero, Card.Effect.DrawCard, 1, Card.Fraction.None)) { FGCentered = true });
+                    D(Card.Fraction.Empire, "Romboló", "Egy kártyát húz a pakliból", "'Ne add fel a hajót!'", 7, 0, 2, 7, false, Vector3.Zero, Card.Effect.DrawCard, 1, Card.Fraction.None)) { FGCentered = true });
 
             list.Add(new Card(rect, ResourceManager.Textures["General"][0], null,
                 D(Card.Fraction.Empire, "Tábornok", string.Empty, "'A háború célja a béke elérése.'", 7, 2, 0, 8, false, Vector3.Zero, Card.Effect.AttackBonus, 3, Card.Fraction.Empire)));
 
             list.Add(new Card(rect, ResourceManager.Textures["Emperor"][0], null,
-                D(Card.Fraction.Empire, "Az uralkodó", "Két krátyát húz a pakliból", "'Ha a szív nem királyi,\nannak birtokosa sohasem király.'", 8, 0, 0, 8, false, Vector3.Zero, Card.Effect.DrawCard, 2, Card.Fraction.None)));
+                D(Card.Fraction.Empire, "Az uralkodó", "Két kártyát húz a pakliból", "'Ha a szív nem királyi,\nannak birtokosa sohasem király.'", 8, 0, 0, 8, false, Vector3.Zero, Card.Effect.DrawCard, 2, Card.Fraction.None)));
 
             // ALLIANCE
             for (int i = 0; i < 3; i++)
@@ -255,7 +255,7 @@ namespace CardGame {
                 D(Card.Fraction.Alliance, "Nagykövet", "Eltávolítja az összes\nlapot a boltból", "'Az őszinteség kérdéseket szül.'", 0, 2, 2, 8, false, Vector3.Zero, Card.Effect.ScrapFromShop, 5, Card.Fraction.Alliance)));
 
             list.Add(new Card(rect, ResourceManager.Textures["Minister"][0], null,
-                D(Card.Fraction.Alliance, "Miniszterelnök", "Egy krátyát húz a pakliból", "'Vitából pattan elő az igazság szikrája.'", 3, 5, 5, 8, false, Vector3.Zero, Card.Effect.DrawCard, 1, Card.Fraction.Alliance)));
+                D(Card.Fraction.Alliance, "Miniszterelnök", "Egy kártyát húz a pakliból", "'Vitából pattan elő az igazság szikrája.'", 3, 5, 5, 8, false, Vector3.Zero, Card.Effect.DrawCard, 1, Card.Fraction.Alliance)));
 
             // MACHINES
             for (int i = 0; i < 3; i++) {
@@ -294,7 +294,7 @@ namespace CardGame {
                     D(Card.Fraction.Machines, "Cirkáló", string.Empty, "'Körözés a célterület felett..'", 6, 0, 0, 7, true, new Vector3(0f, 0.5f, 0.5f), Card.Effect.AttackBonus, 6, Card.Fraction.Machines)) { FGCentered = true });
 
             list.Add(new Card(rect, ResourceManager.Textures["Factory"][0], null,
-                D(Card.Fraction.Machines, "A Gyár", "Két krátyát húz a pakliból", "'Egy újabb széria..'", 5, 5, 0, 8, false, Vector3.Zero, Card.Effect.DrawCard, 2, Card.Fraction.Machines)));
+                D(Card.Fraction.Machines, "A Gyár", "Két kártyát húz a pakliból", "'Egy újabb széria..'", 5, 5, 0, 8, false, Vector3.Zero, Card.Effect.DrawCard, 2, Card.Fraction.Machines)));
 
             list.Add(new Card(rect, ResourceManager.Textures["The_fleet"][0], null,
                 D(Card.Fraction.Machines, "A flotta", string.Empty, "'Nincs ember, aki útját állhatná.'", 9, 0, 0, 8, false, Vector3.Zero, Card.Effect.AttackBonus, 7, Card.Fraction.Machines)));
@@ -445,7 +445,7 @@ namespace CardGame {
                 D(Card.Fraction.Empire, "Milícia", string.Empty, "'A fő cél az, hogy minden ember\nfel legyen fegyverezve.'", 1, 0, 0, 1, false, Vector3.Zero, Card.Effect.None, 0, Card.Fraction.None)));
 
             list.Add(new Card(rect, bgtextures[Random.Shared.Next(0, bgtextures.Length)], ResourceManager.Textures["Scout"][0],
-                D(Card.Fraction.Empire, "Felderítő", "Egy krátyát húz a pakliból", "'A felkészülésre fordított idő\nritkán vész kárba!'", 1, 0, 0, 1, false, Vector3.Zero, Card.Effect.DrawCard, 1, Card.Fraction.Empire)));
+                D(Card.Fraction.Empire, "Felderítő", "Egy kártyát húz a pakliból", "'A felkészülésre fordított idő\nritkán vész kárba!'", 1, 0, 0, 1, false, Vector3.Zero, Card.Effect.DrawCard, 1, Card.Fraction.Empire)));
 
             list.Add(new Card(rect, bgtextures[Random.Shared.Next(0, bgtextures.Length)], ResourceManager.Textures["Infantry"][0],
                 D(Card.Fraction.Empire, "Gyalogság", string.Empty, "'Minden sereg alappillére.'", 2, 0, 0, 2, true, new Vector3(0.5f, -0.5f, 0f), Card.Effect.AttackBonus, 1, Card.Fraction.Empire)));
@@ -472,13 +472,13 @@ namespace CardGame {
                 D(Card.Fraction.Empire, "Komp", string.Empty, "'Egyszerű, de rendíthetetlen.'", 6, 0, 1, 7, false, Vector3.Zero, Card.Effect.HealthBonus, 2, Card.Fraction.Empire)) { FGCentered = true });
 
             list.Add(new Card(rect, skytexture[Random.Shared.Next(0, skytexture.Length)], ResourceManager.Textures["SP"][1],
-                D(Card.Fraction.Empire, "Romboló", "Egy krátyát húz a pakliból", "'Ne add fel a hajót!'", 7, 0, 2, 7, false, Vector3.Zero, Card.Effect.DrawCard, 1, Card.Fraction.None)) { FGCentered = true });
+                D(Card.Fraction.Empire, "Romboló", "Egy kártyát húz a pakliból", "'Ne add fel a hajót!'", 7, 0, 2, 7, false, Vector3.Zero, Card.Effect.DrawCard, 1, Card.Fraction.None)) { FGCentered = true });
 
             list.Add(new Card(rect, ResourceManager.Textures["General"][0], null,
                 D(Card.Fraction.Empire, "Tábornok", string.Empty, "'A háború célja a béke elérése.'", 7, 2, 0, 8, false, Vector3.Zero, Card.Effect.AttackBonus, 3, Card.Fraction.Empire)));
 
             list.Add(new Card(rect, ResourceManager.Textures["Emperor"][0], null,
-                D(Card.Fraction.Empire, "Az uralkodó", "Két krátyát húz a pakliból", "'Ha a szív nem királyi,\nannak birtokosa sohasem király.'", 8, 0, 0, 8, false, Vector3.Zero, Card.Effect.DrawCard, 2, Card.Fraction.None)));
+                D(Card.Fraction.Empire, "Az uralkodó", "Két kártyát húz a pakliból", "'Ha a szív nem királyi,\nannak birtokosa sohasem király.'", 8, 0, 0, 8, false, Vector3.Zero, Card.Effect.DrawCard, 2, Card.Fraction.None)));
 
             // ALLIANCE
             list.Add(new Card(rect, ResourceManager.Textures["Medicine"][0], null,
@@ -518,7 +518,7 @@ namespace CardGame {
                 D(Card.Fraction.Alliance, "Nagykövet", "Eltávolítja az összes\nlapot a boltból", "'Az őszinteség kérdéseket szül.'", 0, 2, 2, 8, false, Vector3.Zero, Card.Effect.ScrapFromShop, 5, Card.Fraction.Alliance)));
 
             list.Add(new Card(rect, ResourceManager.Textures["Minister"][0], null,
-                D(Card.Fraction.Alliance, "Miniszterelnök", "Egy krátyát húz a pakliból", "'Vitából pattan elő az igazság szikrája.'", 3, 5, 5, 8, false, Vector3.Zero, Card.Effect.DrawCard, 1, Card.Fraction.Alliance)));
+                D(Card.Fraction.Alliance, "Miniszterelnök", "Egy kártyát húz a pakliból", "'Vitából pattan elő az igazság szikrája.'", 3, 5, 5, 8, false, Vector3.Zero, Card.Effect.DrawCard, 1, Card.Fraction.Alliance)));
 
             // MACHINES
             list.Add(new Card(rect, bgtextures[Random.Shared.Next(0, bgtextures.Length)], ResourceManager.Textures["Combat_drones"][0],
@@ -550,7 +550,7 @@ namespace CardGame {
                 D(Card.Fraction.Machines, "Cirkáló", string.Empty, "'Körözés a célterület felett..'", 6, 0, 0, 7, true, new Vector3(0f, 0.5f, 0.5f), Card.Effect.AttackBonus, 6, Card.Fraction.Machines)) { FGCentered = true });
 
             list.Add(new Card(rect, ResourceManager.Textures["Factory"][0], null,
-                D(Card.Fraction.Machines, "A Gyár", "Két krátyát húz a pakliból", "'Egy újabb széria..'", 5, 5, 0, 8, false, Vector3.Zero, Card.Effect.DrawCard, 2, Card.Fraction.Machines)));
+                D(Card.Fraction.Machines, "A Gyár", "Két kártyát húz a pakliból", "'Egy újabb széria..'", 5, 5, 0, 8, false, Vector3.Zero, Card.Effect.DrawCard, 2, Card.Fraction.Machines)));
 
             list.Add(new Card(rect, ResourceManager.Textures["The_fleet"][0], null,
                 D(Card.Fraction.Machines, "A flotta", string.Empty, "'Nincs ember, aki útját állhatná.'", 9, 0, 0, 8, false, Vector3.Zero, Card.Effect.AttackBonus, 7, Card.Fraction.Machines)));

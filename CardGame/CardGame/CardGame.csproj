@@ -5,13 +5,16 @@
     <RollForward>Major</RollForward>
     <PublishReadyToRun>false</PublishReadyToRun>
     <TieredCompilation>false</TieredCompilation>
-    <UseWindowsForms>true</UseWindowsForms>
+    <UseWindowsForms>false</UseWindowsForms>
     <ServerGarbageCollection>true</ServerGarbageCollection>
-    <SelfContained>true</SelfContained>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <PublishReadyToRun>true</PublishReadyToRun>
     <TieredCompilation>false</TieredCompilation>
+    <TieredPGO>false</TieredPGO>
+    <SelfContained>true</SelfContained>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -19,20 +22,20 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="FontStashSharp.MonoGame" Version="1.5.3" />
+    <PackageReference Include="FontStashSharp.MonoGame" Version="1.5.4" />
     <PackageReference Include="MessagePack" Version="3.1.4" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.2" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.3" />
     <PackageReference Include="Microsoft.ML" Version="5.0.0" />
     <PackageReference Include="Microsoft.ML.CpuMath" Version="5.0.0" />
     <PackageReference Include="Microsoft.ML.DataView" Version="5.0.0" />
     <PackageReference Include="Microsoft.ML.TensorFlow" Version="5.0.0" />
-    <PackageReference Include="Microsoft.NETCore.DotNetAppHost" Version="10.0.2" />
-    <PackageReference Include="Microsoft.NETCore.DotNetHostPolicy" Version="8.0.23" />
-    <PackageReference Include="Microsoft.NETCore.DotNetHostResolver" Version="8.0.23" />
+    <PackageReference Include="Microsoft.NETCore.DotNetAppHost" Version="10.0.3" />
+    <PackageReference Include="Microsoft.NETCore.DotNetHostPolicy" Version="8.0.24" />
+    <PackageReference Include="Microsoft.NETCore.DotNetHostResolver" Version="8.0.24" />
     <PackageReference Include="Microsoft.NETCore.Jit" Version="2.0.8" />
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
     <PackageReference Include="Microsoft.NETCore.Targets" Version="5.0.0" />
-    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.4.1" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4.1" />
     <!-- <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4.1" /> -->
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4.1" />
     <PackageReference Include="NETStandard.Library" Version="2.0.3" />
@@ -41,7 +44,7 @@
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
     <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.2" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.3" />
     <PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0" />
     <PackageReference Include="System.Globalization" Version="4.3.0" />
     <PackageReference Include="System.IO" Version="4.3.0" />

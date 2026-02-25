@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CardGame.TCP;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using static CardGame.TCP.MessagePackHelper;
 
 #nullable enable
@@ -14,22 +15,31 @@ namespace CardGame {
         private IDrawable? fg;
         private MainMenu menu;
         private SplashScreen? splashScreen;
+        private Texture2D[] CursorTexture;
+        private Vector2 CursorLocation;
+        private bool CursorPressed;
         private Task ResourceManagerLoading;
+        private readonly TaskCompletionSource<bool> ResourceManagerLoaded = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         public Game1()
         {
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
 
-            _graphics = new GraphicsDeviceManager(this);
-            _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-            _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-            _graphics.PreferMultiSampling = true;
-            _graphics.HardwareModeSwitch = false;
-            _graphics.IsFullScreen = true;
+            _graphics = new GraphicsDeviceManager(this) {
+                PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width,
+                PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height,
+                PreferMultiSampling = true,
+                HardwareModeSwitch = false,
+                IsFullScreen = true
+            };
+            _graphics.PreparingDeviceSettings += (s, e) => {
+                e.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = 4;
+            };
+            _graphics.ApplyChanges();
             this.IsFixedTimeStep = true;
             this.TargetElapsedTime = System.TimeSpan.FromSeconds(1d / 60d);
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
         }
 
         protected override void Initialize()
@@ -39,6 +49,7 @@ namespace CardGame {
             ResourceManager.FontPath = "FONTS";
             ResourceManager.SoundPath = "SFX";
             ResourceManager.SongPath = "MUSIC";
+            ResourceManager.TargetLoadTime = 8;
             base.Initialize();
         }
 
@@ -46,13 +57,15 @@ namespace CardGame {
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             splashScreen = new SplashScreen(Content);
-            ResourceManagerLoading = Task.Run(() => {
+            ResourceManagerLoading = Task.Run(async () => {
                 MLController.Init();
                 DatabaseConnector.Init();
-                ResourceManager.Init(Content);
+                ResourceManager.Init(Content, externallyCalledTextureLoading: true);
+                await ResourceManagerLoaded.Task;
                 MusicPlayer.Init();
+                CursorTexture = ResourceManager.Textures["Cursor"];
             });
-
+            //ResourceManager.Init(Content);
             // TODO: use this.Content to load your game content here
         }
 
@@ -62,9 +75,15 @@ namespace CardGame {
             //    if (splashScreen is null && (fg is null || fg.WINNER != ForeGround.GameWinner.InProgress))
             //        Exit();
             DisplayInfo.IsFocused = this.IsActive;
+            MouseState mouseState = Mouse.GetState();
+            CursorLocation = mouseState.Position.ToVector2();
+            CursorPressed = mouseState.LeftButton == ButtonState.Pressed;
             if (splashScreen is not null && !splashScreen.Finished) {
                 splashScreen.Percentage = ResourceManager.GetLoadProgress();
                 splashScreen.Update(gameTime);
+                ResourceManager.LoadNextTextureBatch(Content);
+                if (ResourceManager.IsLoaded)
+                    ResourceManagerLoaded.TrySetResult(true);
                 if (ResourceManagerLoading.IsCompleted)
                     splashScreen.AddNewCards = false;
             }
@@ -161,7 +180,8 @@ namespace CardGame {
         {
             GraphicsDevice.Clear(Color.Black);
 
-            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied,
+                SamplerState.LinearClamp, DepthStencilState.None, new() { CullMode = CullMode.None, MultiSampleAntiAlias = true });
             if (splashScreen is not null) {
                 splashScreen.Draw(gameTime, _spriteBatch);
             }
@@ -173,6 +193,13 @@ namespace CardGame {
                     fg?.Draw(gameTime, _spriteBatch);
                 }
             }
+            //Cursor
+            if (CursorTexture is not null)
+                if (CursorPressed)
+                    _spriteBatch.Draw(CursorTexture[1], CursorLocation, Color.White);
+                else
+                    _spriteBatch.Draw(CursorTexture[0], CursorLocation, Color.White);
+            //
             _spriteBatch.End();
 
             // TODO: Add your drawing code here

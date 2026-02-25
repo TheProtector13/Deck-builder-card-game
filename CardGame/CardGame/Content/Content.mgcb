@@ -3,7 +3,7 @@
 
 /outputDir:bin/$(Platform)
 /intermediateDir:obj/$(Platform)
-/platform:Windows
+/platform:DesktopGL
 /config:
 /profile:HiDef
 /compress:True
@@ -118,7 +118,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/CC0/CARDS/FACES/Embassy.png;TEXTURES/CARDS/FACES/Embassy.png
 
 #begin ../../../ASSETS/CC0/CARDS/FACES/Emperor.jpg
@@ -224,9 +224,9 @@
 /processorParam:ColorKeyEnabled=False
 /processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/CC0/CARDS/FACES/Lopakodo.png;TEXTURES/CARDS/FACES/Lopakodo.png
 
 #begin ../../../ASSETS/CC0/CARDS/FACES/Media.jpg
@@ -308,9 +308,9 @@
 /processorParam:ColorKeyEnabled=False
 /processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/CC0/CARDS/FACES/RobotDrone.png;TEXTURES/CARDS/FACES/RobotDrone.png
 
 #begin ../../../ASSETS/CC0/CARDS/FACES/Sabotage.jpg
@@ -476,7 +476,7 @@
 /processorParam:ColorKeyEnabled=False
 /processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/CARDS/ICONS/AllianceIcon.png;TEXTURES/CARDS/ICONS/AllianceIcon.png
@@ -486,9 +486,9 @@
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
 /processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
+/processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/CARDS/ICONS/AllianceIconWB.png;TEXTURES/CARDS/ICONS/AllianceIconWB.png
@@ -498,9 +498,9 @@
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
 /processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
+/processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/CARDS/ICONS/AttackBGI.png;TEXTURES/CARDS/ICONS/AttackBGI.png
@@ -512,7 +512,7 @@
 /processorParam:ColorKeyEnabled=False
 /processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/CARDS/ICONS/CollectorCultIcon.png;TEXTURES/CARDS/ICONS/CollectorCultIcon.png
@@ -522,9 +522,9 @@
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
 /processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
+/processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/CARDS/ICONS/CollectorCultIconWB.png;TEXTURES/CARDS/ICONS/CollectorCultIconWB.png
@@ -536,7 +536,7 @@
 /processorParam:ColorKeyEnabled=False
 /processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/CARDS/ICONS/EmpireIcon.png;TEXTURES/CARDS/ICONS/EmpireIcon.png
@@ -546,9 +546,9 @@
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
 /processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
+/processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/CARDS/ICONS/EmpireIconWB.png;TEXTURES/CARDS/ICONS/EmpireIconWB.png
@@ -558,9 +558,9 @@
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
 /processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
+/processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/CARDS/ICONS/HealthBGI.png;TEXTURES/CARDS/ICONS/HealthBGI.png
@@ -570,9 +570,9 @@
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
 /processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
+/processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/CARDS/ICONS/HPIcon.png;TEXTURES/CARDS/ICONS/HPIcon.png
@@ -584,7 +584,7 @@
 /processorParam:ColorKeyEnabled=False
 /processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/CARDS/ICONS/MachinesIcon.png;TEXTURES/CARDS/ICONS/MachinesIcon.png
@@ -594,9 +594,9 @@
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
 /processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
+/processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/CARDS/ICONS/MachinesIconWB.png;TEXTURES/CARDS/ICONS/MachinesIconWB.png
@@ -606,9 +606,9 @@
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
 /processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
+/processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/CARDS/ICONS/MoneyBGI.png;TEXTURES/CARDS/ICONS/MoneyBGI.png
@@ -620,7 +620,7 @@
 /processorParam:ColorKeyEnabled=False
 /processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/CARDS/ICONS/TargetIcon.png;TEXTURES/CARDS/ICONS/TargetIcon.png
@@ -632,7 +632,7 @@
 /processorParam:ColorKeyEnabled=False
 /processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/CARDS/ICONS/TheEyeIcon.png;TEXTURES/CARDS/ICONS/TheEyeIcon.png
@@ -642,9 +642,9 @@
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
 /processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
+/processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/CARDS/ICONS/TheEyeIconWB.png;TEXTURES/CARDS/ICONS/TheEyeIconWB.png
@@ -37627,6 +37627,30 @@
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/CC0/UI/UI_OBJ/BUTTON2.png;TEXTURES/UI/BUTTON2.png
 
+#begin ../../../ASSETS/CC0/UI/UI_OBJ/Cursor0.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../ASSETS/CC0/UI/UI_OBJ/Cursor0.png;TEXTURES/UI/Cursor0.png
+
+#begin ../../../ASSETS/CC0/UI/UI_OBJ/Cursor1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../ASSETS/CC0/UI/UI_OBJ/Cursor1.png;TEXTURES/UI/Cursor1.png
+
 #begin ../../../ASSETS/CC0/UI/UI_OBJ/Defeat.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -38032,7 +38056,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Anti_air.png;TEXTURES/CARDS/FACES/Anti_air.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Black_market.png
@@ -38044,7 +38068,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Black_market.png;TEXTURES/CARDS/FACES/Black_market.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Booting.png
@@ -38056,7 +38080,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Booting.png;TEXTURES/CARDS/FACES/Booting.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Collectors.png
@@ -38068,7 +38092,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Collectors.png;TEXTURES/CARDS/FACES/Collectors.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Combat_drones.png
@@ -38080,7 +38104,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Combat_drones.png;TEXTURES/CARDS/FACES/Combat_drones.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Counter_inteligence.png
@@ -38090,9 +38114,9 @@
 /processorParam:ColorKeyEnabled=False
 /processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Counter_inteligence.png;TEXTURES/CARDS/FACES/Counter_inteligence.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Drone.png
@@ -38104,7 +38128,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Drone.png;TEXTURES/CARDS/FACES/Drone.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Heavy_infantry.png
@@ -38116,7 +38140,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Heavy_infantry.png;TEXTURES/CARDS/FACES/Heavy_infantry.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Infantry.png
@@ -38128,7 +38152,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Infantry.png;TEXTURES/CARDS/FACES/Infantry.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Mechanized.png
@@ -38136,11 +38160,11 @@
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
 /processorParam:ColorKeyEnabled=False
-/processorParam:GenerateMipmaps=False
+/processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Mechanized.png;TEXTURES/CARDS/FACES/Mechanized.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Medicine1.png
@@ -38152,7 +38176,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Medicine1.png;TEXTURES/CARDS/FACES/Medicine1.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Medicine2.png
@@ -38164,7 +38188,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Medicine2.png;TEXTURES/CARDS/FACES/Medicine2.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Medicine3.png
@@ -38176,7 +38200,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Medicine3.png;TEXTURES/CARDS/FACES/Medicine3.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Militia.png
@@ -38188,7 +38212,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Militia.png;TEXTURES/CARDS/FACES/Militia.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Mine.png
@@ -38200,7 +38224,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Mine.png;TEXTURES/CARDS/FACES/Mine.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Money1.png
@@ -38212,7 +38236,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Money1.png;TEXTURES/CARDS/FACES/Money1.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Money2.png
@@ -38224,7 +38248,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Money2.png;TEXTURES/CARDS/FACES/Money2.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Money3.png
@@ -38236,7 +38260,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Money3.png;TEXTURES/CARDS/FACES/Money3.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Orbital1.png
@@ -38248,7 +38272,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Orbital1.png;TEXTURES/CARDS/FACES/Orbital1.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Orbital2.png
@@ -38260,7 +38284,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Orbital2.png;TEXTURES/CARDS/FACES/Orbital2.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Robot1.png
@@ -38272,7 +38296,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Robot1.png;TEXTURES/CARDS/FACES/Robot1.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Robot2.png
@@ -38284,7 +38308,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Robot2.png;TEXTURES/CARDS/FACES/Robot2.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Robot3.png
@@ -38296,7 +38320,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Robot3.png;TEXTURES/CARDS/FACES/Robot3.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Satelite.png
@@ -38308,7 +38332,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Satelite.png;TEXTURES/CARDS/FACES/Satelite.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Scout.png
@@ -38320,7 +38344,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Scout.png;TEXTURES/CARDS/FACES/Scout.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/SP1.png
@@ -38332,7 +38356,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/SP1.png;TEXTURES/CARDS/FACES/SP1.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/SP2.png
@@ -38344,7 +38368,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/SP2.png;TEXTURES/CARDS/FACES/SP2.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/SP3.png
@@ -38356,7 +38380,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/SP3.png;TEXTURES/CARDS/FACES/SP3.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/SP4.png
@@ -38368,7 +38392,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/SP4.png;TEXTURES/CARDS/FACES/SP4.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Specialist.png
@@ -38380,7 +38404,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Specialist.png;TEXTURES/CARDS/FACES/Specialist.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Trader.png
@@ -38392,7 +38416,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Trader.png;TEXTURES/CARDS/FACES/Trader.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Trading_post.png
@@ -38404,7 +38428,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Trading_post.png;TEXTURES/CARDS/FACES/Trading_post.png
 
 #begin ../../../ASSETS/LIC/CARDS/FACES/Unstoppable.png
@@ -38416,7 +38440,7 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=DxtCompressed
+/processorParam:TextureFormat=Color
 /build:../../../ASSETS/LIC/CARDS/FACES/Unstoppable.png;TEXTURES/CARDS/FACES/Unstoppable.png
 
 #begin ../../../ASSETS/LIC/CARDS/ICONS/MoneyFGI.png
@@ -38426,7 +38450,7 @@
 /processorParam:ColorKeyEnabled=False
 /processorParam:GenerateMipmaps=True
 /processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=True
+/processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=DxtCompressed
 /build:../../../ASSETS/LIC/CARDS/ICONS/MoneyFGI.png;TEXTURES/CARDS/ICONS/MoneyFGI.png
