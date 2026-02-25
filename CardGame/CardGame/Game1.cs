@@ -16,8 +16,7 @@ namespace CardGame {
         private MainMenu menu;
         private SplashScreen? splashScreen;
         private Texture2D[] CursorTexture;
-        private Vector2 CursorLocation;
-        private bool CursorPressed;
+        private readonly MouseInfo mouseInfo;
         private Task ResourceManagerLoading;
         private readonly TaskCompletionSource<bool> ResourceManagerLoaded = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -40,6 +39,7 @@ namespace CardGame {
             this.TargetElapsedTime = System.TimeSpan.FromSeconds(1d / 60d);
             Content.RootDirectory = "Content";
             IsMouseVisible = false;
+            mouseInfo = new MouseInfo(Mouse.GetState());
         }
 
         protected override void Initialize()
@@ -75,9 +75,7 @@ namespace CardGame {
             //    if (splashScreen is null && (fg is null || fg.WINNER != ForeGround.GameWinner.InProgress))
             //        Exit();
             DisplayInfo.IsFocused = this.IsActive;
-            MouseState mouseState = Mouse.GetState();
-            CursorLocation = mouseState.Position.ToVector2();
-            CursorPressed = mouseState.LeftButton == ButtonState.Pressed;
+            mouseInfo.Update(Mouse.GetState());
             if (splashScreen is not null && !splashScreen.Finished) {
                 splashScreen.Percentage = ResourceManager.GetLoadProgress();
                 splashScreen.Update(gameTime);
@@ -195,10 +193,14 @@ namespace CardGame {
             }
             //Cursor
             if (CursorTexture is not null)
-                if (CursorPressed)
-                    _spriteBatch.Draw(CursorTexture[1], CursorLocation, Color.White);
+                if (mouseInfo.Current.RightButton == ButtonState.Pressed)
+                    _spriteBatch.Draw(CursorTexture[2], mouseInfo.GetMousePosition(true), Color.White);
+                else if (mouseInfo.Current.LeftButton == ButtonState.Pressed)
+                    _spriteBatch.Draw(CursorTexture[1], mouseInfo.GetMousePosition(true), Color.White);
+                else if (mouseInfo.Current.MiddleButton == ButtonState.Pressed || mouseInfo.WheelDelta != 0)
+                    _spriteBatch.Draw(CursorTexture[3], mouseInfo.GetMousePosition(true), Color.White);
                 else
-                    _spriteBatch.Draw(CursorTexture[0], CursorLocation, Color.White);
+                    _spriteBatch.Draw(CursorTexture[0], mouseInfo.GetMousePosition(true), Color.White);
             //
             _spriteBatch.End();
 

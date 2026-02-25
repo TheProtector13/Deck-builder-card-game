@@ -37651,6 +37651,30 @@
 /processorParam:TextureFormat=Color
 /build:../../../ASSETS/CC0/UI/UI_OBJ/Cursor1.png;TEXTURES/UI/Cursor1.png
 
+#begin ../../../ASSETS/CC0/UI/UI_OBJ/Cursor2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../ASSETS/CC0/UI/UI_OBJ/Cursor2.png;TEXTURES/UI/Cursor2.png
+
+#begin ../../../ASSETS/CC0/UI/UI_OBJ/Cursor3.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../ASSETS/CC0/UI/UI_OBJ/Cursor3.png;TEXTURES/UI/Cursor3.png
+
 #begin ../../../ASSETS/CC0/UI/UI_OBJ/Defeat.png
 /importer:TextureImporter
 /processor:TextureProcessor

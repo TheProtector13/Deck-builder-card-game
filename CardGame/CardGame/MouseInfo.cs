@@ -9,6 +9,8 @@ namespace CardGame {
 
         public Point GetMousePosition() => Current.Position;
 
+        public Vector2 GetMousePosition(bool _) => Current.Position.ToVector2();
+
         public void Update(MouseState newCurrent)
         {
             if (!DisplayInfo.IsFocused) return;

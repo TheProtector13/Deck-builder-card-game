@@ -3151,6 +3151,8 @@
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/BUTTON2.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/Cursor0.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/Cursor1.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/Cursor2.png</File>
+    <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/Cursor3.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/Defeat.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/NOK_Button1.png</File>
     <File>E:/documents/tanulás/Online Oktatás/Fősuli/MGR/CardGame/CardGame/Content/../../../ASSETS/CC0/UI/UI_OBJ/NOK_Button2.png</File>
@@ -6372,6 +6374,8 @@
     <File>TEXTURES/UI/BUTTON2.png</File>
     <File>TEXTURES/UI/Cursor0.png</File>
     <File>TEXTURES/UI/Cursor1.png</File>
+    <File>TEXTURES/UI/Cursor2.png</File>
+    <File>TEXTURES/UI/Cursor3.png</File>
     <File>TEXTURES/UI/Defeat.png</File>
     <File>TEXTURES/UI/NOK_Button1.png</File>
     <File>TEXTURES/UI/NOK_Button2.png</File>
