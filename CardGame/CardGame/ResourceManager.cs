@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -97,22 +97,22 @@ namespace CardGame {
         /// Gets the collection of textures grouped by their associated keys. The key is derived from the texture file name without its extension and any trailing digits or numbering.
         /// Returns a Texture2D array. If a texture is part of a sequence (e.g., texture1, texture2, texture3), all related textures are grouped into an array under the same key.
         /// </summary>
-        public static ImmutableDictionary<string, Texture2D[]> Textures { get; private set; } = ImmutableDictionary<string, Texture2D[]>.Empty;
+        public static FrozenDictionary<string, Texture2D[]> Textures { get; private set; }
         private static readonly Queue<Tuple<string, string[], List<Texture2D>>> extTextureLoadQueue = new();
         private static List<Tuple<string, string[], List<Texture2D>>> extTextureLoadDone;
         private static readonly Dictionary<Color, Texture2D> SingleColorTextures = new(10);
         /// <summary>
         /// Gets the collection of sound effects available in the application, indexed by unique string keys. The key is derived from the sound effect file name without its extension.
         /// </summary>
-        public static ImmutableDictionary<string, SoundEffect> SoundEffects { get; private set; } = ImmutableDictionary<string, SoundEffect>.Empty;
+        public static FrozenDictionary<string, SoundEffect> SoundEffects { get; private set; }
         /// <summary>
         /// Gets the collection of songs, indexed by unique string keys. The key is derived from the song file name without its extension.
         /// </summary>
-        public static ImmutableDictionary<string, Song> Songs { get; private set; } = ImmutableDictionary<string, Song>.Empty;
+        public static FrozenDictionary<string, Song> Songs { get; private set; }
         /// <summary>
         /// Gets the collection of fonts available for use, indexed by unique string keys. The key is derived from the font file name without its extension.
         /// </summary>
-        public static ImmutableDictionary<string, FontSystem> Fonts { get; private set; } = ImmutableDictionary<string, FontSystem>.Empty;
+        public static FrozenDictionary<string, FontSystem> Fonts { get; private set; }
 
 
         /// <summary>
@@ -246,7 +246,7 @@ namespace CardGame {
                 }
             }
             if (!externallyCalledTextureLoading)
-                Textures = textures.ToImmutableDictionary();
+                Textures = textures.ToFrozenDictionary();
             else
                 extCalledTextureLoading = true;
             // Load Songs
@@ -267,7 +267,7 @@ namespace CardGame {
                         throw new Exception($"Duplicate song key: {key} ! Song names MUST be unique!");
                     }
                 }
-                Songs = songs.ToImmutableDictionary();
+                Songs = songs.ToFrozenDictionary();
             }
             // Load SoundEffects
             if (SoundPath != string.Empty) {
@@ -287,7 +287,7 @@ namespace CardGame {
                         throw new Exception($"Duplicate sound effect key: {key} ! Sound effect names MUST be unique!");
                     }
                 }
-                SoundEffects = soundeffects.ToImmutableDictionary();
+                SoundEffects = soundeffects.ToFrozenDictionary();
             }
             // Load Fonts
             if (FontPath != string.Empty) {
@@ -311,7 +311,7 @@ namespace CardGame {
                         throw new Exception($"Duplicate font key: {piplinepaths[i]} ! Font names MUST be unique!");
                     }
                 }
-                Fonts = fonts.ToImmutableDictionary();
+                Fonts = fonts.ToFrozenDictionary();
             }
             IsLoaded = !externallyCalledTextureLoading;
         }
@@ -328,7 +328,7 @@ namespace CardGame {
             if (!extCalledTextureLoading || IsLoaded)
                 return;
             if (extTextureLoadQueue.Count == 0) {
-                Textures = extTextureLoadDone.ToImmutableDictionary(batch => batch.Item1, batch => batch.Item3.ToArray());
+                Textures = extTextureLoadDone.ToFrozenDictionary(batch => batch.Item1, batch => batch.Item3.ToArray());
                 extTextureLoadDone = null;
                 IsLoaded = true;
                 return;
@@ -414,13 +414,9 @@ namespace CardGame {
                     tex.Dispose();
                 }
             }
-            Textures.Clear();
             foreach (SoundEffect sfx in SoundEffects.Values) {
                 sfx.Dispose();
             }
-            SoundEffects.Clear();
-            Songs.Clear();
-            Fonts.Clear();
         }
     }
 }
