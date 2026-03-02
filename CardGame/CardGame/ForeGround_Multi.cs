@@ -896,12 +896,14 @@ namespace CardGame {
         //csak egyszer kell meghívni, amikor a képernyő mérete változik
         private void CalculateLayout()
         {
+            float scalingSubt = Math.Clamp(DisplayInfo.AspectRatio - (16 / 9f), float.MinValue, 0);
+            float scalingfactor = 1 + scalingSubt;
             int startX = DisplayInfo.GetPXfromHeight(0.01666666667);
             int startY = startX;
-            int hpiconHeight = DisplayInfo.GetPXfromHeight(0.111111112);
+            int hpiconHeight = DisplayInfo.GetPXfromHeight(0.111111112 * scalingfactor);
             int shopendingX = (int)Math.Round(DisplayInfo.GetPXfromHeight(0.71111111) * 0.73828125);
             int regularendingX = shopendingX + (int)MathF.Round(hpiconHeight * 3.4746f); //2.75f
-            int enemydeckHeight = DisplayInfo.GetPXfromHeight(0.1041666667);
+            int enemydeckHeight = DisplayInfo.GetPXfromHeight(0.1041666667 * scalingfactor);
             int enemydeckWidth = (int)MathF.Round(enemydeckHeight * CARD_WIDTH_SCALE);
             int previewHeight = DisplayInfo.ScreenHeight - (2 * startX);
             int previewWidth = (int)MathF.Round(previewHeight * CARD_WIDTH_SCALE);
@@ -919,12 +921,12 @@ namespace CardGame {
             int startEDeckY = startY + (groupingOffset * 4);
             EnemyDeckLoc = new(startEDeckX, startEDeckY, enemydeckWidth, enemydeckHeight);
             EnemyScrapLoc = new(startEDeckX + enemydeckWidth + (groupingOffset * 6), startEDeckY, enemydeckWidth, enemydeckHeight);
-            int enemyHandHeight = DisplayInfo.GetPXfromHeight(0.166666667);
+            int enemyHandHeight = DisplayInfo.GetPXfromHeight(0.166666667 * scalingfactor);
             EnemyHandLoc = new(EnemyScrapLoc.Right + (2 * groupingOffset), startY,
                 DisplayInfo.ScreenWidth - EnemyScrapLoc.Right - (4 * groupingOffset) - regularendingX,
                 enemyHandHeight);
             startY *= 2;
-            startY += enemyHandHeight;
+            startY += (int)MathF.Ceiling(DisplayInfo.GetPXfromHeight(0.166666667 * (1 - scalingSubt)));
             ShopLoc = new(0, startY,
                 DisplayInfo.ScreenWidth - shopendingX,
                 (DisplayInfo.ScreenHeight / 2) - startY);
@@ -943,7 +945,7 @@ namespace CardGame {
                 DisplayInfo.ScreenHeight - ShopLoc.Bottom - (startX * 3) - PlayerHandLoc.Height);
             //icons
             int hpiconWidth = (int)Math.Round(hpiconHeight * 1.8026315789474);
-            int iconheight = DisplayInfo.GetPXfromHeight(0.0833333333);
+            int iconheight = DisplayInfo.GetPXfromHeight(0.0833333333 * scalingfactor);
             int iconheighthalf = iconheight / 2;
             int startIconX = DisplayInfo.ScreenWidth - regularendingX + (2 * groupingOffset);
             int startEIconY = EnemyHandLoc.Y + (enemyHandHeight / 2) - iconheighthalf;
@@ -1919,7 +1921,7 @@ namespace CardGame {
                         EnemyHand[i].Draw(gameTime, spriteBatch);
                 }
                 //shop cards
-                for (int i = 0; i < Shop.Length; i++) {
+                for (int i = Shop.Length - 1; i >= 0; i--) {
                     if (Shop[i] != null) {
                         if (previewThis.TrueForAll(item => item.Item1 != Shop[i]))
                             Shop[i]!.Draw(gameTime, spriteBatch);

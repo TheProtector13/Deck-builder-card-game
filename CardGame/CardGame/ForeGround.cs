@@ -348,6 +348,7 @@ namespace CardGame {
                                     maxValues.Sort();
                                     maxValues.Reverse();
                                     int maxValueIndex = 0;
+                                    int maxIndex = 0;
                                     List<int> foundCardIndexes = [];
                                     while (foundCardIndexes.Count == 0 && maxValueIndex < maxValues.Count) {
                                         //If there is more than one max value, select one randomly
@@ -357,7 +358,7 @@ namespace CardGame {
                                             .Select(x => x.index)
                                             .ToList();
                                         while (maxIndices.Count > 0) {
-                                            int maxIndex = maxIndices[RandomNumberGenerator.GetInt32(0, maxIndices.Count)];
+                                            maxIndex = maxIndices[RandomNumberGenerator.GetInt32(0, maxIndices.Count)];
                                             maxIndices.Remove(maxIndex);
                                             foundCardIndexes = Shop.Select((card, index) => new { card, index })
                                                 .Where(x => x.card != null && x.card.CardFraction == (Card.Fraction)maxIndex)
@@ -369,11 +370,19 @@ namespace CardGame {
                                         maxValueIndex++;
                                     }
                                     if (foundCardIndexes.Count > 0) {
-                                        ModelInput78 input78 = new();
+                                        ModelInput89 input89 = new();
+                                        float[] prefStrategy = new float[5];
+                                        prefStrategy[maxIndex] = 1;
                                         List<float> inputs = [];
+                                        inputs.AddRange(prefStrategy);
+                                        int highestPrice = foundCardIndexes.Select(index => Shop[index]).Max(card => card!.Price);
                                         for (int j = 0; j < Shop.Length; j++) {
                                             if (foundCardIndexes.Contains(j)) {
                                                 inputs.Add(1);
+                                                if (Shop[j]!.Price == highestPrice)
+                                                    inputs.Add(1);
+                                                else
+                                                    inputs.Add(0);
                                                 for (int k = 0; k < (int)Card.Effect.None; k++) {
                                                     if (Shop[j]!.CardEffect == (Card.Effect)k) {
                                                         inputs.Add(1);
@@ -384,11 +393,11 @@ namespace CardGame {
                                                 }
                                             }
                                             else {
-                                                inputs.AddRange(new float[13]);
+                                                inputs.AddRange(new float[14]);
                                             }
                                         }
-                                        input78.Features = inputs.ToArray();
-                                        ModelOutput6 output6 = MLController.ShoppingEngine.Predict(input78);
+                                        input89.Features = inputs.ToArray();
+                                        ModelOutput6 output6 = MLController.ShoppingEngine.Predict(input89);
                                         scrapindex = output6.Prediction.ToList().IndexOf(output6.Prediction.Max());
                                     }
                                 }
@@ -858,12 +867,14 @@ namespace CardGame {
         //csak egyszer kell meghívni, amikor a képernyő mérete változik
         private void CalculateLayout()
         {
+            float scalingSubt = Math.Clamp(DisplayInfo.AspectRatio - (16 / 9f), float.MinValue, 0);
+            float scalingfactor = 1 + scalingSubt;
             int startX = DisplayInfo.GetPXfromHeight(0.01666666667);
             int startY = startX;
-            int hpiconHeight = DisplayInfo.GetPXfromHeight(0.111111112);
+            int hpiconHeight = DisplayInfo.GetPXfromHeight(0.111111112 * scalingfactor);
             int shopendingX = (int)Math.Round(DisplayInfo.GetPXfromHeight(0.71111111) * 0.73828125);
             int regularendingX = shopendingX + (int)MathF.Round(hpiconHeight * 3.4746f); //2.75f
-            int enemydeckHeight = DisplayInfo.GetPXfromHeight(0.1041666667);
+            int enemydeckHeight = DisplayInfo.GetPXfromHeight(0.1041666667 * scalingfactor);
             int enemydeckWidth = (int)MathF.Round(enemydeckHeight * CARD_WIDTH_SCALE);
             int previewHeight = DisplayInfo.ScreenHeight - (2 * startX);
             int previewWidth = (int)MathF.Round(previewHeight * CARD_WIDTH_SCALE);
@@ -881,12 +892,12 @@ namespace CardGame {
             int startEDeckY = startY + (groupingOffset * 4);
             EnemyDeckLoc = new(startEDeckX, startEDeckY, enemydeckWidth, enemydeckHeight);
             EnemyScrapLoc = new(startEDeckX + enemydeckWidth + (groupingOffset * 6), startEDeckY, enemydeckWidth, enemydeckHeight);
-            int enemyHandHeight = DisplayInfo.GetPXfromHeight(0.166666667);
+            int enemyHandHeight = DisplayInfo.GetPXfromHeight(0.166666667 * scalingfactor);
             EnemyHandLoc = new(EnemyScrapLoc.Right + (2 * groupingOffset), startY,
                 DisplayInfo.ScreenWidth - EnemyScrapLoc.Right - (4 * groupingOffset) - regularendingX,
                 enemyHandHeight);
             startY *= 2;
-            startY += enemyHandHeight;
+            startY += (int)MathF.Ceiling(DisplayInfo.GetPXfromHeight(0.166666667 * (1 - scalingSubt)));
             ShopLoc = new(0, startY,
                 DisplayInfo.ScreenWidth - shopendingX,
                 (DisplayInfo.ScreenHeight / 2) - startY);
@@ -905,7 +916,7 @@ namespace CardGame {
                 DisplayInfo.ScreenHeight - ShopLoc.Bottom - (startX * 3) - PlayerHandLoc.Height);
             //icons
             int hpiconWidth = (int)Math.Round(hpiconHeight * 1.8026315789474);
-            int iconheight = DisplayInfo.GetPXfromHeight(0.0833333333);
+            int iconheight = DisplayInfo.GetPXfromHeight(0.0833333333 * scalingfactor);
             int iconheighthalf = iconheight / 2;
             int startIconX = DisplayInfo.ScreenWidth - regularendingX + (2 * groupingOffset);
             int startEIconY = EnemyHandLoc.Y + (enemyHandHeight / 2) - iconheighthalf;
@@ -1144,38 +1155,52 @@ namespace CardGame {
                                     maxIndexes.Sort();
                                     maxIndexes.Reverse();
                                     int maxIndex = 0;
+                                    int prefIndex = 0;
                                     HashSet<Card> TBuy = [];
                                     //első kettő típus
                                     while (maxIndex < 2) {
-                                        List<int> maxIndices = maxIndexes.Select((value, index) => new { value, index })
+                                        List<int> maxIndices = strategy!.Prediction.Select((value, index) => new { value, index })
                                             .Where(pair => pair.value == maxIndexes[maxIndex])
                                             .Select(pair => pair.index)
                                             .ToList();
                                         foreach (int index in maxIndices) {
+                                            if (TBuy.Count == 0)
+                                                prefIndex = index;
                                             TBuy.UnionWith(affordableCards.Where(card => card!.CardFraction == (Card.Fraction)index).ToList()!);
                                         }
                                         maxIndex++;
                                     }
                                     //Ha nincs, akkor a harmadik
                                     if (TBuy.Count == 0) {
-                                        List<int> maxIndices = maxIndexes.Select((value, index) => new { value, index })
+                                        List<int> maxIndices = strategy!.Prediction.Select((value, index) => new { value, index })
                                                 .Where(pair => pair.value == maxIndexes[maxIndex])
                                                 .Select(pair => pair.index)
                                                 .ToList();
                                         foreach (int index in maxIndices) {
+                                            if (TBuy.Count == 0)
+                                                prefIndex = index;
                                             TBuy.UnionWith(affordableCards.Where(card => card!.CardFraction == (Card.Fraction)index).ToList()!);
                                         }
                                     }
                                     //Egyébként frakciómentes lapot vesz
                                     if (TBuy.Count == 0) {
+                                        prefIndex = Array.IndexOf(strategy!.Prediction, maxIndexes[0]);
                                         TBuy = affordableCards.Where(card => card!.CardFraction == Card.Fraction.None).ToHashSet();
                                         if (TBuy.Count == 0)
                                             break;
                                     }
                                     List<float> input = [];
+                                    float[] prefStrategy = new float[5];
+                                    prefStrategy[prefIndex] = 1;
+                                    input.AddRange(prefStrategy);
                                     Card[] TBuyArray = TBuy.ToArray();
+                                    int highestPrice = TBuyArray.Max(card => card!.Price);
                                     foreach (Card card in TBuyArray) {
                                         input.Add(1);
+                                        if (card.Price == highestPrice)
+                                            input.Add(1);
+                                        else
+                                            input.Add(0);
                                         for (int i = 0; i < (int)Card.Effect.None; i++) {
                                             if (card.CardEffect == (Card.Effect)i)
                                                 input.Add(1);
@@ -1183,8 +1208,8 @@ namespace CardGame {
                                                 input.Add(0);
                                         }
                                     }
-                                    input.AddRange(new float[78 - input.Count]);
-                                    ModelOutput6 choosen = MLController.ShoppingEngine.Predict(new ModelInput78() { Features = input.ToArray() });
+                                    input.AddRange(new float[89 - input.Count]);
+                                    ModelOutput6 choosen = MLController.ShoppingEngine.Predict(new ModelInput89() { Features = input.ToArray() });
                                     int chosenIndex = Array.IndexOf(choosen.Prediction, choosen.Prediction.Max());
                                     toBuy = TBuyArray[chosenIndex];
                                 }
@@ -1644,7 +1669,7 @@ namespace CardGame {
                         EnemyHand[i].Draw(gameTime, spriteBatch);
                 }
                 //shop cards
-                for (int i = 0; i < Shop.Length; i++) {
+                for (int i = Shop.Length - 1; i >= 0; i--) {
                     if (Shop[i] != null) {
                         if (previewThis.TrueForAll(item => item.Item1 != Shop[i]))
                             Shop[i]!.Draw(gameTime, spriteBatch);

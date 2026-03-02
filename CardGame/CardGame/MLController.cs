@@ -3,8 +3,8 @@ using Microsoft.ML;
 using Microsoft.ML.Data;
 
 namespace CardGame {
-    public class ModelInput78 {
-        [VectorType(78)]
+    public class ModelInput89 {
+        [VectorType(89)]
         [ColumnName("serving_default_keras_tensor")]
         public float[] Features { get; set; }
     }
@@ -47,7 +47,7 @@ namespace CardGame {
         public static ITransformer StrategyModel { get; private set; }
 
         public static PredictionEngine<ModelInput26, ModelOutput2> DiscardEngine { get; private set; }
-        public static PredictionEngine<ModelInput78, ModelOutput6> ShoppingEngine { get; private set; }
+        public static PredictionEngine<ModelInput89, ModelOutput6> ShoppingEngine { get; private set; }
         public static PredictionEngine<ModelInput5, ModelOutput5> StrategyEngine { get; private set; }
 
         static MLController()
@@ -76,9 +76,9 @@ namespace CardGame {
             DiscardModel = discardPipeline.Fit(emptyData);
             DiscardEngine = mlContext.Model.CreatePredictionEngine<ModelInput26, ModelOutput2>(DiscardModel);
 
-            emptyData = mlContext.Data.LoadFromEnumerable<ModelInput78>(Array.Empty<ModelInput78>());
+            emptyData = mlContext.Data.LoadFromEnumerable<ModelInput89>(Array.Empty<ModelInput89>());
             ShoppingModel = shoppingPipeline.Fit(emptyData);
-            ShoppingEngine = mlContext.Model.CreatePredictionEngine<ModelInput78, ModelOutput6>(ShoppingModel);
+            ShoppingEngine = mlContext.Model.CreatePredictionEngine<ModelInput89, ModelOutput6>(ShoppingModel);
 
             emptyData = mlContext.Data.LoadFromEnumerable<ModelInput5>(Array.Empty<ModelInput5>());
             StrategyModel = strategyPipeline.Fit(emptyData);

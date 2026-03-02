@@ -1,5 +1,5 @@
-Alliance		- pénz, életerő, --BOLT
-CollectorCult		- pénz, támadás+, carddropchance++
-Empire			- támadás++, dropcard, drawcard, pénz
-Machines		- támadás+++
-TheEye 			- steal, show, hide
+Alliance		- pénz, életerő, --BOLT 1
+CollectorCult		- pénz, támadás+, carddropchance++ 5
+Empire			- támadás++, dropcard, drawcard, pénz 4
+Machines		- támadás+++ 6
+TheEye 			- steal, show, hide 3
