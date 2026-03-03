@@ -1,4 +1,5 @@
-﻿using System.Runtime;
+﻿using System;
+using System.Runtime;
 using System.Threading.Tasks;
 using CardGame.TCP;
 using Microsoft.Xna.Framework;
@@ -29,14 +30,15 @@ namespace CardGame {
                 PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height,
                 PreferMultiSampling = true,
                 HardwareModeSwitch = false,
-                IsFullScreen = true
+                IsFullScreen = true,
+                SynchronizeWithVerticalRetrace = true
             };
             _graphics.PreparingDeviceSettings += (s, e) => {
                 e.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = 4;
             };
             _graphics.ApplyChanges();
             this.IsFixedTimeStep = true;
-            this.TargetElapsedTime = System.TimeSpan.FromSeconds(1d / 60d);
+            this.TargetElapsedTime = TimeSpan.FromTicks(TimeSpan.TicksPerSecond / 30);
             Content.RootDirectory = "Content";
             IsMouseVisible = false;
             mouseInfo = new MouseInfo(Mouse.GetState());
@@ -49,7 +51,8 @@ namespace CardGame {
             ResourceManager.FontPath = "FONTS";
             ResourceManager.SoundPath = "SFX";
             ResourceManager.SongPath = "MUSIC";
-            ResourceManager.TargetLoadTime = 8;
+            ResourceManager.TargetLoadTime = 10;
+            ResourceManager.ExceptedFrameRate = 30;
             base.Initialize();
         }
 
@@ -89,6 +92,7 @@ namespace CardGame {
                 splashScreen.Dispose();
                 splashScreen = null;
                 menu = new();
+                this.TargetElapsedTime = TimeSpan.FromTicks(TimeSpan.TicksPerSecond / 60);
             }
             else {
                 if (menu.CurrentMenuState == MainMenu.MenuState.None)
