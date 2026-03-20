@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace CardGame {
@@ -44,9 +45,9 @@ namespace CardGame {
             ScreenRect = new Rectangle(0, 0, ScreenWidth, ScreenHeight);
         }
 
-        public static int GetPXfromWidth(double percent) => (int)(ScreenWidth * percent);
+        public static int GetPXfromWidth(double percent) => (int)Math.Round(ScreenWidth * percent);
 
-        public static int GetPXfromHeight(double percent) => (int)(ScreenHeight * percent);
+        public static int GetPXfromHeight(double percent) => (int)Math.Round(ScreenHeight * percent);
 
         public static double GetPercentFromWidth(int px) => (double)px / ScreenWidth;
 

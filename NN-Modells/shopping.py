@@ -216,7 +216,7 @@ def load_eval_batch(X_path, Y_path, start, size, n_samples, D=89, C=6):
     yb = Y_mm[start:end].astype(np.float32)
     return xb, yb
 
-# betöltjük a meta fájlt, ha nem volt korábban
+# betöltjük a meta fájlt
 meta = np.load(META_path)
 N_samples = int(meta['n_samples'])
 print(f"Betöltés memmapból: {N_samples} minta.")

@@ -14,7 +14,7 @@ namespace CardGame {
         private readonly Tuple<Rectangle, float>[] objLoc;
         private readonly Rectangle bgRect;
         private TimeSpan lastFrameChange = TimeSpan.Zero;
-        private TimeSpan frameTime = TimeSpan.FromSeconds(1d / 25d);
+        private TimeSpan frameTime = TimeSpan.FromTicks(TimeSpan.TicksPerSecond / 25);
         private int currentFrame = 0;
         private static readonly float rotRad = MathHelper.ToRadians(0.05f);
 

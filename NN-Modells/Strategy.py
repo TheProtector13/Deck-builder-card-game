@@ -4,7 +4,7 @@ from tensorflow.keras import layers, models
 import numpy as np
 from itertools import combinations
 
-# --- definíciók ---
+# definíciók
 x_def = np.eye(5, dtype=np.float32)
 
 y_def = np.array(
@@ -18,17 +18,16 @@ y_def = np.array(
     dtype=np.float32,
 )
 
-# --- tanító adatok gyűjtése ---
+# tanító adatok
 x_t = [[0, 0, 0, 0, 0]]
 y_t = [[0.2, 0.2, 0.2, 0.2, 0.2]]
 
-# egységvektorok
 for i in range(5):
     x_t.append(x_def[i].tolist())
     y_t.append(y_def[i].tolist())
 
 
-# --- súlykombinációk generálása ---
+# súlykombinációk generálása
 def weight_sets(k, step=0.1):
     n = int(1 / step)
     if k == 1:
@@ -51,27 +50,24 @@ def weight_sets(k, step=0.1):
     return [np.array(w, dtype=np.float32) * step for w in result]
 
 
-# --- kombinációk kiszámolása ---
-for k in range(2, 6):  # 2..5
+# kombinációk kiszámolása
+for k in range(2, 6):
     weights_list = weight_sets(k, step=0.1)
 
     for combo in combinations(range(5), k):
         for weights in weights_list:
-            # x vektor
+
             x = np.zeros(5, dtype=np.float32)
             for idx, w in zip(combo, weights):
                 x[idx] = w
 
-            # y vektor
             y = np.zeros(5, dtype=np.float32)
             for idx, w in zip(combo, weights):
                 y += w * y_def[idx]
 
-            # hozzáadás
             x_t.append(x.tolist())
             y_t.append(y.tolist())
 
-# --- numpy tömbbé alakítás ---
 X_train = np.array(x_t, dtype=np.float32)
 y_train = np.array(y_t, dtype=np.float32)
 
@@ -86,12 +82,13 @@ Y_eval = np.array([
     [0.1, 0.25, 0.25, 0.2, 0.2]
     ], dtype=np.float32)
 
-# --- ellenőrzés ---
+# ellenőrzés (validation)
 print("X_train shape:", X_train.shape)
 print("y_train shape:", y_train.shape)
 print("példa sor:")
 print(X_train[10], "=>", y_train[10])
 
+# neurális háló alakja
 leaky_model = models.Sequential(
     [
         layers.Input(shape=(5,)),
@@ -117,4 +114,5 @@ history2 = leaky_model.fit(
 loss, acc = leaky_model.evaluate(X_eval, Y_eval)
 print("Test leaky loss:", loss, "Test acc:", acc)
 
+# mentés
 #leaky_model.export("D:\\MC\\TENSORS")

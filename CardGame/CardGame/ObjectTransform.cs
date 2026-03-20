@@ -10,7 +10,7 @@ namespace CardGame {
         /// <remarks>This value represents the standard time interval applied to transformations when no
         /// specific duration is provided. It can be used as a baseline for animation or timing-related features that
         /// require a default transform time.</remarks>
-        public static TimeSpan DefaultTransformTime { get; } = TimeSpan.FromSeconds(0.5);
+        public static TimeSpan DefaultTransformTime { get; } = TimeSpan.FromTicks(TimeSpan.TicksPerSecond / 2);
         private Rectangle _moveTarget;
         private Rectangle _startLocation;
         private TimeSpan _transformBegin = TimeSpan.Zero;
