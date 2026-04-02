@@ -2,6 +2,7 @@
 Egy pakliépítő kártyajáték, amely a MonoGame motorra épül.
 
 <img width="1920" height="1080" alt="Képernyőkép 2025-12-15 195943" src="https://github.com/user-attachments/assets/d6d5ab2a-b4af-4172-9787-a1e4ee544a60" />
+<img width="1920" height="1080" alt="Képernyőkép 2026-03-09 154052" src="https://github.com/user-attachments/assets/abc0cf21-0554-44a1-8be0-f4780a44df9c" />
 
 ## Irányítás:
 Kilépéshez nyomj **ESC**-et.
@@ -28,16 +29,16 @@ A játékos és az ellenfél a következő tulajdonságokkal rendelkezik:
 ## Játékmenet:
 1. A játék kezdetén minden játékos 10-10 lapot kap a pakliába. Ezek a lapok nem frakciókötöttek. Egy darab pénz egységet biztosítanak a játékosnak.
 2. A játék körökből áll, ahol a játékosok egymás után kerülnek sorra, majd új kör kezdődik.
-3. Minden kör kezdetén a játékosok 5 lapot húznak a pakliukból, amiből a kör során mindet ki is kell játszaniuk. Egy kör egy adott játékos számára csak akkor érhet véget, ha kezében nem marad kártya.
+3. Minden kör kezdetén a játékosok 5 lapot húznak a paklijukból, amiből a kör során mindet ki is kell játszaniuk. Egy kör egy adott játékos számára csak akkor érhet véget, ha kezében nem marad lap.
 4. A lapok kijátszása során, vagy akár azt követően, a játékos jogosult kártyákat vásárolni a boltból a lapok kijátszása során szerzett pénzösszegből. A megvásárolt lapok az adott játékos "scrap pila"-jába, azaz az *eldobott halomba* kerülnek. A kártyák kijátszása által szerzett pénzösszeg csak az adott kör végéig érvényes, nem marad meg.
-5. A kör végén a játékos által begyűjtött támadási pontok levondónak az ellenfél életerejéből. A kijátszott lapok az *eldobott halomba* kerülnek.
-6. A következő kör megkezdődik a lapok kiosztásával az adott játékos pakliából, ha a pakliban nincs több lap, akkor az *eldobott halomból* keverjük be ismét a paklit.
-7. A körök addig ismétlődnek, amíg az ellenfél vagy a játékos életereje el nem fogy!
+5. A kör végén a játékos által begyűjtött támadási pontok levondónak az ellenfél életerejéből. A kijátszott lapok az *eldobott talonba* kerülnek.
+6. A következő kör megkezdődik a lapok kiosztásával az adott játékos pakliából, ha a pakliban nincs több lap, akkor az *eldobott talonból* keverjük be ismét a paklit.
+7. A körök addig ismétlődnek, amíg az ellenfél vagy a játékos életereje/autoritása el nem fogy!
 
 <img width="1920" height="1080" alt="Képernyőkép 2025-12-16 133338" src="https://github.com/user-attachments/assets/bf2685ee-ad9d-4b83-b88c-6fe1074ab274" />
 
 ## A játék célja:
-- Az ellenfél legyőzése az életerejének nullára csökkentésével
+- Az ellenfél legyőzése az életerejének/autoritásának nullára csökkentésével
 
 ## Ehhez szükséges lépések:
 - Építsd a paklidat kártyák vásárlásával a boltból 
@@ -60,11 +61,55 @@ A játékpakliba található kártyák öt frakcióhoz tartoznak. Ezek a frakci�
 - **Kuratórium** - Pénzt biztosít, gyenge támadás. Tartósan eltávolíthat kártyákat a játékosok pakliából, így a fontosabb kártyák gyakrabban kijátszhatóak.
 <img width="128" height="128" alt="CollectorCultIconWB" src="https://github.com/user-attachments/assets/7ee2a051-ea76-4f3a-bc85-12a55bdd8a44" />
 
+## Játékmódok
+A játék egyjátékos és LAN hálózaton helyi többjátékos módban is játszható.
+Az egyjátékos módban a gépi ellenfél TensorFlow-ban tanított Feed-Forward neurális hálózatokon alapuló döntéshozatalla van megvalósítva.
+A többjátékos módban a potenciális ellenfelek hálózati felderítésére UDP broadcastot, vagy multicastot használ a szoftver.
+Játék közben TCP+TLS kommunikáció zajlik. A játék megkezdéséhez a játékot kezdeményező fél képernyőjén megjelent 8 karakteres kódot meg kell adni a csatlakozáshoz a kliens oldalán.
+
+<img width="1920" height="1080" alt="Képernyőkép 2026-02-01 203225" src="https://github.com/user-attachments/assets/e6d816b3-39b5-4760-821d-d66d1403096f" />
+
+## Példa a kártyalapokra és lapfelépítés
+
+<img width="1342" height="660" alt="Kép1" src="https://github.com/user-attachments/assets/4fa4e709-0288-4a9c-881d-27c61992a38a" />
+
+<table>
+  <tr>
+    <td><img width="693" height="1043" alt="Képernyőkép 2026-02-01 202740" src="https://github.com/user-attachments/assets/c5ac34d7-1782-400e-9e54-19872f9804d1" /></td>
+    <td><img width="693" height="1041" alt="Képernyőkép 2026-02-01 202852" src="https://github.com/user-attachments/assets/c6d00ea6-e5e9-425c-8198-02bbb7ea0b91" /></td>
+    <td><img width="691" height="1046" alt="Képernyőkép 2026-02-01 202918" src="https://github.com/user-attachments/assets/b7f6cf1a-1806-4781-8969-71ee67fba2a3" /></td>
+  </tr>
+  <tr>
+    <td><img width="695" height="1040" alt="Képernyőkép 2026-02-01 202942" src="https://github.com/user-attachments/assets/b55c66f9-dae8-4324-b281-822a1a2dc550" /></td>
+    <td><img width="690" height="1044" alt="Képernyőkép 2026-02-01 203001" src="https://github.com/user-attachments/assets/2d1769a1-4853-4bce-acea-8b528482fee1" /></td>
+    <td><img width="698" height="1042" alt="Képernyőkép 2026-02-01 203027" src="https://github.com/user-attachments/assets/75a696ad-7405-4450-b9dc-5b08b6733215" /></td>
+  </tr>
+</table>
+
+## Beállítások
+<img width="1920" height="1080" alt="Képernyőkép 2026-03-09 154158" src="https://github.com/user-attachments/assets/a5dcdb17-d99f-42ae-8ad4-a6e0b2cdc6e9" />
+Lehetőség van a beállítások felületen a zene és hangefektusok hangerejének módosítására, valamint multicast módrol broadcast módra állítania a hállózati felderítés módját.
+Az egyjátékos ellenfelet neurális hálózatok használatáról véletlenszerű döntéshozatalra lehet állítani.
+
+## Felhasznált források
+- CraftPix - 2D/3D játék asset gyűjtemény (sprite-ok, UI, tilesetek, game kit-ek) - elsősorban a kártyalapokon megjelnő ábrákhoz használtuk fel - [craftpix.net](https://craftpix.net)
+- GameIcons - PNG/SVG ikoncsomagok - Ábrák, gombok és szimbólumok létrehozására használtuk fel kiindulási mintaként - [game-icons.net](https://game-icons.net)
+
+**Felhasznált hanganyag:**
+- [Symphony Sounds](https://freesound.org/people/benpm/sounds/185347/) by [benpm](https://freesound.org/people/benpm/) | License: [Attribution 4.0](https://creativecommons.org/licenses/by/4.0/)
+- [Epic Orchestra - LOOP.wav](https://freesound.org/people/joshuaempyre/sounds/250856/) by [joshuaempyre](https://freesound.org/people/joshuaempyre/) | License: [Attribution 4.0](https://creativecommons.org/licenses/by/4.0/)
+- [Video Game Music Seamless.wav](https://freesound.org/people/x1shi/sounds/685206/) by [x1shi](https://freesound.org/people/x1shi/) | License: [Creative Commons 0](http://creativecommons.org/publicdomain/zero/1.0/)
+- **Adding the Sun** Kevin MacLeod ([incompetech.com](https://incompetech.com)) Licensed under Creative Commons: By [Attribution 4.0](https://creativecommons.org/licenses/by/4.0/) License
+- **Rynos Theme** Kevin MacLeod ([incompetech.com](https://incompetech.com)) Licensed under Creative Commons: By [Attribution 4.0](https://creativecommons.org/licenses/by/4.0/) License
+- **Floating Cities** Kevin MacLeod ([incompetech.com](https://incompetech.com)) Licensed under Creative Commons: By [Attribution 4.0](https://creativecommons.org/licenses/by/4.0/) License
+- **Motivator** Kevin MacLeod ([incompetech.com](https://incompetech.com)) Licensed under Creative Commons: By [Attribution 4.0](https://creativecommons.org/licenses/by/4.0/) License
+
 ---
 # Deck builder card game (ENG)
 A deck builder card game based on monogame engine.
 
 <img width="1920" height="1080" alt="Képernyőkép 2025-12-15 195943" src="https://github.com/user-attachments/assets/d6d5ab2a-b4af-4172-9787-a1e4ee544a60" />
+<img width="1920" height="1080" alt="Képernyőkép 2026-03-09 154052" src="https://github.com/user-attachments/assets/abc0cf21-0554-44a1-8be0-f4780a44df9c" />
 
 ## Controls:
 Press **ESC** key to leave and close the game.
@@ -120,3 +165,46 @@ The cards in the deck belong to five factions. These factions usually provide th
 
 - **Advisory board** - Provide some money, weak attack. Can permanently remove cards from your own deck, this way you can play your important cards more often.
 <img width="128" height="128" alt="CollectorCultIconWB" src="https://github.com/user-attachments/assets/7ee2a051-ea76-4f3a-bc85-12a55bdd8a44" />
+
+## Game Modes
+The game can be played in single-player mode and in local multiplayer mode over a LAN network.
+In single-player mode, the AI opponent is implemented with decision-making based on Feed-Forward neural networks trained in TensorFlow.
+In multiplayer mode, the software uses UDP broadcast or multicast to discover potential opponents on the network.
+During gameplay, TCP+TLS communication is used. To start a game, the player must enter the 8-character code shown on the host’s screen on the client side.
+
+<img width="1920" height="1080" alt="Képernyőkép 2026-02-01 203225" src="https://github.com/user-attachments/assets/e6d816b3-39b5-4760-821d-d66d1403096f" />
+
+## Example Card Faces and Card Structure
+
+<img width="1342" height="660" alt="Kép1" src="https://github.com/user-attachments/assets/4fa4e709-0288-4a9c-881d-27c61992a38a" />
+
+<table>
+  <tr>
+    <td><img width="693" height="1043" alt="Képernyőkép 2026-02-01 202740" src="https://github.com/user-attachments/assets/c5ac34d7-1782-400e-9e54-19872f9804d1" /></td>
+    <td><img width="693" height="1041" alt="Képernyőkép 2026-02-01 202852" src="https://github.com/user-attachments/assets/c6d00ea6-e5e9-425c-8198-02bbb7ea0b91" /></td>
+    <td><img width="691" height="1046" alt="Képernyőkép 2026-02-01 202918" src="https://github.com/user-attachments/assets/b7f6cf1a-1806-4781-8969-71ee67fba2a3" /></td>
+  </tr>
+  <tr>
+    <td><img width="695" height="1040" alt="Képernyőkép 2026-02-01 202942" src="https://github.com/user-attachments/assets/b55c66f9-dae8-4324-b281-822a1a2dc550" /></td>
+    <td><img width="690" height="1044" alt="Képernyőkép 2026-02-01 203001" src="https://github.com/user-attachments/assets/2d1769a1-4853-4bce-acea-8b528482fee1" /></td>
+    <td><img width="698" height="1042" alt="Képernyőkép 2026-02-01 203027" src="https://github.com/user-attachments/assets/75a696ad-7405-4450-b9dc-5b08b6733215" /></td>
+  </tr>
+</table>
+
+## Settings
+<img width="1920" height="1080" alt="Képernyőkép 2026-03-09 154158" src="https://github.com/user-attachments/assets/a5dcdb17-d99f-42ae-8ad4-a6e0b2cdc6e9" />
+It is possible to adjust the volume of the music and sound effects in the settings menu, as well as to switch the network discovery method from multicast to broadcast.
+The single-player opponent can also be switched from using neural networks to random decision-making.
+
+## Sources
+- CraftPix - 2D/3D game asset collection (sprites, UI, tilesets, game kits) - primarily used for the illustrations appearing on the cards - [craftpix.net](https://craftpix.net)
+- GameIcons - PNG/SVG icon packs - used as samples for creating illustrations, buttons, and symbols - [game-icons.net](https://game-icons.net)
+
+**Audio Sources:**
+- [Symphony Sounds](https://freesound.org/people/benpm/sounds/185347/) by [benpm](https://freesound.org/people/benpm/) | License: [Attribution 4.0](https://creativecommons.org/licenses/by/4.0/)
+- [Epic Orchestra - LOOP.wav](https://freesound.org/people/joshuaempyre/sounds/250856/) by [joshuaempyre](https://freesound.org/people/joshuaempyre/) | License: [Attribution 4.0](https://creativecommons.org/licenses/by/4.0/)
+- [Video Game Music Seamless.wav](https://freesound.org/people/x1shi/sounds/685206/) by [x1shi](https://freesound.org/people/x1shi/) | License: [Creative Commons 0](http://creativecommons.org/publicdomain/zero/1.0/)
+- **Adding the Sun** Kevin MacLeod ([incompetech.com](https://incompetech.com)) Licensed under Creative Commons: By [Attribution 4.0](https://creativecommons.org/licenses/by/4.0/) License
+- **Rynos Theme** Kevin MacLeod ([incompetech.com](https://incompetech.com)) Licensed under Creative Commons: By [Attribution 4.0](https://creativecommons.org/licenses/by/4.0/) License
+- **Floating Cities** Kevin MacLeod ([incompetech.com](https://incompetech.com)) Licensed under Creative Commons: By [Attribution 4.0](https://creativecommons.org/licenses/by/4.0/) License
+- **Motivator** Kevin MacLeod ([incompetech.com](https://incompetech.com)) Licensed under Creative Commons: By [Attribution 4.0](https://creativecommons.org/licenses/by/4.0/) License
