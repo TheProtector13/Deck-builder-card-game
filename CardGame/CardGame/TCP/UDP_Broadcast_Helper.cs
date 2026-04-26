@@ -18,7 +18,7 @@ namespace CardGame.TCP {
         private static readonly int Port = 38799;
         private static readonly IPEndPoint MulticastAddress = new(IPAddress.Parse("239.255.0.1"), Port);
         private static readonly IPEndPoint BroadcastAddress = new(IPAddress.Broadcast, Port);
-        private static readonly IPAddress iPAddress;
+        private static IPAddress iPAddress;
         private static readonly byte[] Magic = Encoding.ASCII.GetBytes("CGv1"); //Card Game version 1
         private static readonly bool CanUseMulticast = CheckMulticastAvailable();
         private static bool multicastEnabled = CanUseMulticast;
@@ -53,12 +53,13 @@ namespace CardGame.TCP {
 
         static UDP_Broadcast_Helper()
         {
-            _udp = new UdpClient(Port);
-            _udp.EnableBroadcast = true;
-            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0)) {
-                socket.Connect("8.8.8.8", 65530);
-                var endPoint = socket.LocalEndPoint as IPEndPoint;
-                iPAddress = endPoint!.Address;
+            _udp = new UdpClient(Port) {
+                EnableBroadcast = true
+            };
+            iPAddress = GetMyLocalIP();
+            if (IPAddress.IsLoopback(iPAddress)) {
+                CanUseMulticast = false;
+                multicastEnabled = false;
             }
             if (CanUseMulticast) {
                 try {
@@ -89,6 +90,11 @@ namespace CardGame.TCP {
         //Hosting
         public static void StartHosting(string username)
         {
+            if (IPAddress.IsLoopback(iPAddress)) {
+                iPAddress = GetMyLocalIP(); // retry connecting to network
+                if (IPAddress.IsLoopback(iPAddress))
+                    return; // cannot host if no network available
+            }
             if (username != string.Empty)
                 UserName = username;
             Secret = CryptographyHelper.GenerateRandomSecret();
@@ -262,6 +268,11 @@ namespace CardGame.TCP {
 
         public static void StartClient(string username)
         {
+            if (IPAddress.IsLoopback(iPAddress)) {
+                iPAddress = GetMyLocalIP(); // retry connecting to network
+                if (IPAddress.IsLoopback(iPAddress))
+                    return; // cannot discover if no network available
+            }
             if (username != string.Empty)
                 UserName = username;
             if (_cancellationToken != null && !_cancellationToken.IsCancellationRequested) throw new InvalidOperationException("Already started or another mode is running!");
@@ -402,6 +413,36 @@ namespace CardGame.TCP {
                     return true;
             }
             return false;
+        }
+
+        private static IPAddress GetMyLocalIP()
+        {
+            if (!NetworkInterface.GetIsNetworkAvailable()) { return IPAddress.Loopback; }
+            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0)) {
+                try {
+                    socket.Connect("8.8.8.8", 65530);
+                    var endPoint = socket.LocalEndPoint as IPEndPoint;
+                    return endPoint!.Address;
+                }
+                catch (SocketException) {
+                    NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces()
+                        .Where(ni => ni.OperationalStatus == OperationalStatus.Up &&
+                        ni.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                        .OrderByDescending(ni => ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
+                        ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211).ToArray();
+                    foreach (NetworkInterface ni in interfaces) {
+                        IPInterfaceProperties props = ni.GetIPProperties();
+                        IPAddress? addr = props.UnicastAddresses
+                            .Where(u => u.Address.AddressFamily == AddressFamily.InterNetwork &&
+                            !IPAddress.IsLoopback(u.Address))
+                            .Select(u => u.Address)
+                            .FirstOrDefault();
+                        if (addr != null)
+                            return addr;
+                    }
+                }
+                return IPAddress.Loopback;
+            }
         }
 
     }
