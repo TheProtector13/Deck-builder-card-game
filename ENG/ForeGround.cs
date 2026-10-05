@@ -61,23 +61,20 @@ namespace CardGame {
         private TimeSpan LastGC = TimeSpan.Zero;
 
         //Game variables
-		private int zeroSlotStreak = 0, enemyZeroSlotStreak = 0;
-        private float currentPenalty = 0f, enemyCurrentPenalty = 0f;
         private int PlayerAttack = 0;
         private int PlayerMoney = 0;
-        private static int InitHealth = 90;
-        private int PlayerHealth = InitHealth;	  
+        private int PlayerHealth = 90;
         private int EnemyAttack = 0;
         private int EnemyMoney = 0;
-        private int EnemyHealth = InitHealth;
-        public string PlayerName { get; set; } = "Játékos";
+        private int EnemyHealth = 90;
+        public string PlayerName { get; set; } = "Player";
         public string EnemyName { get; set; } = "AI";
         private bool playerTurn = true;
         private bool playAllCards = false;
         private int PlayerCard2ScrapThisTurn = 0;
         private int EnemyCard2ScrapThisTurn = 0;
         private readonly List<Card> stolenCards = [];
-        public short EnemyDecisionMaking { get; set; } = 0; // 0 - NN, 1 - StrategyHeuristic, 2 - Heuristic, 3 - Random
+        public bool RandomAI { get; set; } = false;
         public GameWinner WINNER { get; private set; } = GameWinner.InProgress;
 
 
@@ -159,7 +156,7 @@ namespace CardGame {
             PlayedPileTarget = [];
             PlayerHandTarget = [];
             EndTurnButton = new Button(ResourceManager.Textures["BUTTON"], mouse) {
-                Text = "Kör vége",
+                Text = "End turn",
                 Enabled = false
             };
             EndTurnButton.Click += EndTurnEventHandler;
@@ -265,7 +262,7 @@ namespace CardGame {
                         if (player) {
                             if (PlayerScrap.Count != 0 && PlayerHand.Count + PlayerDeck.Count + PlayerScrap.Count - card.EffectAmount > 6) {
                                 cardSelector = new(PlayerScrap, card.EffectAmount, mouse) {
-                                    Title = $"Válaszd ki a paklidból kidobandó lapokat! (Max. {card.EffectAmount} db)"
+                                    Title = $"Select the cards to scrap from your deck! (Max {card.EffectAmount})"
                                 };
                                 cardSelector.SelectionConfirmed += ScrapOwnCardEventHandler;
                             }
@@ -275,37 +272,58 @@ namespace CardGame {
                                 int scrapped = 0;
                                 while (scrapped < card.EffectAmount && EnemyScrap.Count > 0) {
                                     int scrapindex = 0;
-                                    if (EnemyDecisionMaking == 3) {
-                                        scrapindex = RandomNumberGenerator.GetInt32(0, EnemyScrap.Count);
-                                    }
-                                    else if (EnemyDecisionMaking == 2) {
-                                        Card toScrap = GreedyBuyAlgorithm(EnemyHealth, PlayerHealth, EnemyScrap, GetFractionDistribution(false).Item1, true);
-                                        scrapindex = EnemyScrap.IndexOf(toScrap);
-                                        if (scrapindex == -1)
-                                            scrapindex = RandomNumberGenerator.GetInt32(0, EnemyScrap.Count);
-                                    }
-                                    else if (EnemyDecisionMaking == 1) {
-                                        ModelOutput5 output5 = MLController.StrategyEngine.Predict(new ModelInput5() { Features = GetStrategyDistribution(true) });
-                                        Card toScrap = StrategyAwareGreedyBuyAlgorithm(EnemyHealth, PlayerHealth, EnemyScrap, GetFractionDistribution(false).Item1, output5.Prediction, true);
-                                        scrapindex = EnemyScrap.IndexOf(toScrap);
-                                        if (scrapindex == -1)
-                                            scrapindex = RandomNumberGenerator.GetInt32(0, EnemyScrap.Count);
-                                    }
-                                    else {
-                                        List<Card> tempScrap = EnemyScrap;
-                                        for (int i = 1; i < tempScrap.Count; i++) {
-                                            ModelInput49 input = MLController.CreateDiscardInput(tempScrap[scrapindex], tempScrap[i], GetStrategyDistribution(false));
-                                            ModelOutput2 output = MLController.DiscardEngine.Predict(input);
-                                            if (output.Prediction[0] > output.Prediction[1]) {
-                                                scrapindex = i;
+                                    if (!RandomAI) {
+                                        if (EnemyScrap.Count > 1) {
+                                            List<Card> tempScrap = EnemyScrap.Where(card => card.CardFraction == Card.Fraction.None).ToList();
+                                            ModelOutput5 strategyoutput = MLController.StrategyEngine.Predict(new ModelInput5() { Features = GetStrategyDistribution(true) });
+                                            List<float> minValues = strategyoutput.Prediction.ToList();
+                                            minValues.Sort();
+                                            for (int i = 0; i < 2; i++) {
+                                                tempScrap.AddRange(EnemyScrap.Where(card => card.CardFraction == (Card.Fraction)Array.IndexOf(strategyoutput.Prediction, minValues[i])).ToList());
                                             }
+                                            if (tempScrap.Count == 0)
+                                                tempScrap = EnemyScrap;
+                                            for (int i = 1; i < tempScrap.Count; i++) {
+                                                List<float> inputs = [];
+                                                //scrapindexed card
+                                                inputs.Add(1);
+                                                for (int j = 0; j < (int)Card.Effect.None; j++) {
+                                                    if (tempScrap[scrapindex].CardEffect == (Card.Effect)j) {
+                                                        inputs.Add(1);
+                                                    }
+                                                    else {
+                                                        inputs.Add(0);
+                                                    }
+                                                }
+                                                //current card
+                                                inputs.Add(1);
+                                                for (int j = 0; j < (int)Card.Effect.None; j++) {
+                                                    if (tempScrap[i].CardEffect == (Card.Effect)j) {
+                                                        inputs.Add(1);
+                                                    }
+                                                    else {
+                                                        inputs.Add(0);
+                                                    }
+                                                }
+                                                ModelOutput2 output = MLController.DiscardEngine.Predict(new ModelInput26() { Features = inputs.ToArray() });
+                                                if (output.Prediction[0] < output.Prediction[1]) {
+                                                    scrapindex = i;
+                                                }
+                                            }
+                                            scrapindex = EnemyScrap.IndexOf(tempScrap[scrapindex]);
                                         }
-                                        scrapindex = EnemyScrap.IndexOf(tempScrap[scrapindex]);
+                                        else {
+                                            if (EnemyScrap[scrapindex].CardFraction != Card.Fraction.None)
+                                                break;
+                                        }
                                     }
                                     if (EnemyScrap[scrapindex].CardFraction != Card.Fraction.None)
                                         GameDeck.Add(EnemyScrap[scrapindex]);
                                     EnemyScrap.RemoveAt(scrapindex);
+                                    scrapSFX.Play(GameSettings.SFXVolume, 0, 0);
                                     scrapped++;
+                                    changed = true;
+                                    //AI LOGIC KELL IDE !!! (done)
                                 }
                             }
                         }
@@ -314,47 +332,84 @@ namespace CardGame {
                         if (player) {
                             cardSelector = new(Shop.ToList()!, card.EffectAmount, mouse, true) {
                                 HasCancelButton = false,
-                                Title = $"Válaszd ki a boltból eltávolítandó lapokat! (Pontosan {card.EffectAmount} db)"
+                                Title = $"Select the cards to remove from the shop! (Exactly {card.EffectAmount})"
                             };
                             cardSelector.SelectionConfirmed += ScrapFromShopEventHandler;
                         }
                         else {
                             for (int i = 0; i < card.EffectAmount; i++) {
                                 int scrapindex = 0;
-                                if (EnemyDecisionMaking == 3) {
+                                if (RandomAI) {
                                     scrapindex = RandomNumberGenerator.GetInt32(0, Shop.Length);
                                 }
-                                else if (EnemyDecisionMaking == 2) {
-                                    Card toScrap = GreedyBuyAlgorithm(EnemyHealth, PlayerHealth, Shop.Where(card => card != null).Select(card => card!).ToList(), GetFractionDistribution(true).Item1, false);
-                                    scrapindex = Array.IndexOf(Shop, toScrap);
-                                }
-                                else if (EnemyDecisionMaking == 1) {
-                                    Card toScrap = StrategyAwareGreedyBuyAlgorithm(EnemyHealth, PlayerHealth, Shop.Where(card => card != null).Select(card => card!).ToList(), GetFractionDistribution(true).Item1, GetStrategyDistribution(true), false);
-                                    scrapindex = Array.IndexOf(Shop, toScrap);
-                                }
                                 else {
-                                    Card[] mydeck = EnemyDeck.Concat(EnemyHand).Concat(EnemyScrap).ToArray();
-                                    Card[] enemydeck = PlayerDeck.Concat(PlayerHand).Concat(PlayerScrap).ToArray();
-                                    ModelInput158 input104 = MLController.CreateShoppingInput(GetStrategyDistribution(true), GetStrategyDistribution(true), GetFractionDistribution(false).Item1, GetFractionDistribution(true).Item1, Shop, Shop.Where(c => c != null).Max(c => c!.Price), PlayerHealth / (float)InitHealth, EnemyHealth / (float)InitHealth, mydeck, enemydeck);
-                                    ModelOutput6 output6 = MLController.ShoppingEngine.Predict(input104);
-                                    scrapindex = -1;
-                                    float bestScrapScore = float.NegativeInfinity;
-                                    for (int scrapCand = 1; scrapCand < Shop.Length; scrapCand++) {
-                                        if (Shop[scrapCand] == null)
-                                            continue;
-                                        if (output6.Prediction[scrapCand] > bestScrapScore) {
-                                            bestScrapScore = output6.Prediction[scrapCand];
-                                            scrapindex = scrapCand;
+                                    float[] distribution = GetStrategyDistribution(true);
+                                    List<float> maxValues = distribution.ToList();
+                                    maxValues.Sort();
+                                    maxValues.Reverse();
+                                    int maxValueIndex = 0;
+                                    int maxIndex = 0;
+                                    List<int> foundCardIndexes = [];
+                                    while (foundCardIndexes.Count == 0 && maxValueIndex < maxValues.Count) {
+                                        //If there is more than one max value, select one randomly
+                                        List<int> maxIndices = distribution
+                                            .Select((value, index) => new { value, index })
+                                            .Where(x => x.value == maxValues[maxValueIndex])
+                                            .Select(x => x.index)
+                                            .ToList();
+                                        while (maxIndices.Count > 0) {
+                                            maxIndex = maxIndices[RandomNumberGenerator.GetInt32(0, maxIndices.Count)];
+                                            maxIndices.Remove(maxIndex);
+                                            foundCardIndexes = Shop.Select((card, index) => new { card, index })
+                                                .Where(x => x.card != null && x.card.CardFraction == (Card.Fraction)maxIndex)
+                                                .Select(x => x.index)
+                                                .ToList();
+                                            if (foundCardIndexes.Count > 0)
+                                                break;
                                         }
+                                        maxValueIndex++;
+                                    }
+                                    if (foundCardIndexes.Count > 0) {
+                                        ModelInput89 input89 = new();
+                                        float[] prefStrategy = new float[5];
+                                        prefStrategy[maxIndex] = 1;
+                                        List<float> inputs = [];
+                                        inputs.AddRange(prefStrategy);
+                                        int highestPrice = foundCardIndexes.Select(index => Shop[index]).Max(card => card!.Price);
+                                        for (int j = 0; j < Shop.Length; j++) {
+                                            if (foundCardIndexes.Contains(j)) {
+                                                inputs.Add(1);
+                                                if (Shop[j]!.Price == highestPrice)
+                                                    inputs.Add(1);
+                                                else
+                                                    inputs.Add(0);
+                                                for (int k = 0; k < (int)Card.Effect.None; k++) {
+                                                    if (Shop[j]!.CardEffect == (Card.Effect)k) {
+                                                        inputs.Add(1);
+                                                    }
+                                                    else {
+                                                        inputs.Add(0);
+                                                    }
+                                                }
+                                            }
+                                            else {
+                                                inputs.AddRange(new float[14]);
+                                            }
+                                        }
+                                        input89.Features = inputs.ToArray();
+                                        ModelOutput6 output6 = MLController.ShoppingEngine.Predict(input89);
+                                        scrapindex = output6.Prediction.ToList().IndexOf(output6.Prediction.Max());
                                     }
                                 }
                                 if (Shop[scrapindex] != null) {
                                     if (Shop[scrapindex]!.CardFraction != Card.Fraction.None)
                                         GameDeck.Add(Shop[scrapindex]!);
+                                    scrapSFX.Play(GameSettings.SFXVolume, 0, 0);
                                     Shop[scrapindex] = null;
                                 }
                                 RefillShop();
                             }
+                            //AI LOGIC KELL IDE !!! (done)
                         }
                         break;
                     case Card.Effect.ShowHand:
@@ -392,7 +447,7 @@ namespace CardGame {
                         }
                         cardSelector = new(deckcards.TakeLast(card.EffectAmount).ToList(), 0, mouse) {
                             HasOkButton = false,
-                            Title = $"Az ellenfél pakliának következő {card.EffectAmount} lapja."
+                            Title = $"The next {card.EffectAmount} cards of the enemy's deck."
                         };
                         break;
                     case Card.Effect.StealCard:
@@ -544,16 +599,6 @@ namespace CardGame {
                         allcards++;
                     }
                 }
-				if (player == playerTurn) {
-                    foreach (var card in PlayedPile) {
-                        if (stolenCards.Contains(card))
-                            continue;
-                        if (card.CardFraction != Card.Fraction.None) {
-                            cards[(int)card.CardFraction]++;
-                            allcards++;
-                        }
-                    }
-                }
                 if (allcards > 0) {
                     for (int i = 0; i < distribution.Length; i++) {
                         distribution[i] = (float)cards[i] / allcards;
@@ -584,17 +629,7 @@ namespace CardGame {
                         allcards++;
                     }
                 }
-                if (player == playerTurn) {
-                    foreach (var card in PlayedPile) {
-                        if (stolenCards.Contains(card))
-                            continue;
-                        if (card.CardFraction != Card.Fraction.None) {
-                            cards[(int)card.CardFraction]++;
-                            allcards++;
-                        }
-                    }
-                } 
-				if (allcards > 0) {
+                if (allcards > 0) {
                     for (int i = 0; i < distribution.Length; i++) {
                         distribution[i] = (float)cards[i] / allcards;
                     }
@@ -608,23 +643,28 @@ namespace CardGame {
             return distribution;
         }
 
-		private Tuple<float[], int[]> GetFractionDistribution(bool player = true)
+        private Tuple<float[], int[]> GetFractionDistribution()
         {
             int allcards = 0;
             int[] cards = new int[6];
             float[] distribution = new float[6];
-            List<Card> tmp = player ? PlayerHand.Concat(PlayerDeck).Concat(PlayerScrap).ToList() : EnemyHand.Concat(EnemyDeck).Concat(EnemyScrap).ToList();
-            foreach (var card in tmp) {
+            foreach (var card in PlayerHand) {
                 cards[(int)card.CardFraction]++;
                 allcards++;
             }
-            if (playerTurn == player) {
-                foreach (var card in PlayedPile) {
-                    if (stolenCards.Contains(card))
-                        continue;
-                    cards[(int)card.CardFraction]++;
-                    allcards++;
-                }
+            foreach (var card in PlayerDeck) {
+                cards[(int)card.CardFraction]++;
+                allcards++;
+            }
+            foreach (var card in PlayerScrap) {
+                cards[(int)card.CardFraction]++;
+                allcards++;
+            }
+            foreach (var card in PlayedPile) {
+                if (stolenCards.Contains(card))
+                    continue;
+                cards[(int)card.CardFraction]++;
+                allcards++;
             }
             if (allcards > 0) {
                 for (int i = 0; i < distribution.Length; i++) {
@@ -824,137 +864,6 @@ namespace CardGame {
             stolenCards.Clear();
         }
 
-        private T[][] GetCombinations<T>(List<T> array, int Comb_length)
-        {
-            static void Combination(int index, int r_length, List<T> data, ref List<T[]> result, List<T> input)
-            {
-                int length = input.Count;
-                if (data.Count == r_length) {
-                    result.Add(data.ToArray());
-                    return;
-                }
-                for (int i = index; i < length; i++) {
-                    data.Add(input[i]);
-                    Combination(i + 1, r_length, data, ref result, input);
-                    data.RemoveAt(data.Count - 1);
-                }
-            }
-            int n = array.Count;
-            List<T[]> result = [];
-            Combination(0, Comb_length, [], ref result, array);
-            return result.ToArray();
-        }
-
-        private static float[] ComputeFractionCounterMultipliers(float[] strategyPrediction)
-        {
-            int n = strategyPrediction.Length; // 5
-            int[] order = Enumerable.Range(0, n)
-                .OrderByDescending(i => strategyPrediction[i])
-                .ToArray();
-
-            const float maxMult = 2.0f;
-            const float minMult = 0.5f;
-            float ratio = minMult / maxMult; // 0.25
-
-            float[] multiplier = new float[n];
-            for (int rank = 0; rank < n; rank++) {
-                int fractionIndex = order[rank];
-                float t = (float)rank / (n - 1);
-                multiplier[fractionIndex] = maxMult * MathF.Pow(ratio, t);
-            }
-            return multiplier;
-        }
-
-        private static Card StrategyAwareGreedyBuyAlgorithm(
-            int myHP, int enemyHP, List<Card> availableCards,
-            float[] fractiondistribution, float[] strategyPrediction,
-            bool inverseOutput = false)
-        {
-            double[] GetWeightTable(int MyHP, int EnemyHP)
-            {
-                double AggroThreshold = InitHealth * 0.2;
-                double DangerThreshold = InitHealth * 0.3;
-                if (EnemyHP <= AggroThreshold || MyHP <= DangerThreshold)
-                    return [2.5, 0.5, 0.3, 0.5];
-                return [1.0, 1.0, 1.0, 1.5];
-            }
-
-            float[] counterMultiplier = ComputeFractionCounterMultipliers(strategyPrediction);
-            double[] weightTable = GetWeightTable(myHP, enemyHP);
-
-            Card? bestCard = null;
-            double bestScore = double.MinValue;
-            foreach (var card in availableCards) {
-                double score = 0;
-                score += (card.GetTrueAttack() + (card.CardEffect == Card.Effect.AttackBonus ? card.EffectAmount : 0)) * weightTable[0];
-                score += (card.Health + (card.CardEffect == Card.Effect.HealthBonus ? card.EffectAmount : 0)) * weightTable[1];
-                score += (card.Money + (card.CardEffect == Card.Effect.MoneyBonus ? card.EffectAmount : 0)) * weightTable[2];
-
-                double synergyBase = (fractiondistribution[(int)card.CardFraction] + 0.05) * (13 - (int)card.CardEffect);
-                float counterBonus = card.CardFraction != Card.Fraction.None
-                    ? counterMultiplier[(int)card.CardFraction]
-                    : 1f;
-                score += synergyBase * weightTable[3] * counterBonus;
-
-                if (inverseOutput) score = -score;
-                if (score > bestScore) { bestScore = score; bestCard = card; }
-            }
-            return bestCard!;
-        }
-
-        private static Card GreedyBuyAlgorithm(int myHP, int enemyHP, List<Card> availableCards, float[] fractiondistribution, bool inverseOutput = false)
-		{
-            double[] GetWeightTable(int MyHP, int EnemyHP)
-            {
-                double AggroThreshold = InitHealth * 0.2;
-                double DangerThreshold = InitHealth * 0.3;
-                if (EnemyHP <= AggroThreshold || MyHP <= DangerThreshold) {
-                    return [2.5, 0.5, 0.3, 0.5];
-                }
-                return [1.0, 1.0, 1.0, 1.5];
-            }
-
-            double[] weightTable = GetWeightTable(myHP, enemyHP);
-            Card? bestCard = null;
-            double bestScore = double.MinValue;
-            foreach (var card in availableCards) {
-                double score = 0;
-                score += (card.GetTrueAttack() + (card.CardEffect == Card.Effect.AttackBonus ? card.EffectAmount : 0)) * weightTable[0];
-                score += (card.Health + (card.CardEffect == Card.Effect.HealthBonus ? card.EffectAmount : 0)) * weightTable[1];
-                score += (card.Money + (card.CardEffect == Card.Effect.MoneyBonus ? card.EffectAmount : 0)) * weightTable[2];
-                score += fractiondistribution[(int)card.CardFraction] * (13 - (int)card.CardEffect) * weightTable[3];
-                if (inverseOutput) {
-                    score = -score;
-                }
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestCard = card;
-                }
-			}
-            return bestCard!;
-		}
-		
-		 private float GetPenalty(int streak, bool player)
-        {
-            float currentPenalty = player ? this.currentPenalty : this.enemyCurrentPenalty;
-            if (streak > 0) {
-                float penalty = 0.02f * (float)Math.Pow(2.5, streak - 1);
-                currentPenalty = Math.Min(penalty, 1f);
-            }
-            else {
-                currentPenalty *= 0.8f;
-                if (currentPenalty < 0.001f)
-                    currentPenalty = 0f;
-            }
-            if (currentPenalty < 0.00001f)
-                currentPenalty = 0f;
-            if (player)
-                this.currentPenalty = currentPenalty;
-            else
-                this.enemyCurrentPenalty = currentPenalty;
-            return currentPenalty;
-        }
-		
         //csak egyszer kell meghívni, amikor a képernyő mérete változik
         private void CalculateLayout()
         {
@@ -1116,7 +1025,7 @@ namespace CardGame {
                     //EndingCheck
                     if (PlayerHealth <= 0) {
                         endingScreen = new(ResourceManager.Textures["Defeat"][0], null, ResourceManager.Fonts["FONT_C"]) {
-                            Title = "Vereség!"
+                            Title = "Defeat!"
                         };
                         MusicPlayer.Mute();
                         defeatSFX.Play(GameSettings.SFXVolume, 0, 0);
@@ -1139,7 +1048,7 @@ namespace CardGame {
                             Card.Fraction.TheEye => new(ResourceManager.Textures["Victory_T"][0], ResourceManager.Textures["TheEyeIcon"][0], ResourceManager.Fonts["FONT_TE"]),
                             _ => new(ResourceManager.Textures["Victory_C"][0], null, ResourceManager.Fonts["FONT_C"]),
                         };
-                        endingScreen.Title = "Győzelem!";
+                        endingScreen.Title = "Victory!";
                         MusicPlayer.Mute();
                         victorySFX.Play(GameSettings.SFXVolume, 0, 0);
                         endingScreen.Update(gameTime);
@@ -1151,7 +1060,7 @@ namespace CardGame {
                         if (PlayerCard2ScrapThisTurn != 0) {
                             PlayerCard2ScrapThisTurn = Math.Clamp(PlayerCard2ScrapThisTurn, 0, PlayerHand.Count - 1);
                             cardSelector = new(PlayerHand, PlayerCard2ScrapThisTurn, mouse, true) {
-                                Title = $"Válaszd ki a kezedből kidobandó lapokat! (Pontosan {PlayerCard2ScrapThisTurn} db)"
+                                Title = $"Select the cards to discard from your hand! (Exactly {PlayerCard2ScrapThisTurn})"
                             };
                             cardSelector.SelectionConfirmed += ScrapOwnCardFromHandEventHandler;
                             cardSelector.HasCancelButton = false;
@@ -1191,43 +1100,33 @@ namespace CardGame {
                             EnemyCard2ScrapThisTurn = Math.Clamp(EnemyCard2ScrapThisTurn, 0, EnemyHand.Count - 1);
                             for (int i = 0; i < EnemyCard2ScrapThisTurn; i++) {
                                 Card scrapped;
-                                if (EnemyDecisionMaking == 3)
-                            scrapped = DeckGenerator.GetCard(EnemyHand);
-                        else if (EnemyDecisionMaking == 2 || EnemyDecisionMaking == 1) {
-                            // heuristic logic One-Step Lookahead
-                            double GetScore(Card[] action)
-                            {
-                                double score = 0;
-                                foreach (var card in action) {
-                                    int sinergy = action.Count(c => c != card && c.CardFraction == card.CardFraction);
-                                    score += ((card.GetTrueAttack() + (card.CardEffect == Card.Effect.AttackBonus ? card.EffectAmount : 0)) * 2) + (card.Health + (card.CardEffect == Card.Effect.HealthBonus ? card.EffectAmount : 0) +
-                                         card.Money + (card.CardEffect == Card.Effect.MoneyBonus ? card.EffectAmount : 0) + (sinergy * (13 - (int)card.CardEffect)));
+                                if (RandomAI)
+                                    scrapped = DeckGenerator.GetCard(EnemyHand);
+                                else {
+                                    int scrappedIndex = 0;
+                                    for (int j = 1; j < EnemyHand.Count; j++) {
+                                        List<float> input = [];
+                                        input.add(1);
+                                        for (int k = 0; k < (int)Card.Effect.None; k++) {
+                                            if (EnemyHand[scrappedIndex].CardEffect == (Card.Effect)k)
+                                                input.Add(1);
+                                            else
+                                                input.Add(0);
+                                        }
+                                        input.add(1);
+                                        for (int k = 0; k < (int)Card.Fraction.None; k++) {
+                                            if (EnemyHand[j].CardFraction == (Card.Fraction)k)
+                                                input.Add(1);
+                                            else
+                                                input.Add(0);
+                                        }
+                                        ModelOutput2 output = MLController.DiscardEngine.Predict(new ModelInput26() { Features = input.ToArray() });
+                                        if (output.Prediction[0] < output.Prediction[1]) {
+                                            scrappedIndex = j;
+                                        }
+                                    }
+                                    scrapped = EnemyHand[scrappedIndex];
                                 }
-                                return score;
-                            }
-                            Card[][] legalactions = GetCombinations(new List<Card>(EnemyHand), EnemyHand.Count - 1);
-                            Card[]? bestActions = null;
-                            double bestScore = double.MinValue;
-                            for (int j = 0; j < legalactions.Length; j++) {
-                                double score = GetScore(legalactions[j]);
-                                if (score > bestScore) {
-                                    bestScore = score;
-                                    bestActions = legalactions[j];
-                                }
-                            }
-                            scrapped = EnemyHand.Except(bestActions!).First();
-                        }
-                        else {
-                            int scrapindex = 0;
-                            for (int j = 1; j < EnemyHand.Count; j++) {
-                                ModelInput49 input = MLController.CreateDiscardInput(EnemyHand[scrapindex], EnemyHand[j], GetStrategyDistribution(false));
-                                ModelOutput2 output = MLController.DiscardEngine.Predict(input);
-                                if (output.Prediction[0] > output.Prediction[1]) {
-                                    scrapindex = j;
-								}
-							}
-                            scrapped = EnemyHand[scrapindex];
-						}
                                 EnemyScrap.Add(scrapped);
                                 EnemyHandTarget.RemoveAt(EnemyHand.IndexOf(scrapped));
                                 EnemyHand.Remove(scrapped);
@@ -1244,40 +1143,75 @@ namespace CardGame {
                         else if (EnemyHand.Count == 0) {
                             //Buy something from shop
                             List<Card> affordableCards = Shop.Where(card => card!.Price <= EnemyMoney).ToList()!;
-                            ModelOutput5 strategy = MLController.StrategyEngine.Predict(new ModelInput5() { Features = GetStrategyDistribution(true) });
+                            ModelOutput5? strategy = null;
+                            if (!RandomAI)
+                                strategy = MLController.StrategyEngine.Predict(new ModelInput5() { Features = GetStrategyDistribution(true) });
                             while (affordableCards.Count > 0) {
                                 Card toBuy;
-                        if (EnemyDecisionMaking == 3)
-                            toBuy = affordableCards[RandomNumberGenerator.GetInt32(0, affordableCards.Count)];
-                        else if (EnemyDecisionMaking == 2) {
-                            toBuy = GreedyBuyAlgorithm(EnemyHealth, PlayerHealth, affordableCards, GetFractionDistribution(false).Item1);
-						}
-                        else if (EnemyDecisionMaking == 1) {
-                            toBuy = StrategyAwareGreedyBuyAlgorithm(EnemyHealth, PlayerHealth, affordableCards, GetFractionDistribution(false).Item1, strategy.Prediction);
-                        }
-                        else {
-                            Card[] mydeck = EnemyDeck.Concat(EnemyHand).Concat(EnemyScrap).ToArray();
-                            Card[] enemydeck = PlayerDeck.Concat(PlayerHand).Concat(PlayerScrap).ToArray();
-                            ModelInput158 input104 = MLController.CreateShoppingInput(strategy.Prediction, GetStrategyDistribution(false), GetFractionDistribution(false).Item1, GetFractionDistribution(true).Item1, Shop, EnemyMoney, EnemyHealth / (float)InitHealth, PlayerHealth / (float)InitHealth, mydeck, enemydeck);
-                            ModelOutput6 choosen = MLController.ShoppingEngine.Predict(input104);
-                            int chosenIndex = -1;
-                            float bestScore = float.NegativeInfinity;
-                            choosen.Prediction[0] -= Math.Abs(choosen.Prediction[0]) * GetPenalty(enemyZeroSlotStreak, false);
-                            for (int i = affordableCards.Count > 1 ? 1 : 0;
-                                i < Shop.Length;
-                                i++) {
-                                if (Shop[i] == null || Shop[i]!.Price > EnemyMoney)
-                                    continue;
-                                if (choosen.Prediction[i] > bestScore) {
-                                    bestScore = choosen.Prediction[i];
-                                    chosenIndex = i;
-                                }
-                            }
-							if (chosenIndex == 0)
-                                enemyZeroSlotStreak++;
-							else
-                                enemyZeroSlotStreak = 0;
-							toBuy = Shop[chosenIndex]!;
+                                if (RandomAI)
+                                    toBuy = affordableCards[RandomNumberGenerator.GetInt32(0, affordableCards.Count)];
+                                else {
+                                    List<float> maxIndexes = strategy!.Prediction.ToList();
+                                    maxIndexes.Sort();
+                                    maxIndexes.Reverse();
+                                    int maxIndex = 0;
+                                    int prefIndex = 0;
+                                    HashSet<Card> TBuy = [];
+                                    //első kettő típus
+                                    while (maxIndex < 2) {
+                                        List<int> maxIndices = strategy!.Prediction.Select((value, index) => new { value, index })
+                                            .Where(pair => pair.value == maxIndexes[maxIndex])
+                                            .Select(pair => pair.index)
+                                            .ToList();
+                                        foreach (int index in maxIndices) {
+                                            if (TBuy.Count == 0)
+                                                prefIndex = index;
+                                            TBuy.UnionWith(affordableCards.Where(card => card!.CardFraction == (Card.Fraction)index).ToList()!);
+                                        }
+                                        maxIndex++;
+                                    }
+                                    //Ha nincs, akkor a harmadik
+                                    if (TBuy.Count == 0) {
+                                        List<int> maxIndices = strategy!.Prediction.Select((value, index) => new { value, index })
+                                                .Where(pair => pair.value == maxIndexes[maxIndex])
+                                                .Select(pair => pair.index)
+                                                .ToList();
+                                        foreach (int index in maxIndices) {
+                                            if (TBuy.Count == 0)
+                                                prefIndex = index;
+                                            TBuy.UnionWith(affordableCards.Where(card => card!.CardFraction == (Card.Fraction)index).ToList()!);
+                                        }
+                                    }
+                                    //Egyébként frakciómentes lapot vesz
+                                    if (TBuy.Count == 0) {
+                                        prefIndex = Array.IndexOf(strategy!.Prediction, maxIndexes[0]);
+                                        TBuy = affordableCards.Where(card => card!.CardFraction == Card.Fraction.None).ToHashSet();
+                                        if (TBuy.Count == 0)
+                                            break;
+                                    }
+                                    List<float> input = [];
+                                    float[] prefStrategy = new float[5];
+                                    prefStrategy[prefIndex] = 1;
+                                    input.AddRange(prefStrategy);
+                                    Card[] TBuyArray = TBuy.ToArray();
+                                    int highestPrice = TBuyArray.Max(card => card!.Price);
+                                    foreach (Card card in TBuyArray) {
+                                        input.Add(1);
+                                        if (card.Price == highestPrice)
+                                            input.Add(1);
+                                        else
+                                            input.Add(0);
+                                        for (int i = 0; i < (int)Card.Effect.None; i++) {
+                                            if (card.CardEffect == (Card.Effect)i)
+                                                input.Add(1);
+                                            else
+                                                input.Add(0);
+                                        }
+                                    }
+                                    input.AddRange(new float[89 - input.Count]);
+                                    ModelOutput6 choosen = MLController.ShoppingEngine.Predict(new ModelInput89() { Features = input.ToArray() });
+                                    int chosenIndex = Array.IndexOf(choosen.Prediction, choosen.Prediction.Max());
+                                    toBuy = TBuyArray[chosenIndex];
                                 }
                                 BuyFromShop(toBuy, false);
                                 EnemyMoney -= toBuy.Price;
@@ -1442,14 +1376,14 @@ namespace CardGame {
                         if (previewThisCard == null) {
                             if (PlayerScrapLoc.Contains(mouse.GetMousePosition()) && PlayerScrap.Count != 0) {
                                 cardSelector = new(PlayerScrap, 0, mouse) {
-                                    Title = "Játékos eldobott kártyái",
+                                    Title = "Player's discarded cards",
                                     HasOkButton = false
                                 };
                                 cardSelector.Update(gameTime);
                             }
                             else if (EnemyScrapLoc.Contains(mouse.GetMousePosition()) && EnemyScrap.Count != 0) {
                                 cardSelector = new(EnemyScrap, 0, mouse) {
-                                    Title = "Ellenfél eldobott kártyái",
+                                    Title = "Enemy's discarded cards",
                                     HasOkButton = false
                                 };
                                 cardSelector.Update(gameTime);
@@ -1461,7 +1395,7 @@ namespace CardGame {
                                 }
                                 DeckGenerator.ShuffleDeck(Localcards);
                                 cardSelector = new(Localcards, 0, mouse) {
-                                    Title = "Játékos pakliának kártyái (keverve)",
+                                    Title = "Player's deck cards (shuffled)",
                                     HasOkButton = false
                                 };
                                 cardSelector.Update(gameTime);
@@ -1517,54 +1451,54 @@ namespace CardGame {
                                 if (PrevHObject != hobj) {
                                     PrevHObject = hobj;
                                     string fname = prevw.CardFraction switch {
-                                        Card.Fraction.Alliance => "'Szövetség'",
-                                        Card.Fraction.CollectorCult => "'Kuratórium'",
-                                        Card.Fraction.Empire => "'Birodalom'",
-                                        Card.Fraction.Machines => "'Gépek'",
-                                        Card.Fraction.TheEye => "'A szem'",
-                                        Card.Fraction.None => "frakciómentes lapok",
+                                        Card.Fraction.Alliance => "'Alliance'",
+                                        Card.Fraction.CollectorCult => "'Curatorium'",
+                                        Card.Fraction.Empire => "'Empire'",
+                                        Card.Fraction.Machines => "'Machines'",
+                                        Card.Fraction.TheEye => "'The Eye'",
+                                        Card.Fraction.None => "faction-free",
                                         _ => string.Empty
                                     };
                                     string reqname = prevw.EffectRequirement switch {
-                                        Card.Fraction.Alliance => "'Szövetség'",
-                                        Card.Fraction.CollectorCult => "'Kuratórium'",
-                                        Card.Fraction.Empire => "'Birodalom'",
-                                        Card.Fraction.Machines => "'Gépek'",
-                                        Card.Fraction.TheEye => "'A szem'",
-                                        Card.Fraction.None => "frakciómentes lapok",
+                                        Card.Fraction.Alliance => "'Alliance'",
+                                        Card.Fraction.CollectorCult => "'Curatorium'",
+                                        Card.Fraction.Empire => "'Empire'",
+                                        Card.Fraction.Machines => "'Machines'",
+                                        Card.Fraction.TheEye => "'The Eye'",
+                                        Card.Fraction.None => "faction-free",
                                         _ => string.Empty
                                     };
                                     string specEffect = prevw.CardEffect switch {
-                                        Card.Effect.ScrapEnemyCard => "A következő kör kezdetén az ellenfél eldob egy lapot,\nmielőtt azt kijátszhatná.",
-                                        Card.Effect.ScrapFromShop => "Eltávolít egy lapot a boltból.",
-                                        Card.Effect.AntiShow => "Az ellenfél nem fedheti fel a lapjaid ebben a körben.",
-                                        Card.Effect.StealCard => "Ellopja az ellenfél egy kártyáját és kijátsza azt.",
-                                        Card.Effect.DrawCard => "Húz még egy kártyát.",
-                                        Card.Effect.ScrapOwnCard => "Véglegesen eltávolít egy lapot az eldobott halmodból.",
-                                        Card.Effect.AttackBonus => "Támadási bónusz.",
-                                        Card.Effect.HealthBonus => "Életerő/Autoritás növelése.",
-                                        Card.Effect.MoneyBonus => "Játékpénz bónusz.",
-                                        Card.Effect.ShowHand => "Ellenfél kezében lévő lapok felfedése.",
-                                        Card.Effect.ShowDeck => "Ellenfél paklijának felfedése. Megmutatja, hogy milyen lapokat\nfog húzni az ellenfél a következő körben.",
-                                        Card.Effect.SelfDestruct => "A lap kijátszásakor megsemmisíti önmagát.",
-                                        Card.Effect.None => "Nincs speciális képesség!",
+                                        Card.Effect.ScrapEnemyCard => "At the start of the next turn, the enemy scraps a card,\nbefore they could play it.",
+                                        Card.Effect.ScrapFromShop => "Removes a card from the shop.",
+                                        Card.Effect.AntiShow => "The enemy cannot reveal your cards this turn.",
+                                        Card.Effect.StealCard => "Steals a card from the enemy and plays it.",
+                                        Card.Effect.DrawCard => "Draws an extra card.",
+                                        Card.Effect.ScrapOwnCard => "Permanently removes a card from your discard pile.",
+                                        Card.Effect.AttackBonus => "Attack bonus.",
+                                        Card.Effect.HealthBonus => "Increases health/authority.",
+                                        Card.Effect.MoneyBonus => "Money bonus.",
+                                        Card.Effect.ShowHand => "Reveals cards in the enemy's hand.",
+                                        Card.Effect.ShowDeck => "Reveals the enemy's deck. Shows which cards\nthe enemy will draw next turn.",
+                                        Card.Effect.SelfDestruct => "Destroys itself when played.",
+                                        Card.Effect.None => "No special ability!",
                                         _ => string.Empty,
                                     };
                                     var distribution = GetFractionDistribution();
                                     ToolTipsBox.Text = hobj switch {
-                                        Card.HoveredObject.None => $"Ez a kártya a {fname} lapjaihoz tartozik,\n" +
-                                                                   $"melyből jelenleg {distribution.Item2[(int)prevw.CardFraction]} db van a tulajdonodban.\n" +
-                                                                   $"Ez a paklid {distribution.Item1[(int)prevw.CardFraction].ToString("P2")}-ának felel meg.",
-                                        Card.HoveredObject.Price => $"A lap ára {prevw.Price} játékpénz!\nEzt a lapot jelenleg {(PlayerMoney >= prevw.Price ? "meg tudod vásárolni" : "NEM tudod megvásárolni")}!",
-                                        Card.HoveredObject.Fraction => $"Ez a kártya frakciójele.\nMeghatározza, hogy az adott lap\nmelyik frakcióhoz tartozik.\nEz a kártya a {fname} lapjai közé tartozik.",
-                                        Card.HoveredObject.BaseAbilities => $"Ez a mező a lap alapképességeit határozza meg.\n" +
-                                                                            $"Ezeket a képességeket nem köti feltétel,\n" +
-                                                                            $"értékeiket kijátszásuk mindig megadja a játékosnak.\n\n" +
-                                                                            $"Ez a lap {prevw.Money} pénzt, {prevw.Health} életerőt és {prevw.GetTrueAttack()} támadást biztosít.",
-                                        Card.HoveredObject.SpecialAbility => $"Ez a mező a lap speciális képességeit határozza meg.\n" +
-                                                                             $"A lap képessége {(prevw.EffectRequirement != Card.Fraction.None ? $"feltételhez kötött.\nA speciális képesség kihasználásához legalább egy\n{reqname} lapot ki kell játszani a jelenlegi körben!\n" : "NEM kötött feltételhez,\naz alapképességekkel egyszerre kijátszható.\n")}" +
-                                                                             $"A lap speciális képessége {prevw.EffectAmount} alkalommal biztosítja:\n{specEffect}",
-                                        Card.HoveredObject.Unknown => "A lap adatai ismeretlenek!",
+                                        Card.HoveredObject.None => $"This card belongs to the {fname} cards,\n" +
+                                                                   $"of which you currently own {distribution.Item2[(int)prevw.CardFraction]}.\n" +
+                                                                   $"This makes up {distribution.Item1[(int)prevw.CardFraction].ToString("P2")} of your deck.",
+                                        Card.HoveredObject.Price => $"This card costs {prevw.Price} money!\nYou currently {(PlayerMoney >= prevw.Price ? "can" : "CANNOT")} afford this card!",
+                                        Card.HoveredObject.Fraction => $"This is the card's faction symbol.\nIt determines which faction\nthe card belongs to.\nThis card belongs to the {fname} cards.",
+                                        Card.HoveredObject.BaseAbilities => $"This field shows the card's base abilities.\n" +
+                                                                            $"These abilities have no requirements,\n" +
+                                                                            $"playing the card always grants their values to the player.\n\n" +
+                                                                            $"This card provides {prevw.Money} money, {prevw.Health} health and {prevw.GetTrueAttack()} attack.",
+                                        Card.HoveredObject.SpecialAbility => $"This field shows the card's special ability.\n" +
+                                                                             $"The ability is {(prevw.EffectRequirement != Card.Fraction.None ? $"conditional.\nTo use the special ability, at least one\n{reqname} card must be played this turn!\n" : "NOT conditional,\nit can be played together with the base abilities.\n")}" +
+                                                                             $"The card's special ability triggers {prevw.EffectAmount} times:\n{specEffect}",
+                                        Card.HoveredObject.Unknown => "This card's data is unknown!",
                                         _ => string.Empty
                                     };
                                 }

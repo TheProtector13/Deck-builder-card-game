@@ -2,6 +2,9 @@ ASSETS/LIC/
 CardGame/.vs/
 CardGame/CardGame/bin/
 CardGame/CardGame/obj/
+TEST/CardGame/bin
+TEST/CardGame/obj
+TEST/CardGame/.vs/
 DOKUMENTÁCIÓ/
 linkek.txt
 mgr ötletek.txt

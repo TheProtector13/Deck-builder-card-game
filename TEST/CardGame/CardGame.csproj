@@ -1,0 +1,85 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RollForward>Major</RollForward>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <TieredCompilation>false</TieredCompilation>
+    <UseWindowsForms>false</UseWindowsForms>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <TieredCompilation>false</TieredCompilation>
+    <TieredPGO>false</TieredPGO>
+    <SelfContained>true</SelfContained>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Icon.ico" />
+    <EmbeddedResource Include="Icon.ico">
+      <LogicalName>Icon.ico</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icon.bmp">
+      <LogicalName>Icon.bmp</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.7" />
+    <PackageReference Include="Microsoft.ML" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ML.CpuMath" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ML.DataView" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ML.TensorFlow" Version="5.0.0" />
+    <PackageReference Include="SciSharp.TensorFlow.Redist" Version="2.16.0" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="NN\discardingAI\fingerprint.pb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\discardingAI\saved_model.pb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\discardingAI\variables\variables.data-00000-of-00001">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\discardingAI\variables\variables.index">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\shoppingAI\fingerprint.pb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\shoppingAI\saved_model.pb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\shoppingAI\variables\variables.data-00000-of-00001">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\shoppingAI\variables\variables.index">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\strategyAI\fingerprint.pb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\strategyAI\saved_model.pb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\strategyAI\variables\variables.data-00000-of-00001">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NN\strategyAI\variables\variables.index">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

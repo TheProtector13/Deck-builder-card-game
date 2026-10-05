@@ -1,7 +1,6 @@
-5 fraction distribution (saját) + X2: (kétszer)
+X2: (kétszer)
 ---
-price_ratio
-5 x fraction one-hot
+EXISTS
 ScrapEnemyCard
 ScrapFromShop
 AntiShow
@@ -14,9 +13,4 @@ MoneyBonus
 ShowHand
 ShowDeck
 SelfDestruct
-free_effect
-attack_norm
-health_norm
-money_norm
 ---
-49

@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
+using CardGame.TCP;
 using FontStashSharp;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Tensorflow;
+using static CardGame.TCP.MessagePackHelper;
 
 #nullable enable
 namespace CardGame {
-    internal class ForeGround : IDrawable {
+    internal class ForeGround_Multi : IDrawable, IDisposable {
         private static readonly float CARD_WIDTH_SCALE = 2f / 3f;
         private static readonly int MAX_OFFSET_CARDS = 4;
         private readonly BackGround BG;
@@ -61,23 +61,20 @@ namespace CardGame {
         private TimeSpan LastGC = TimeSpan.Zero;
 
         //Game variables
-		private int zeroSlotStreak = 0, enemyZeroSlotStreak = 0;
-        private float currentPenalty = 0f, enemyCurrentPenalty = 0f;
         private int PlayerAttack = 0;
         private int PlayerMoney = 0;
-        private static int InitHealth = 90;
-        private int PlayerHealth = InitHealth;	  
+        private int PlayerHealth = 90;
         private int EnemyAttack = 0;
         private int EnemyMoney = 0;
-        private int EnemyHealth = InitHealth;
-        public string PlayerName { get; set; } = "Játékos";
+        private int EnemyHealth = 90;
+        public string PlayerName { get; set; } = "Player";
         public string EnemyName { get; set; } = "AI";
         private bool playerTurn = true;
         private bool playAllCards = false;
         private int PlayerCard2ScrapThisTurn = 0;
         private int EnemyCard2ScrapThisTurn = 0;
         private readonly List<Card> stolenCards = [];
-        public short EnemyDecisionMaking { get; set; } = 0; // 0 - NN, 1 - StrategyHeuristic, 2 - Heuristic, 3 - Random
+        public bool RandomAI { get; set; } = false;
         public GameWinner WINNER { get; private set; } = GameWinner.InProgress;
 
 
@@ -104,9 +101,19 @@ namespace CardGame {
         private readonly SoundEffect flipSFX, shuffleSFX, explodeSFX, explodeEXT_SFX, defeatSFX, victorySFX;
         private readonly SoundEffect buySFX, scrapSFX, stealSFX, dropcardSFX;
 
-        private ForeGround() => throw new NotImplementedException();
-        public ForeGround(BackGround bg)
+        //TCP
+        private readonly TcpTlsPeer peer;
+        private bool enemyendturn = false;
+        private readonly List<Card> EnemyUnknownDeck = [];
+        private readonly List<Card> PlayerUnknownDeck = [];
+
+        private ForeGround_Multi() => throw new NotImplementedException();
+        public ForeGround_Multi(BackGround bg, TcpTlsPeer peer)
         {
+            this.peer = peer;
+            playerTurn = peer.IsHost;
+            PlayerName = UDP_Broadcast_Helper.UserName;
+            EnemyName = UDP_Broadcast_Helper.ClientName;
             mouse = new(Mouse.GetState());
             BG = bg;
             GameDeck = DeckGenerator.GenDeck(BG.Type);
@@ -159,7 +166,7 @@ namespace CardGame {
             PlayedPileTarget = [];
             PlayerHandTarget = [];
             EndTurnButton = new Button(ResourceManager.Textures["BUTTON"], mouse) {
-                Text = "Kör vége",
+                Text = "End turn",
                 Enabled = false
             };
             EndTurnButton.Click += EndTurnEventHandler;
@@ -179,9 +186,11 @@ namespace CardGame {
             stealSFX = ResourceManager.SoundEffects["Steal"];
             dropcardSFX = ResourceManager.SoundEffects["Dropcard"];
             CalculateLayout();
-            RefillShop();
-            RefillPlayerHand();
-            RefillEnemyHand();
+            if (peer.IsHost) {
+                RefillShop();
+                RefillPlayerHand();
+                RefillEnemyHand();
+            }
             //ITT NEM UPDATEOLJUK A BG-T, AZT A GAME1 CSINÁLJA
         }
 
@@ -218,18 +227,12 @@ namespace CardGame {
                 for (int i = 0; i <= (int)Card.Effect.None; i++) {
                     foreach (var card in PlayerHand.Where(card => card.CardEffect == (Card.Effect)i)) {
                         AddToPlayedPile(card, PlayerHandTarget[PlayerHand.IndexOf(card)], true);
+                        peer.SendAsync(new ActionPayload(ActionType.Play, card.GetCardDetails(), CryptographyHelper.NowMs()));
                         return;
                     }
                 }
             }
-            else {
-                for (int i = 0; i <= (int)Card.Effect.None; i++) {
-                    foreach (var card in EnemyHand.Where(card => card.CardEffect == (Card.Effect)i)) {
-                        AddToPlayedPile(card, EnemyHandTarget[EnemyHand.IndexOf(card)], false);
-                        return;
-                    }
-                }
-            }
+            return;
         }
 
         private void PlayCard(Card card, bool player = true)
@@ -265,97 +268,20 @@ namespace CardGame {
                         if (player) {
                             if (PlayerScrap.Count != 0 && PlayerHand.Count + PlayerDeck.Count + PlayerScrap.Count - card.EffectAmount > 6) {
                                 cardSelector = new(PlayerScrap, card.EffectAmount, mouse) {
-                                    Title = $"Válaszd ki a paklidból kidobandó lapokat! (Max. {card.EffectAmount} db)"
+                                    Title = $"Select the cards to scrap from your deck! (Max {card.EffectAmount})"
                                 };
                                 cardSelector.SelectionConfirmed += ScrapOwnCardEventHandler;
                             }
-                        }
-                        else {
-                            if (EnemyScrap.Count != 0 && EnemyHand.Count + EnemyDeck.Count + EnemyScrap.Count - card.EffectAmount > 6) {
-                                int scrapped = 0;
-                                while (scrapped < card.EffectAmount && EnemyScrap.Count > 0) {
-                                    int scrapindex = 0;
-                                    if (EnemyDecisionMaking == 3) {
-                                        scrapindex = RandomNumberGenerator.GetInt32(0, EnemyScrap.Count);
-                                    }
-                                    else if (EnemyDecisionMaking == 2) {
-                                        Card toScrap = GreedyBuyAlgorithm(EnemyHealth, PlayerHealth, EnemyScrap, GetFractionDistribution(false).Item1, true);
-                                        scrapindex = EnemyScrap.IndexOf(toScrap);
-                                        if (scrapindex == -1)
-                                            scrapindex = RandomNumberGenerator.GetInt32(0, EnemyScrap.Count);
-                                    }
-                                    else if (EnemyDecisionMaking == 1) {
-                                        ModelOutput5 output5 = MLController.StrategyEngine.Predict(new ModelInput5() { Features = GetStrategyDistribution(true) });
-                                        Card toScrap = StrategyAwareGreedyBuyAlgorithm(EnemyHealth, PlayerHealth, EnemyScrap, GetFractionDistribution(false).Item1, output5.Prediction, true);
-                                        scrapindex = EnemyScrap.IndexOf(toScrap);
-                                        if (scrapindex == -1)
-                                            scrapindex = RandomNumberGenerator.GetInt32(0, EnemyScrap.Count);
-                                    }
-                                    else {
-                                        List<Card> tempScrap = EnemyScrap;
-                                        for (int i = 1; i < tempScrap.Count; i++) {
-                                            ModelInput49 input = MLController.CreateDiscardInput(tempScrap[scrapindex], tempScrap[i], GetStrategyDistribution(false));
-                                            ModelOutput2 output = MLController.DiscardEngine.Predict(input);
-                                            if (output.Prediction[0] > output.Prediction[1]) {
-                                                scrapindex = i;
-                                            }
-                                        }
-                                        scrapindex = EnemyScrap.IndexOf(tempScrap[scrapindex]);
-                                    }
-                                    if (EnemyScrap[scrapindex].CardFraction != Card.Fraction.None)
-                                        GameDeck.Add(EnemyScrap[scrapindex]);
-                                    EnemyScrap.RemoveAt(scrapindex);
-                                    scrapped++;
-                                }
-                            }
-                        }
+                        } //NO OP
                         break;
                     case Card.Effect.ScrapFromShop:
                         if (player) {
                             cardSelector = new(Shop.ToList()!, card.EffectAmount, mouse, true) {
                                 HasCancelButton = false,
-                                Title = $"Válaszd ki a boltból eltávolítandó lapokat! (Pontosan {card.EffectAmount} db)"
+                                Title = $"Select the cards to remove from the shop! (Exactly {card.EffectAmount})"
                             };
                             cardSelector.SelectionConfirmed += ScrapFromShopEventHandler;
-                        }
-                        else {
-                            for (int i = 0; i < card.EffectAmount; i++) {
-                                int scrapindex = 0;
-                                if (EnemyDecisionMaking == 3) {
-                                    scrapindex = RandomNumberGenerator.GetInt32(0, Shop.Length);
-                                }
-                                else if (EnemyDecisionMaking == 2) {
-                                    Card toScrap = GreedyBuyAlgorithm(EnemyHealth, PlayerHealth, Shop.Where(card => card != null).Select(card => card!).ToList(), GetFractionDistribution(true).Item1, false);
-                                    scrapindex = Array.IndexOf(Shop, toScrap);
-                                }
-                                else if (EnemyDecisionMaking == 1) {
-                                    Card toScrap = StrategyAwareGreedyBuyAlgorithm(EnemyHealth, PlayerHealth, Shop.Where(card => card != null).Select(card => card!).ToList(), GetFractionDistribution(true).Item1, GetStrategyDistribution(true), false);
-                                    scrapindex = Array.IndexOf(Shop, toScrap);
-                                }
-                                else {
-                                    Card[] mydeck = EnemyDeck.Concat(EnemyHand).Concat(EnemyScrap).ToArray();
-                                    Card[] enemydeck = PlayerDeck.Concat(PlayerHand).Concat(PlayerScrap).ToArray();
-                                    ModelInput158 input104 = MLController.CreateShoppingInput(GetStrategyDistribution(true), GetStrategyDistribution(true), GetFractionDistribution(false).Item1, GetFractionDistribution(true).Item1, Shop, Shop.Where(c => c != null).Max(c => c!.Price), PlayerHealth / (float)InitHealth, EnemyHealth / (float)InitHealth, mydeck, enemydeck);
-                                    ModelOutput6 output6 = MLController.ShoppingEngine.Predict(input104);
-                                    scrapindex = -1;
-                                    float bestScrapScore = float.NegativeInfinity;
-                                    for (int scrapCand = 1; scrapCand < Shop.Length; scrapCand++) {
-                                        if (Shop[scrapCand] == null)
-                                            continue;
-                                        if (output6.Prediction[scrapCand] > bestScrapScore) {
-                                            bestScrapScore = output6.Prediction[scrapCand];
-                                            scrapindex = scrapCand;
-                                        }
-                                    }
-                                }
-                                if (Shop[scrapindex] != null) {
-                                    if (Shop[scrapindex]!.CardFraction != Card.Fraction.None)
-                                        GameDeck.Add(Shop[scrapindex]!);
-                                    Shop[scrapindex] = null;
-                                }
-                                RefillShop();
-                            }
-                        }
+                        } //NO OP
                         break;
                     case Card.Effect.ShowHand:
                         List<Card> cards = player ? EnemyHand : PlayerHand;
@@ -392,24 +318,33 @@ namespace CardGame {
                         }
                         cardSelector = new(deckcards.TakeLast(card.EffectAmount).ToList(), 0, mouse) {
                             HasOkButton = false,
-                            Title = $"Az ellenfél pakliának következő {card.EffectAmount} lapja."
+                            Title = $"The next {card.EffectAmount} cards of the enemy's deck."
                         };
                         break;
                     case Card.Effect.StealCard:
-                        List<Card> cards3 = player ? EnemyHand : PlayerHand;
-                        if (cards3.Any(tcard => tcard.CardEffect == Card.Effect.AntiShow)) {
-                            if (player)
-                                cards3.Where(tcard => tcard.CardEffect == Card.Effect.AntiShow).ToList().ForEach(tcard => tcard.Flipped = true);
-                            break;
-                        }
-                        for (int i = 0; i < card.EffectAmount; i++) {
-                            if (cards3.Count == 0) {
+                        if (peer.IsHost) {
+                            List<Card> cards3 = player ? EnemyHand : PlayerHand;
+                            if (cards3.Any(tcard => tcard.CardEffect == Card.Effect.AntiShow)) {
+                                if (player)
+                                    cards3.Where(tcard => tcard.CardEffect == Card.Effect.AntiShow).ToList().ForEach(tcard => tcard.Flipped = true);
+                                else {
+                                    List<Card> toflip = cards3.Where(tcard => tcard.CardEffect == Card.Effect.AntiShow).ToList();
+                                    // SEND
+                                    peer.SendAsync(new ActionPayload(ActionType.Flip, toflip[0].GetCardDetails(), CryptographyHelper.NowMs()));
+                                }
                                 break;
                             }
-                            Card stolen = DeckGenerator.GetCard(cards3);
-                            stolenCards.Add(stolen);
-                            stealSFX.Play(GameSettings.SFXVolume, 0, 0);
-                            AddToPlayedPile(stolen, player ? EnemyHandTarget[EnemyHand.IndexOf(stolen)] : PlayerHandTarget[PlayerHand.IndexOf(stolen)], !player);
+                            for (int i = 0; i < card.EffectAmount; i++) {
+                                if (cards3.Count == 0) {
+                                    break;
+                                }
+                                Card stolen = DeckGenerator.GetCard(cards3);
+                                stolenCards.Add(stolen);
+                                stealSFX.Play(GameSettings.SFXVolume, 0, 0);
+                                AddToPlayedPile(stolen, player ? EnemyHandTarget[EnemyHand.IndexOf(stolen)] : PlayerHandTarget[PlayerHand.IndexOf(stolen)], !player);
+                                // SEND
+                                peer.SendAsync(new ActionPayload(ActionType.Steal, stolen.GetCardDetails(), CryptographyHelper.NowMs()));
+                            }
                         }
                         break;
                     case Card.Effect.ScrapEnemyCard:
@@ -420,14 +355,16 @@ namespace CardGame {
                         dropcardSFX.Play(GameSettings.SFXVolume, 0, 0);
                         break;
                     case Card.Effect.DrawCard:
-                        if (player)
-                            for (int i = 0; i < card.EffectAmount; i++) {
-                                PlayerDrawCard();
-                            }
-                        else
-                            for (int i = 0; i < card.EffectAmount; i++) {
-                                EnemyDrawCard();
-                            }
+                        if (peer.IsHost) {
+                            if (player)
+                                for (int i = 0; i < card.EffectAmount; i++) {
+                                    PlayerDrawCard();
+                                }
+                            else
+                                for (int i = 0; i < card.EffectAmount; i++) {
+                                    EnemyDrawCard();
+                                }
+                        }
                         break;
                     case Card.Effect.MoneyBonus:
                         if (player)
@@ -464,6 +401,8 @@ namespace CardGame {
                     GameDeck.Add(card);
                 scrapSFX.Play(GameSettings.SFXVolume, 0, 0);
                 PlayerScrap.Remove(card);
+                // SEND
+                peer.SendAsync(new ActionPayload(ActionType.Scrap, card.GetCardDetails(), CryptographyHelper.NowMs()));
             }
             changed = true;
         }
@@ -477,6 +416,8 @@ namespace CardGame {
                 PlayerHandTarget.RemoveAt(PlayerHand.IndexOf(card));
                 PlayerHand.Remove(card);
                 flipSFX.Play(GameSettings.SFXVolume, 0, 0);
+                // SEND
+                peer.SendAsync(new ActionPayload(ActionType.ScrapFromHand, card.GetCardDetails(), CryptographyHelper.NowMs()));
             }
             changed = true;
         }
@@ -491,11 +432,15 @@ namespace CardGame {
                             GameDeck.Add(Shop[i]!);
                         Shop[i] = null;
                         scrapSFX.Play(GameSettings.SFXVolume, 0, 0);
+                        if (!peer.IsHost)
+                            // SEND
+                            peer.SendAsync(new ActionPayload(ActionType.ScrapFromShop, card.GetCardDetails(), CryptographyHelper.NowMs()));
                         break;
                     }
                 }
             }
-            RefillShop();
+            if (peer.IsHost)
+                RefillShop();
         }
 
         private void EndTurnEventHandler(object? sender, EventArgs e)
@@ -503,7 +448,10 @@ namespace CardGame {
             cardMouseControlEnabled = false;
             EndTurnButton.Enabled = false;
             ClearPlayedPile(true);
-            RefillPlayerHand();
+            // SEND
+            peer.SendAsync(new ActionPayload(ActionType.EndTurn, null, CryptographyHelper.NowMs()));
+            if (peer.IsHost)
+                RefillPlayerHand();
             PlayerMoney = 0;
             EnemyHealth -= PlayerAttack;
             if (PlayerAttack > 0)
@@ -520,111 +468,28 @@ namespace CardGame {
 
         //######## END ####################
 
-        private float[] GetStrategyDistribution(bool player = true)
-        {
-            int allcards = 0;
-            int[] cards = new int[5];
-            float[] distribution = new float[5];
-            if (player) {
-                foreach (var card in PlayerHand) {
-                    if (card.CardFraction != Card.Fraction.None) {
-                        cards[(int)card.CardFraction]++;
-                        allcards++;
-                    }
-                }
-                foreach (var card in PlayerDeck) {
-                    if (card.CardFraction != Card.Fraction.None) {
-                        cards[(int)card.CardFraction]++;
-                        allcards++;
-                    }
-                }
-                foreach (var card in PlayerScrap) {
-                    if (card.CardFraction != Card.Fraction.None) {
-                        cards[(int)card.CardFraction]++;
-                        allcards++;
-                    }
-                }
-				if (player == playerTurn) {
-                    foreach (var card in PlayedPile) {
-                        if (stolenCards.Contains(card))
-                            continue;
-                        if (card.CardFraction != Card.Fraction.None) {
-                            cards[(int)card.CardFraction]++;
-                            allcards++;
-                        }
-                    }
-                }
-                if (allcards > 0) {
-                    for (int i = 0; i < distribution.Length; i++) {
-                        distribution[i] = (float)cards[i] / allcards;
-                    }
-                }
-                else {
-                    for (int i = 0; i < distribution.Length; i++) {
-                        distribution[i] = 0.2f;
-                    }
-                }
-            }
-            else {
-                foreach (var card in EnemyHand) {
-                    if (card.CardFraction != Card.Fraction.None) {
-                        cards[(int)card.CardFraction]++;
-                        allcards++;
-                    }
-                }
-                foreach (var card in EnemyDeck) {
-                    if (card.CardFraction != Card.Fraction.None) {
-                        cards[(int)card.CardFraction]++;
-                        allcards++;
-                    }
-                }
-                foreach (var card in EnemyScrap) {
-                    if (card.CardFraction != Card.Fraction.None) {
-                        cards[(int)card.CardFraction]++;
-                        allcards++;
-                    }
-                }
-                if (player == playerTurn) {
-                    foreach (var card in PlayedPile) {
-                        if (stolenCards.Contains(card))
-                            continue;
-                        if (card.CardFraction != Card.Fraction.None) {
-                            cards[(int)card.CardFraction]++;
-                            allcards++;
-                        }
-                    }
-                } 
-				if (allcards > 0) {
-                    for (int i = 0; i < distribution.Length; i++) {
-                        distribution[i] = (float)cards[i] / allcards;
-                    }
-                }
-                else {
-                    for (int i = 0; i < distribution.Length; i++) {
-                        distribution[i] = 0.2f;
-                    }
-                }
-            }
-            return distribution;
-        }
-
-		private Tuple<float[], int[]> GetFractionDistribution(bool player = true)
+        private Tuple<float[], int[]> GetFractionDistribution()
         {
             int allcards = 0;
             int[] cards = new int[6];
             float[] distribution = new float[6];
-            List<Card> tmp = player ? PlayerHand.Concat(PlayerDeck).Concat(PlayerScrap).ToList() : EnemyHand.Concat(EnemyDeck).Concat(EnemyScrap).ToList();
-            foreach (var card in tmp) {
+            foreach (var card in PlayerHand) {
                 cards[(int)card.CardFraction]++;
                 allcards++;
             }
-            if (playerTurn == player) {
-                foreach (var card in PlayedPile) {
-                    if (stolenCards.Contains(card))
-                        continue;
-                    cards[(int)card.CardFraction]++;
-                    allcards++;
-                }
+            foreach (var card in PlayerDeck) {
+                cards[(int)card.CardFraction]++;
+                allcards++;
+            }
+            foreach (var card in PlayerScrap) {
+                cards[(int)card.CardFraction]++;
+                allcards++;
+            }
+            foreach (var card in PlayedPile) {
+                if (stolenCards.Contains(card))
+                    continue;
+                cards[(int)card.CardFraction]++;
+                allcards++;
             }
             if (allcards > 0) {
                 for (int i = 0; i < distribution.Length; i++) {
@@ -656,7 +521,10 @@ namespace CardGame {
             card.Flipped = true;
             card.RenderPrice = false;
             buySFX.Play(GameSettings.SFXVolume, 0, 0);
-            RefillShop();
+            // SEND
+            peer.SendAsync(new ActionPayload(ActionType.Buy, card.GetCardDetails(), CryptographyHelper.NowMs()));
+            if (peer.IsHost)
+                RefillShop();
         }
 
         private void RefillPlayerHand()
@@ -680,6 +548,14 @@ namespace CardGame {
                         handCardWidth,
                         PlayerHandLoc.Height)));
             }
+            // SEND
+            CardDetails[] deck = PlayerDeck.Select((card) => card.GetCardDetails()).ToArray();
+            peer.SendAsync(new CardListPayload(true, CardType.Deck, deck, CryptographyHelper.NowMs()));
+            CardDetails[] scrap = PlayerScrap.Select((card) => card.GetCardDetails()).ToArray();
+            peer.SendAsync(new CardListPayload(true, CardType.Scrap, scrap, CryptographyHelper.NowMs()));
+            CardDetails[] hand = PlayerHand.Select((card) => card.GetCardDetails()).ToArray();
+            peer.SendAsync(new CardListPayload(true, CardType.Hand, hand, CryptographyHelper.NowMs()));
+            //
             shuffleSFX.Play(GameSettings.SFXVolume, 0, 0);
             changed = true;
         }
@@ -690,6 +566,11 @@ namespace CardGame {
                 PlayerDeck.AddRange(PlayerScrap);
                 PlayerScrap.Clear();
                 DeckGenerator.ShuffleDeck(PlayerDeck);
+                // SEND
+                CardDetails[] deck = PlayerDeck.Select((card) => card.GetCardDetails()).ToArray();
+                peer.SendAsync(new CardListPayload(true, CardType.Deck, deck, CryptographyHelper.NowMs()));
+                CardDetails[] scrap = PlayerScrap.Select((card) => card.GetCardDetails()).ToArray();
+                peer.SendAsync(new CardListPayload(true, CardType.Scrap, scrap, CryptographyHelper.NowMs()));
             }
             PlayerHand.Add(PlayerDeck[^1]);
             PlayerHand[^1].Flipped = false;
@@ -711,6 +592,8 @@ namespace CardGame {
                     PlayerHandLoc.Height);
             }
             flipSFX.Play(GameSettings.SFXVolume, 0, 0);
+            // SEND
+            peer.SendAsync(new ActionPayload(ActionType.Draw, PlayerHand[^1].GetCardDetails(), CryptographyHelper.NowMs()));
             changed = true;
         }
 
@@ -734,6 +617,14 @@ namespace CardGame {
                         handCardWidth,
                         EnemyHandLoc.Height)));
             }
+            // SEND
+            CardDetails[] deck = EnemyDeck.Select((card) => card.GetCardDetails()).ToArray();
+            peer.SendAsync(new CardListPayload(false, CardType.Deck, deck, CryptographyHelper.NowMs()));
+            CardDetails[] scrap = EnemyScrap.Select((card) => card.GetCardDetails()).ToArray();
+            peer.SendAsync(new CardListPayload(false, CardType.Scrap, scrap, CryptographyHelper.NowMs()));
+            CardDetails[] hand = EnemyHand.Select((card) => card.GetCardDetails()).ToArray();
+            peer.SendAsync(new CardListPayload(false, CardType.Hand, hand, CryptographyHelper.NowMs()));
+            //
             shuffleSFX.Play(GameSettings.SFXVolume, 0, 0);
             changed = true;
         }
@@ -744,6 +635,11 @@ namespace CardGame {
                 EnemyDeck.AddRange(EnemyScrap);
                 EnemyScrap.Clear();
                 DeckGenerator.ShuffleDeck(EnemyDeck);
+                // SEND
+                CardDetails[] deck = EnemyDeck.Select((card) => card.GetCardDetails()).ToArray();
+                peer.SendAsync(new CardListPayload(false, CardType.Deck, deck, CryptographyHelper.NowMs()));
+                CardDetails[] scrap = EnemyScrap.Select((card) => card.GetCardDetails()).ToArray();
+                peer.SendAsync(new CardListPayload(false, CardType.Scrap, scrap, CryptographyHelper.NowMs()));
             }
             EnemyHand.Add(EnemyDeck[^1]);
             EnemyDeck.RemoveAt(EnemyDeck.Count - 1);
@@ -764,6 +660,8 @@ namespace CardGame {
                     EnemyHandLoc.Height);
             }
             flipSFX.Play(GameSettings.SFXVolume, 0, 0);
+            // SEND
+            peer.SendAsync(new ActionPayload(ActionType.Draw, EnemyHand[^1].GetCardDetails(), CryptographyHelper.NowMs()));
             changed = true;
         }
 
@@ -795,6 +693,9 @@ namespace CardGame {
                     }
                 }
             }
+            // SEND
+            CardDetails[] shop = Shop.Select((card) => card!.GetCardDetails()).ToArray();
+            peer.SendAsync(new CardListPayload(true, CardType.Shop, shop, CryptographyHelper.NowMs()));
         }
 
         private void ClearPlayedPile(bool player = true)
@@ -824,137 +725,174 @@ namespace CardGame {
             stolenCards.Clear();
         }
 
-        private T[][] GetCombinations<T>(List<T> array, int Comb_length)
+        private bool RefillPlayerHand(CardDetails[] cards)
         {
-            static void Combination(int index, int r_length, List<T> data, ref List<T[]> result, List<T> input)
-            {
-                int length = input.Count;
-                if (data.Count == r_length) {
-                    result.Add(data.ToArray());
-                    return;
+            int handCardWidth = (int)MathF.Round(PlayerHandLoc.Height * CARD_WIDTH_SCALE);
+            int handWidthOffset = (int)MathF.Round((PlayerHandLoc.Width - (5f * handCardWidth)) / 6);
+            if (PlayerHand.Count == 0 && PlayedPile.Count == 0) {
+                foreach (CardDetails card in cards) {
+                    Card[] deck = PlayerDeck.Where(c => c.GetCardDetails().Equals(card)).ToArray();
+                    Card[] deck2 = PlayerUnknownDeck.Where(c => c.GetCardDetails().Equals(card)).ToArray();
+                    Card[] deck3 = PlayerScrap.Where(c => c.GetCardDetails().Equals(card)).ToArray();
+                    if (deck2.Length != 0) {
+                        PlayerHand.Add(deck2[0]);
+                        PlayerUnknownDeck.Remove(deck2[0]);
+                    }
+                    else if (deck.Length != 0) {
+                        PlayerHand.Add(deck[0]);
+                        PlayerDeck.Remove(deck[0]);
+                    }
+                    else if (deck3.Length != 0) {
+                        PlayerHand.Add(deck3[0]);
+                        PlayerScrap.Remove(deck3[0]);
+                    }
+                    else {
+                        return true;
+                    }
+                    PlayerHand[^1].Flipped = false;
+                    PlayerHandTarget.Add(new(
+                        PlayerDeckLoc,
+                        new Rectangle(
+                            PlayerHandLoc.X + Math.Abs(handWidthOffset) + ((PlayerHand.Count - 1) * handCardWidth) + ((PlayerHand.Count - 1) * handWidthOffset),
+                            PlayerHandLoc.Y,
+                            handCardWidth,
+                            PlayerHandLoc.Height)));
                 }
-                for (int i = index; i < length; i++) {
-                    data.Add(input[i]);
-                    Combination(i + 1, r_length, data, ref result, input);
-                    data.RemoveAt(data.Count - 1);
-                }
-            }
-            int n = array.Count;
-            List<T[]> result = [];
-            Combination(0, Comb_length, [], ref result, array);
-            return result.ToArray();
-        }
-
-        private static float[] ComputeFractionCounterMultipliers(float[] strategyPrediction)
-        {
-            int n = strategyPrediction.Length; // 5
-            int[] order = Enumerable.Range(0, n)
-                .OrderByDescending(i => strategyPrediction[i])
-                .ToArray();
-
-            const float maxMult = 2.0f;
-            const float minMult = 0.5f;
-            float ratio = minMult / maxMult; // 0.25
-
-            float[] multiplier = new float[n];
-            for (int rank = 0; rank < n; rank++) {
-                int fractionIndex = order[rank];
-                float t = (float)rank / (n - 1);
-                multiplier[fractionIndex] = maxMult * MathF.Pow(ratio, t);
-            }
-            return multiplier;
-        }
-
-        private static Card StrategyAwareGreedyBuyAlgorithm(
-            int myHP, int enemyHP, List<Card> availableCards,
-            float[] fractiondistribution, float[] strategyPrediction,
-            bool inverseOutput = false)
-        {
-            double[] GetWeightTable(int MyHP, int EnemyHP)
-            {
-                double AggroThreshold = InitHealth * 0.2;
-                double DangerThreshold = InitHealth * 0.3;
-                if (EnemyHP <= AggroThreshold || MyHP <= DangerThreshold)
-                    return [2.5, 0.5, 0.3, 0.5];
-                return [1.0, 1.0, 1.0, 1.5];
-            }
-
-            float[] counterMultiplier = ComputeFractionCounterMultipliers(strategyPrediction);
-            double[] weightTable = GetWeightTable(myHP, enemyHP);
-
-            Card? bestCard = null;
-            double bestScore = double.MinValue;
-            foreach (var card in availableCards) {
-                double score = 0;
-                score += (card.GetTrueAttack() + (card.CardEffect == Card.Effect.AttackBonus ? card.EffectAmount : 0)) * weightTable[0];
-                score += (card.Health + (card.CardEffect == Card.Effect.HealthBonus ? card.EffectAmount : 0)) * weightTable[1];
-                score += (card.Money + (card.CardEffect == Card.Effect.MoneyBonus ? card.EffectAmount : 0)) * weightTable[2];
-
-                double synergyBase = (fractiondistribution[(int)card.CardFraction] + 0.05) * (13 - (int)card.CardEffect);
-                float counterBonus = card.CardFraction != Card.Fraction.None
-                    ? counterMultiplier[(int)card.CardFraction]
-                    : 1f;
-                score += synergyBase * weightTable[3] * counterBonus;
-
-                if (inverseOutput) score = -score;
-                if (score > bestScore) { bestScore = score; bestCard = card; }
-            }
-            return bestCard!;
-        }
-
-        private static Card GreedyBuyAlgorithm(int myHP, int enemyHP, List<Card> availableCards, float[] fractiondistribution, bool inverseOutput = false)
-		{
-            double[] GetWeightTable(int MyHP, int EnemyHP)
-            {
-                double AggroThreshold = InitHealth * 0.2;
-                double DangerThreshold = InitHealth * 0.3;
-                if (EnemyHP <= AggroThreshold || MyHP <= DangerThreshold) {
-                    return [2.5, 0.5, 0.3, 0.5];
-                }
-                return [1.0, 1.0, 1.0, 1.5];
-            }
-
-            double[] weightTable = GetWeightTable(myHP, enemyHP);
-            Card? bestCard = null;
-            double bestScore = double.MinValue;
-            foreach (var card in availableCards) {
-                double score = 0;
-                score += (card.GetTrueAttack() + (card.CardEffect == Card.Effect.AttackBonus ? card.EffectAmount : 0)) * weightTable[0];
-                score += (card.Health + (card.CardEffect == Card.Effect.HealthBonus ? card.EffectAmount : 0)) * weightTable[1];
-                score += (card.Money + (card.CardEffect == Card.Effect.MoneyBonus ? card.EffectAmount : 0)) * weightTable[2];
-                score += fractiondistribution[(int)card.CardFraction] * (13 - (int)card.CardEffect) * weightTable[3];
-                if (inverseOutput) {
-                    score = -score;
-                }
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestCard = card;
-                }
-			}
-            return bestCard!;
-		}
-		
-		 private float GetPenalty(int streak, bool player)
-        {
-            float currentPenalty = player ? this.currentPenalty : this.enemyCurrentPenalty;
-            if (streak > 0) {
-                float penalty = 0.02f * (float)Math.Pow(2.5, streak - 1);
-                currentPenalty = Math.Min(penalty, 1f);
             }
             else {
-                currentPenalty *= 0.8f;
-                if (currentPenalty < 0.001f)
-                    currentPenalty = 0f;
+                Card[] deck2 = PlayerUnknownDeck.Where(c => c.GetCardDetails().Equals(cards[^1])).ToArray();
+                if (deck2.Length != 0) {
+                    PlayerHand.Add(deck2[0]);
+                    PlayerUnknownDeck.Remove(deck2[0]);
+                }
+                else if (PlayerDeck[^1].GetCardDetails().Equals(cards[^1])) {
+                    PlayerHand.Add(PlayerDeck[^1]);
+                    PlayerDeck.RemoveAt(PlayerDeck.Count - 1);
+                }
+                else {
+                    return true;
+                }
+                PlayerHand[^1].Flipped = false;
+                PlayerHandTarget.Add(new(
+                PlayerDeckLoc,
+                new Rectangle(
+                    PlayerHandLoc.X + Math.Abs(handWidthOffset) + ((PlayerHand.Count - 1) * handCardWidth) + ((PlayerHand.Count - 1) * handWidthOffset),
+                    PlayerHandLoc.Y,
+                    handCardWidth,
+                    PlayerHandLoc.Height)));
+                for (int i = 0; i < PlayerHandTarget.Count - 1; i++) {
+                    PlayerHandTarget[i].MoveTarget = new Rectangle(
+                        PlayerHandLoc.X + Math.Abs(handWidthOffset) + (i * handCardWidth) + (i * handWidthOffset),
+                        PlayerHandLoc.Y,
+                        handCardWidth,
+                        PlayerHandLoc.Height);
+                }
             }
-            if (currentPenalty < 0.00001f)
-                currentPenalty = 0f;
-            if (player)
-                this.currentPenalty = currentPenalty;
-            else
-                this.enemyCurrentPenalty = currentPenalty;
-            return currentPenalty;
+            shuffleSFX.Play(GameSettings.SFXVolume, 0, 0);
+            changed = true;
+            return false;
         }
-		
+
+        private bool RefillEnemyHand(CardDetails[] cards)
+        {
+            int handCardWidth = (int)MathF.Round(EnemyHandLoc.Height * CARD_WIDTH_SCALE);
+            int handWidthOffset = (int)MathF.Round((EnemyHandLoc.Width - (5f * handCardWidth)) / 6);
+            if (EnemyHand.Count == 0 && PlayedPile.Count == 0) {
+                foreach (CardDetails card in cards) {
+                    Card[] deck = EnemyDeck.Where(c => c.GetCardDetails().Equals(card)).ToArray();
+                    Card[] deck2 = EnemyUnknownDeck.Where(c => c.GetCardDetails().Equals(card)).ToArray();
+                    Card[] deck3 = EnemyScrap.Where(c => c.GetCardDetails().Equals(card)).ToArray();
+                    if (deck2.Length != 0) {
+                        EnemyHand.Add(deck2[0]);
+                        EnemyUnknownDeck.Remove(deck2[0]);
+                    }
+                    else if (deck.Length != 0) {
+                        EnemyHand.Add(deck[0]);
+                        EnemyDeck.Remove(deck[0]);
+                    }
+                    else if (deck3.Length != 0) {
+                        EnemyHand.Add(deck3[0]);
+                        EnemyScrap.Remove(deck3[0]);
+                    }
+                    else {
+                        return true;
+                    }
+                    EnemyHand[^1].Flipped = true;
+                    EnemyHandTarget.Add(new(
+                    EnemyDeckLoc,
+                    new Rectangle(
+                        EnemyHandLoc.X + Math.Abs(handWidthOffset) + ((EnemyHand.Count - 1) * handCardWidth) + ((EnemyHand.Count - 1) * handWidthOffset),
+                        EnemyHandLoc.Y,
+                        handCardWidth,
+                        EnemyHandLoc.Height)));
+                }
+            }
+            else {
+                Card[] deck2 = EnemyUnknownDeck.Where(c => c.GetCardDetails().Equals(cards[^1])).ToArray();
+                if (deck2.Length != 0) {
+                    EnemyHand.Add(deck2[0]);
+                    EnemyUnknownDeck.Remove(deck2[0]);
+                }
+                else if (EnemyDeck[^1].GetCardDetails().Equals(cards[^1])) {
+                    EnemyHand.Add(EnemyDeck[^1]);
+                    EnemyDeck.RemoveAt(EnemyDeck.Count - 1);
+                }
+                else {
+                    return true;
+                }
+                EnemyHand[^1].Flipped = true;
+                EnemyHandTarget.Add(new(
+                    EnemyDeckLoc,
+                    new Rectangle(
+                        EnemyHandLoc.X + Math.Abs(handWidthOffset) + ((EnemyHand.Count - 1) * handCardWidth) + ((EnemyHand.Count - 1) * handWidthOffset),
+                        EnemyHandLoc.Y,
+                        handCardWidth,
+                        EnemyHandLoc.Height)));
+                for (int i = 0; i < EnemyHandTarget.Count - 1; i++) {
+                    EnemyHandTarget[i].MoveTarget = new Rectangle(
+                        EnemyHandLoc.X + Math.Abs(handWidthOffset) + (i * handCardWidth) + (i * handWidthOffset),
+                        EnemyHandLoc.Y,
+                        handCardWidth,
+                        EnemyHandLoc.Height);
+                }
+            }
+            shuffleSFX.Play(GameSettings.SFXVolume, 0, 0);
+            changed = true;
+            return false;
+        }
+
+        private void RefillShop(CardDetails[] cards)
+        {
+            if (Shop[0] == null || !Shop[0]!.GetCardDetails().Equals(cards[0])) {
+                Shop[0] = DeckGenerator.GetMoneyCards().Where(card => card.GetCardDetails().Equals(cards[0])).ToArray()[0];
+                Shop[0]!.Flipped = false;
+                Shop[0]!.RenderPrice = true;
+                ShopTarget[0].StartLocation = globalCardStart;
+                previewThis.Add(new(Shop[0]!, ShopTarget[0]));
+            }
+            for (int i = 1; i < Shop.Length; i++) {
+                if (Shop[i] == null) {
+                    continue;
+                }
+                else if (!Shop[i]!.GetCardDetails().Equals(cards[i])) {
+                    if (Shop[i]!.CardFraction != Card.Fraction.None)
+                        GameDeck.Add(Shop[i]!);
+                    Shop[i] = null;
+                }
+            }
+            for (int i = 1; i < Shop.Length; i++) {
+                if (Shop[i] == null) {
+                    Card[] Deck1 = DeckGenerator.GetMoneyCards().Where(card => card.GetCardDetails().Equals(cards[i])).ToArray();
+                    Shop[i] = Deck1.Length != 0 ? Deck1[0] : GameDeck.Where(card => card.GetCardDetails().Equals(cards[i])).ToArray()[0];
+                    GameDeck.Remove(Shop[i]!);
+                    Shop[i]!.Flipped = false;
+                    Shop[i]!.RenderPrice = true;
+                    ShopTarget[i].StartLocation = globalCardStart;
+                    previewThis.Add(new(Shop[i]!, ShopTarget[i]));
+                }
+            }
+        }
+
         //csak egyszer kell meghívni, amikor a képernyő mérete változik
         private void CalculateLayout()
         {
@@ -1113,10 +1051,14 @@ namespace CardGame {
                     if (Keyboard.GetState().IsKeyDown(Keys.Escape)) {
                         WINNER = GameWinner.Enemy;
                     }
+                    //Disconnection Check
+                    if (!peer.IsConnected) {
+                        WINNER = GameWinner.Player;
+                    }
                     //EndingCheck
                     if (PlayerHealth <= 0) {
                         endingScreen = new(ResourceManager.Textures["Defeat"][0], null, ResourceManager.Fonts["FONT_C"]) {
-                            Title = "Vereség!"
+                            Title = "Defeat!"
                         };
                         MusicPlayer.Mute();
                         defeatSFX.Play(GameSettings.SFXVolume, 0, 0);
@@ -1139,10 +1081,346 @@ namespace CardGame {
                             Card.Fraction.TheEye => new(ResourceManager.Textures["Victory_T"][0], ResourceManager.Textures["TheEyeIcon"][0], ResourceManager.Fonts["FONT_TE"]),
                             _ => new(ResourceManager.Textures["Victory_C"][0], null, ResourceManager.Fonts["FONT_C"]),
                         };
-                        endingScreen.Title = "Győzelem!";
+                        endingScreen.Title = "Victory!";
                         MusicPlayer.Mute();
                         victorySFX.Play(GameSettings.SFXVolume, 0, 0);
                         endingScreen.Update(gameTime);
+                    }
+                    // TCP
+                    while (peer.TryDequeueOldest() is ReceivedPacket packet) { //ha nincs csomag null
+                        object p = packet.Payload;
+                        if (peer.IsHost) {
+                            //HOST
+                            if (p is ActionPayload action) {
+                                bool cheating = false;
+                                switch (action.Action) {
+                                    case ActionType.Play:
+                                        Card[] cardtoplay = EnemyHand.Where((card) => card.GetCardDetails().Equals(action.Card)).ToArray();
+                                        if (cardtoplay.Length == 0) {
+                                            cheating = true;
+                                            break;
+                                        }
+                                        AddToPlayedPile(cardtoplay[0], EnemyHandTarget[EnemyHand.IndexOf(cardtoplay[0])], false);
+                                        break;
+                                    case ActionType.Scrap:
+                                        Card[] cardtoscrap = EnemyScrap.Where((card) => card.GetCardDetails().Equals(action.Card)).ToArray();
+                                        if (cardtoscrap.Length == 0) {
+                                            cheating = true;
+                                            break;
+                                        }
+                                        int scrapindex = EnemyScrap.IndexOf(cardtoscrap[0]);
+                                        if (EnemyScrap[scrapindex].CardFraction != Card.Fraction.None)
+                                            GameDeck.Add(EnemyScrap[scrapindex]);
+                                        EnemyScrap.RemoveAt(scrapindex);
+                                        scrapSFX.Play(GameSettings.SFXVolume, 0, 0);
+                                        changed = true;
+                                        break;
+                                    case ActionType.ScrapFromHand:
+                                        Card[] cardtoscrap3 = EnemyHand.Where((card) => card.GetCardDetails().Equals(action.Card)).ToArray();
+                                        if (cardtoscrap3.Length == 0) {
+                                            cheating = true;
+                                            break;
+                                        }
+                                        EnemyScrap.Add(cardtoscrap3[0]);
+                                        EnemyHandTarget.RemoveAt(EnemyHand.IndexOf(cardtoscrap3[0]));
+                                        EnemyHand.Remove(cardtoscrap3[0]);
+                                        changed = true;
+                                        break;
+                                    case ActionType.ScrapFromShop:
+                                        Card[] cardtoscrap2 = Shop.Where((card) => card.GetCardDetails().Equals(action.Card)).ToArray();
+                                        if (cardtoscrap2.Length == 0) {
+                                            cheating = true;
+                                            break;
+                                        }
+                                        int scrapindex2 = Array.IndexOf(Shop, cardtoscrap2[0]);
+                                        if (Shop[scrapindex2] != null) {
+                                            if (Shop[scrapindex2]!.CardFraction != Card.Fraction.None)
+                                                GameDeck.Add(Shop[scrapindex2]!);
+                                            scrapSFX.Play(GameSettings.SFXVolume, 0, 0);
+                                            Shop[scrapindex2] = null;
+                                        }
+                                        RefillShop();
+                                        break;
+                                    case ActionType.Buy:
+                                        Card[] cards = Shop.Where((card) => card.GetCardDetails().Equals(action.Card)).ToArray();
+                                        if (cards.Length == 0) {
+                                            cheating = true;
+                                            break;
+                                        }
+                                        Card card = cards[0];
+                                        if (card.Price > EnemyMoney) {
+                                            cheating = true;
+                                            break;
+                                        }
+                                        for (int i = 0; i < Shop.Length; i++) {
+                                            if (Shop[i] == card) {
+                                                EnemyScrap.Add(Shop[i]!);
+                                                Shop[i] = null;
+                                                break;
+                                            }
+                                        }
+                                        card.Flipped = true;
+                                        card.RenderPrice = false;
+                                        EnemyMoney -= card.Price;
+                                        buySFX.Play(GameSettings.SFXVolume, 0, 0);
+                                        RefillShop();
+                                        changed = true;
+                                        break;
+                                    case ActionType.EndTurn:
+                                        ClearPlayedPile(false);
+                                        RefillEnemyHand();
+                                        enemyendturn = true;
+                                        changed = true;
+                                        break;
+                                    default:
+                                        cheating = true;
+                                        break;
+                                }
+                                if (cheating) {
+                                    WINNER = GameWinner.Player; //kilép, mert ilyet nem kaphat
+                                    break;
+                                }
+                            }
+                            else {
+                                WINNER = GameWinner.Player; //kilép, mert ilyet nem kaphat
+                                break;
+                            }
+                        }
+                        else {
+                            //CLIENT
+                            if (p is ActionPayload action) {
+                                bool cheating = false;
+                                switch (action.Action) {
+                                    case ActionType.Play:
+                                        Card[] cardtoplay = EnemyHand.Where((card) => card.GetCardDetails().Equals(action.Card)).ToArray();
+                                        if (cardtoplay.Length == 0) {
+                                            cheating = true;
+                                            break;
+                                        }
+                                        AddToPlayedPile(cardtoplay[0], EnemyHandTarget[EnemyHand.IndexOf(cardtoplay[0])], false);
+                                        break;
+                                    case ActionType.Draw:
+                                        if (playerTurn)
+                                            cheating = RefillPlayerHand([(CardDetails)action.Card!]);
+                                        else
+                                            cheating = RefillEnemyHand([(CardDetails)action.Card!]);
+                                        break;
+                                    case ActionType.Steal:
+                                        //Ez játék közben is lehet
+                                        List<Card> cards3 = playerTurn ? EnemyHand : PlayerHand;
+                                        Card[] cardtosteal = cards3.Where((card) => card.GetCardDetails().Equals(action.Card)).ToArray();
+                                        if (cardtosteal.Length == 0) {
+                                            cheating = true;
+                                            break;
+                                        }
+                                        stolenCards.Add(cardtosteal[0]);
+                                        stealSFX.Play(GameSettings.SFXVolume, 0, 0);
+                                        AddToPlayedPile(cardtosteal[0], playerTurn ? EnemyHandTarget[EnemyHand.IndexOf(cardtosteal[0])] : PlayerHandTarget[PlayerHand.IndexOf(cardtosteal[0])], !playerTurn);
+                                        break;
+                                    case ActionType.Flip:
+                                        Card[] cardtoflip = EnemyHand.Where((card) => card.GetCardDetails().Equals(action.Card)).ToArray();
+                                        if (cardtoflip.Length == 0) {
+                                            cheating = true;
+                                            break;
+                                        }
+                                        cardtoflip[0].Flipped = false;
+                                        break;
+                                    case ActionType.Scrap:
+                                        Card[] cardtoscrap = EnemyScrap.Where((card) => card.GetCardDetails().Equals(action.Card)).ToArray();
+                                        if (cardtoscrap.Length == 0) {
+                                            cheating = true;
+                                            break;
+                                        }
+                                        int scrapindex = EnemyScrap.IndexOf(cardtoscrap[0]);
+                                        if (EnemyScrap[scrapindex].CardFraction != Card.Fraction.None)
+                                            GameDeck.Add(EnemyScrap[scrapindex]);
+                                        EnemyScrap.RemoveAt(scrapindex);
+                                        scrapSFX.Play(GameSettings.SFXVolume, 0, 0);
+                                        changed = true;
+                                        break;
+                                    case ActionType.ScrapFromHand:
+                                        Card[] cardtoscrap3 = EnemyHand.Where((card) => card.GetCardDetails().Equals(action.Card)).ToArray();
+                                        if (cardtoscrap3.Length == 0) {
+                                            cheating = true;
+                                            break;
+                                        }
+                                        EnemyScrap.Add(cardtoscrap3[0]);
+                                        EnemyHandTarget.RemoveAt(EnemyHand.IndexOf(cardtoscrap3[0]));
+                                        EnemyHand.Remove(cardtoscrap3[0]);
+                                        changed = true;
+                                        break;
+                                    case ActionType.Buy:
+                                        Card[] cards = Shop.Where((card) => card.GetCardDetails().Equals(action.Card)).ToArray();
+                                        if (cards.Length == 0) {
+                                            cheating = true;
+                                            break;
+                                        }
+                                        Card card = cards[0];
+                                        if (card.Price > EnemyMoney) {
+                                            cheating = true;
+                                            break;
+                                        }
+                                        for (int i = 0; i < Shop.Length; i++) {
+                                            if (Shop[i] == card) {
+                                                EnemyScrap.Add(Shop[i]!);
+                                                Shop[i] = null;
+                                                break;
+                                            }
+                                        }
+                                        card.Flipped = true;
+                                        card.RenderPrice = false;
+                                        EnemyMoney -= card.Price;
+                                        buySFX.Play(GameSettings.SFXVolume, 0, 0);
+                                        changed = true;
+                                        break;
+                                    case ActionType.EndTurn:
+                                        ClearPlayedPile(false);
+                                        enemyendturn = true;
+                                        break;
+                                    default:
+                                        cheating = true;
+                                        break;
+                                }
+                                if (cheating) {
+                                    WINNER = GameWinner.Player; //kilép, mert ilyet nem kaphat
+                                    break;
+                                }
+                            }
+                            else {
+                                bool cheating = false;
+                                CardListPayload cardlist = (CardListPayload)p;
+                                switch (cardlist.CardType) {
+                                    case CardType.Deck:
+                                        if (cardlist.HostCards) {
+                                            List<Card> oldDeck = new(EnemyDeck);
+                                            EnemyDeck.Clear();
+                                            foreach (CardDetails card in cardlist.Cards) {
+                                                Card[] deck = oldDeck.Where((c) => c.GetCardDetails().Equals(card)).ToArray();
+                                                Card[] deck2 = EnemyScrap.Where((c) => c.GetCardDetails().Equals(card)).ToArray();
+                                                Card[] deck3 = EnemyUnknownDeck.Where((c) => c.GetCardDetails().Equals(card)).ToArray();
+                                                if (deck3.Length != 0) {
+                                                    EnemyUnknownDeck.Remove(deck3[0]);
+                                                    EnemyDeck.Add(deck3[0]);
+                                                }
+                                                else if (deck.Length != 0) {
+                                                    oldDeck.Remove(deck[0]);
+                                                    EnemyDeck.Add(deck[0]);
+                                                }
+                                                else if (deck2.Length != 0) {
+                                                    EnemyScrap.Remove(deck2[0]);
+                                                    EnemyDeck.Add(deck2[0]);
+                                                }
+                                                else {
+                                                    cheating = true;
+                                                    break;
+                                                }
+                                            }
+                                            EnemyUnknownDeck.AddRange(oldDeck);
+                                        }
+                                        else {
+                                            List<Card> oldDeck = new(PlayerDeck);
+                                            PlayerDeck.Clear();
+                                            foreach (CardDetails card in cardlist.Cards) {
+                                                Card[] deck = oldDeck.Where((c) => c.GetCardDetails().Equals(card)).ToArray();
+                                                Card[] deck2 = PlayerScrap.Where((c) => c.GetCardDetails().Equals(card)).ToArray();
+                                                Card[] deck3 = PlayerUnknownDeck.Where((c) => c.GetCardDetails().Equals(card)).ToArray();
+                                                if (deck3.Length != 0) {
+                                                    PlayerUnknownDeck.Remove(deck3[0]);
+                                                    PlayerDeck.Add(deck3[0]);
+                                                }
+                                                else if (deck.Length != 0) {
+                                                    oldDeck.Remove(deck[0]);
+                                                    PlayerDeck.Add(deck[0]);
+                                                }
+                                                else if (deck2.Length != 0) {
+                                                    PlayerScrap.Remove(deck2[0]);
+                                                    PlayerDeck.Add(deck2[0]);
+                                                }
+                                                else {
+                                                    cheating = true;
+                                                    break;
+                                                }
+                                            }
+                                            PlayerUnknownDeck.AddRange(oldDeck);
+                                        }
+                                        changed = true;
+                                        break;
+                                    case CardType.Scrap:
+                                        if (cardlist.HostCards) {
+                                            List<Card> oldScrap = new(EnemyScrap);
+                                            EnemyScrap.Clear();
+                                            foreach (CardDetails card in cardlist.Cards) {
+                                                Card[] deck = oldScrap.Where((c) => c.GetCardDetails().Equals(card)).ToArray();
+                                                Card[] deck2 = EnemyUnknownDeck.Where((c) => c.GetCardDetails().Equals(card)).ToArray();
+                                                Card[] deck3 = EnemyDeck.Where((c) => c.GetCardDetails().Equals(card)).ToArray();
+                                                if (deck2.Length != 0) {
+                                                    EnemyUnknownDeck.Remove(deck2[0]);
+                                                    EnemyScrap.Add(deck2[0]);
+                                                }
+                                                else if (deck.Length != 0) {
+                                                    oldScrap.Remove(deck[0]);
+                                                    EnemyScrap.Add(deck[0]);
+                                                }
+                                                else if (deck3.Length != 0) {
+                                                    EnemyDeck.Remove(deck3[0]);
+                                                    EnemyScrap.Add(deck3[0]);
+                                                }
+                                                else {
+                                                    cheating = true;
+                                                    break;
+                                                }
+                                            }
+                                            EnemyUnknownDeck.AddRange(oldScrap);
+                                        }
+                                        else {
+                                            List<Card> oldScrap = new(PlayerScrap);
+                                            PlayerScrap.Clear();
+                                            foreach (CardDetails card in cardlist.Cards) {
+                                                Card[] deck = oldScrap.Where((c) => c.GetCardDetails().Equals(card)).ToArray();
+                                                Card[] deck2 = PlayerUnknownDeck.Where((c) => c.GetCardDetails().Equals(card)).ToArray();
+                                                Card[] deck3 = PlayerDeck.Where((c) => c.GetCardDetails().Equals(card)).ToArray();
+                                                if (deck2.Length != 0) {
+                                                    PlayerUnknownDeck.Remove(deck2[0]);
+                                                    PlayerScrap.Add(deck2[0]);
+                                                }
+                                                else if (deck.Length != 0) {
+                                                    oldScrap.Remove(deck[0]);
+                                                    PlayerScrap.Add(deck[0]);
+                                                }
+                                                else if (deck3.Length != 0) {
+                                                    PlayerDeck.Remove(deck3[0]);
+                                                    PlayerScrap.Add(deck3[0]);
+                                                }
+                                                else {
+                                                    cheating = true;
+                                                    break;
+                                                }
+                                            }
+                                            PlayerUnknownDeck.AddRange(oldScrap);
+                                        }
+                                        changed = true;
+                                        break;
+                                    case CardType.Hand:
+                                        if (cardlist.HostCards) {
+                                            cheating = RefillEnemyHand(cardlist.Cards);
+                                        }
+                                        else {
+                                            cheating = RefillPlayerHand(cardlist.Cards);
+                                        }
+                                        break;
+                                    case CardType.Shop:
+                                        RefillShop(cardlist.Cards);
+                                        break;
+                                    default:
+                                        cheating = true;
+                                        break;
+                                }
+                                if (cheating) {
+                                    WINNER = GameWinner.Player; //kilép, mert ilyet nem kaphat
+                                    break;
+                                }
+                            }
+                        }
                     }
                     //
                     if (playerTurn) {
@@ -1151,7 +1429,7 @@ namespace CardGame {
                         if (PlayerCard2ScrapThisTurn != 0) {
                             PlayerCard2ScrapThisTurn = Math.Clamp(PlayerCard2ScrapThisTurn, 0, PlayerHand.Count - 1);
                             cardSelector = new(PlayerHand, PlayerCard2ScrapThisTurn, mouse, true) {
-                                Title = $"Válaszd ki a kezedből kidobandó lapokat! (Pontosan {PlayerCard2ScrapThisTurn} db)"
+                                Title = $"Select the cards to discard from your hand! (Exactly {PlayerCard2ScrapThisTurn})"
                             };
                             cardSelector.SelectionConfirmed += ScrapOwnCardFromHandEventHandler;
                             cardSelector.HasCancelButton = false;
@@ -1185,108 +1463,15 @@ namespace CardGame {
                     }
                     else {
                         cardMouseControlEnabled = false;
-                        //ScrapCards
-                        //AI LOGIC KELL IDE !!! (done)
-                        if (EnemyCard2ScrapThisTurn != 0) {
-                            EnemyCard2ScrapThisTurn = Math.Clamp(EnemyCard2ScrapThisTurn, 0, EnemyHand.Count - 1);
-                            for (int i = 0; i < EnemyCard2ScrapThisTurn; i++) {
-                                Card scrapped;
-                                if (EnemyDecisionMaking == 3)
-                            scrapped = DeckGenerator.GetCard(EnemyHand);
-                        else if (EnemyDecisionMaking == 2 || EnemyDecisionMaking == 1) {
-                            // heuristic logic One-Step Lookahead
-                            double GetScore(Card[] action)
-                            {
-                                double score = 0;
-                                foreach (var card in action) {
-                                    int sinergy = action.Count(c => c != card && c.CardFraction == card.CardFraction);
-                                    score += ((card.GetTrueAttack() + (card.CardEffect == Card.Effect.AttackBonus ? card.EffectAmount : 0)) * 2) + (card.Health + (card.CardEffect == Card.Effect.HealthBonus ? card.EffectAmount : 0) +
-                                         card.Money + (card.CardEffect == Card.Effect.MoneyBonus ? card.EffectAmount : 0) + (sinergy * (13 - (int)card.CardEffect)));
-                                }
-                                return score;
-                            }
-                            Card[][] legalactions = GetCombinations(new List<Card>(EnemyHand), EnemyHand.Count - 1);
-                            Card[]? bestActions = null;
-                            double bestScore = double.MinValue;
-                            for (int j = 0; j < legalactions.Length; j++) {
-                                double score = GetScore(legalactions[j]);
-                                if (score > bestScore) {
-                                    bestScore = score;
-                                    bestActions = legalactions[j];
-                                }
-                            }
-                            scrapped = EnemyHand.Except(bestActions!).First();
-                        }
-                        else {
-                            int scrapindex = 0;
-                            for (int j = 1; j < EnemyHand.Count; j++) {
-                                ModelInput49 input = MLController.CreateDiscardInput(EnemyHand[scrapindex], EnemyHand[j], GetStrategyDistribution(false));
-                                ModelOutput2 output = MLController.DiscardEngine.Predict(input);
-                                if (output.Prediction[0] > output.Prediction[1]) {
-                                    scrapindex = j;
-								}
-							}
-                            scrapped = EnemyHand[scrapindex];
-						}
-                                EnemyScrap.Add(scrapped);
-                                EnemyHandTarget.RemoveAt(EnemyHand.IndexOf(scrapped));
-                                EnemyHand.Remove(scrapped);
-                            }
-                            changed = true;
-                            EnemyCard2ScrapThisTurn = 0;
-                        }
                         //PlayCards
                         if (PlayedPile.Any(card => !card.BaseApplied)) {
                             for (int i = 0; i < PlayedPile.Count; i++) {
                                 PlayCard(PlayedPile[i], false);
                             }
                         }
-                        else if (EnemyHand.Count == 0) {
-                            //Buy something from shop
-                            List<Card> affordableCards = Shop.Where(card => card!.Price <= EnemyMoney).ToList()!;
-                            ModelOutput5 strategy = MLController.StrategyEngine.Predict(new ModelInput5() { Features = GetStrategyDistribution(true) });
-                            while (affordableCards.Count > 0) {
-                                Card toBuy;
-                        if (EnemyDecisionMaking == 3)
-                            toBuy = affordableCards[RandomNumberGenerator.GetInt32(0, affordableCards.Count)];
-                        else if (EnemyDecisionMaking == 2) {
-                            toBuy = GreedyBuyAlgorithm(EnemyHealth, PlayerHealth, affordableCards, GetFractionDistribution(false).Item1);
-						}
-                        else if (EnemyDecisionMaking == 1) {
-                            toBuy = StrategyAwareGreedyBuyAlgorithm(EnemyHealth, PlayerHealth, affordableCards, GetFractionDistribution(false).Item1, strategy.Prediction);
-                        }
-                        else {
-                            Card[] mydeck = EnemyDeck.Concat(EnemyHand).Concat(EnemyScrap).ToArray();
-                            Card[] enemydeck = PlayerDeck.Concat(PlayerHand).Concat(PlayerScrap).ToArray();
-                            ModelInput158 input104 = MLController.CreateShoppingInput(strategy.Prediction, GetStrategyDistribution(false), GetFractionDistribution(false).Item1, GetFractionDistribution(true).Item1, Shop, EnemyMoney, EnemyHealth / (float)InitHealth, PlayerHealth / (float)InitHealth, mydeck, enemydeck);
-                            ModelOutput6 choosen = MLController.ShoppingEngine.Predict(input104);
-                            int chosenIndex = -1;
-                            float bestScore = float.NegativeInfinity;
-                            choosen.Prediction[0] -= Math.Abs(choosen.Prediction[0]) * GetPenalty(enemyZeroSlotStreak, false);
-                            for (int i = affordableCards.Count > 1 ? 1 : 0;
-                                i < Shop.Length;
-                                i++) {
-                                if (Shop[i] == null || Shop[i]!.Price > EnemyMoney)
-                                    continue;
-                                if (choosen.Prediction[i] > bestScore) {
-                                    bestScore = choosen.Prediction[i];
-                                    chosenIndex = i;
-                                }
-                            }
-							if (chosenIndex == 0)
-                                enemyZeroSlotStreak++;
-							else
-                                enemyZeroSlotStreak = 0;
-							toBuy = Shop[chosenIndex]!;
-                                }
-                                BuyFromShop(toBuy, false);
-                                EnemyMoney -= toBuy.Price;
-                                affordableCards = Shop.Where(card => card!.Price <= EnemyMoney).ToList()!;
-                            }
-                            //
-                            //AI LOGIC KELL IDE !!! (done)
-                            ClearPlayedPile(false);
-                            RefillEnemyHand();
+                        if (enemyendturn) {
+                            //ClearPlayedPile(false);
+                            //RefillEnemyHand();
                             EnemyMoney = 0;
                             PlayerHealth -= EnemyAttack;
                             if (EnemyAttack > 0) {
@@ -1296,12 +1481,10 @@ namespace CardGame {
                             }
                             EnemyAttack = 0;
                             playerTurn = true;
+                            enemyendturn = false;
                         }
-                        else {
-                            PlayNext(false);
-                        }
-                        //
                     }
+                    //
                 }
             }
             //END of GamePlay Logic
@@ -1442,14 +1625,14 @@ namespace CardGame {
                         if (previewThisCard == null) {
                             if (PlayerScrapLoc.Contains(mouse.GetMousePosition()) && PlayerScrap.Count != 0) {
                                 cardSelector = new(PlayerScrap, 0, mouse) {
-                                    Title = "Játékos eldobott kártyái",
+                                    Title = "Player's discarded cards",
                                     HasOkButton = false
                                 };
                                 cardSelector.Update(gameTime);
                             }
                             else if (EnemyScrapLoc.Contains(mouse.GetMousePosition()) && EnemyScrap.Count != 0) {
                                 cardSelector = new(EnemyScrap, 0, mouse) {
-                                    Title = "Ellenfél eldobott kártyái",
+                                    Title = "Enemy's discarded cards",
                                     HasOkButton = false
                                 };
                                 cardSelector.Update(gameTime);
@@ -1461,7 +1644,7 @@ namespace CardGame {
                                 }
                                 DeckGenerator.ShuffleDeck(Localcards);
                                 cardSelector = new(Localcards, 0, mouse) {
-                                    Title = "Játékos pakliának kártyái (keverve)",
+                                    Title = "Player's deck cards (shuffled)",
                                     HasOkButton = false
                                 };
                                 cardSelector.Update(gameTime);
@@ -1517,54 +1700,54 @@ namespace CardGame {
                                 if (PrevHObject != hobj) {
                                     PrevHObject = hobj;
                                     string fname = prevw.CardFraction switch {
-                                        Card.Fraction.Alliance => "'Szövetség'",
-                                        Card.Fraction.CollectorCult => "'Kuratórium'",
-                                        Card.Fraction.Empire => "'Birodalom'",
-                                        Card.Fraction.Machines => "'Gépek'",
-                                        Card.Fraction.TheEye => "'A szem'",
-                                        Card.Fraction.None => "frakciómentes lapok",
+                                        Card.Fraction.Alliance => "'Alliance'",
+                                        Card.Fraction.CollectorCult => "'Curatorium'",
+                                        Card.Fraction.Empire => "'Empire'",
+                                        Card.Fraction.Machines => "'Machines'",
+                                        Card.Fraction.TheEye => "'The Eye'",
+                                        Card.Fraction.None => "faction-free",
                                         _ => string.Empty
                                     };
                                     string reqname = prevw.EffectRequirement switch {
-                                        Card.Fraction.Alliance => "'Szövetség'",
-                                        Card.Fraction.CollectorCult => "'Kuratórium'",
-                                        Card.Fraction.Empire => "'Birodalom'",
-                                        Card.Fraction.Machines => "'Gépek'",
-                                        Card.Fraction.TheEye => "'A szem'",
-                                        Card.Fraction.None => "frakciómentes lapok",
+                                        Card.Fraction.Alliance => "'Alliance'",
+                                        Card.Fraction.CollectorCult => "'Curatorium'",
+                                        Card.Fraction.Empire => "'Empire'",
+                                        Card.Fraction.Machines => "'Machines'",
+                                        Card.Fraction.TheEye => "'The Eye'",
+                                        Card.Fraction.None => "faction-free",
                                         _ => string.Empty
                                     };
                                     string specEffect = prevw.CardEffect switch {
-                                        Card.Effect.ScrapEnemyCard => "A következő kör kezdetén az ellenfél eldob egy lapot,\nmielőtt azt kijátszhatná.",
-                                        Card.Effect.ScrapFromShop => "Eltávolít egy lapot a boltból.",
-                                        Card.Effect.AntiShow => "Az ellenfél nem fedheti fel a lapjaid ebben a körben.",
-                                        Card.Effect.StealCard => "Ellopja az ellenfél egy kártyáját és kijátsza azt.",
-                                        Card.Effect.DrawCard => "Húz még egy kártyát.",
-                                        Card.Effect.ScrapOwnCard => "Véglegesen eltávolít egy lapot az eldobott halmodból.",
-                                        Card.Effect.AttackBonus => "Támadási bónusz.",
-                                        Card.Effect.HealthBonus => "Életerő/Autoritás növelése.",
-                                        Card.Effect.MoneyBonus => "Játékpénz bónusz.",
-                                        Card.Effect.ShowHand => "Ellenfél kezében lévő lapok felfedése.",
-                                        Card.Effect.ShowDeck => "Ellenfél paklijának felfedése. Megmutatja, hogy milyen lapokat\nfog húzni az ellenfél a következő körben.",
-                                        Card.Effect.SelfDestruct => "A lap kijátszásakor megsemmisíti önmagát.",
-                                        Card.Effect.None => "Nincs speciális képesség!",
+                                        Card.Effect.ScrapEnemyCard => "At the start of the next turn, the enemy scraps a card,\n before they could play it.",
+                                        Card.Effect.ScrapFromShop => "Removes a card from the shop.",
+                                        Card.Effect.AntiShow => "The enemy cannot reveal your cards this turn.",
+                                        Card.Effect.StealCard => "Steals a card from the enemy and plays it.",
+                                        Card.Effect.DrawCard => "Draws an extra card.",
+                                        Card.Effect.ScrapOwnCard => "Permanently removes a card from your discard pile.",
+                                        Card.Effect.AttackBonus => "Attack bonus.",
+                                        Card.Effect.HealthBonus => "Increases health/authority.",
+                                        Card.Effect.MoneyBonus => "Money bonus.",
+                                        Card.Effect.ShowHand => "Reveals cards in the enemy's hand.",
+                                        Card.Effect.ShowDeck => "Reveals the enemy's deck. Shows which cards\nthe enemy will draw next turn.",
+                                        Card.Effect.SelfDestruct => "Destroys itself when played.",
+                                        Card.Effect.None => "No special ability!",
                                         _ => string.Empty,
                                     };
                                     var distribution = GetFractionDistribution();
                                     ToolTipsBox.Text = hobj switch {
-                                        Card.HoveredObject.None => $"Ez a kártya a {fname} lapjaihoz tartozik,\n" +
-                                                                   $"melyből jelenleg {distribution.Item2[(int)prevw.CardFraction]} db van a tulajdonodban.\n" +
-                                                                   $"Ez a paklid {distribution.Item1[(int)prevw.CardFraction].ToString("P2")}-ának felel meg.",
-                                        Card.HoveredObject.Price => $"A lap ára {prevw.Price} játékpénz!\nEzt a lapot jelenleg {(PlayerMoney >= prevw.Price ? "meg tudod vásárolni" : "NEM tudod megvásárolni")}!",
-                                        Card.HoveredObject.Fraction => $"Ez a kártya frakciójele.\nMeghatározza, hogy az adott lap\nmelyik frakcióhoz tartozik.\nEz a kártya a {fname} lapjai közé tartozik.",
-                                        Card.HoveredObject.BaseAbilities => $"Ez a mező a lap alapképességeit határozza meg.\n" +
-                                                                            $"Ezeket a képességeket nem köti feltétel,\n" +
-                                                                            $"értékeiket kijátszásuk mindig megadja a játékosnak.\n\n" +
-                                                                            $"Ez a lap {prevw.Money} pénzt, {prevw.Health} életerőt és {prevw.GetTrueAttack()} támadást biztosít.",
-                                        Card.HoveredObject.SpecialAbility => $"Ez a mező a lap speciális képességeit határozza meg.\n" +
-                                                                             $"A lap képessége {(prevw.EffectRequirement != Card.Fraction.None ? $"feltételhez kötött.\nA speciális képesség kihasználásához legalább egy\n{reqname} lapot ki kell játszani a jelenlegi körben!\n" : "NEM kötött feltételhez,\naz alapképességekkel egyszerre kijátszható.\n")}" +
-                                                                             $"A lap speciális képessége {prevw.EffectAmount} alkalommal biztosítja:\n{specEffect}",
-                                        Card.HoveredObject.Unknown => "A lap adatai ismeretlenek!",
+                                        Card.HoveredObject.None => $"This card belongs to the {fname} cards,\n" +
+                                                                   $"of which you currently own {distribution.Item2[(int)prevw.CardFraction]}.\n" +
+                                                                   $"This makes up {distribution.Item1[(int)prevw.CardFraction].ToString("P2")} of your deck.",
+                                        Card.HoveredObject.Price => $"This card costs {prevw.Price} money!\nYou currently {(PlayerMoney >= prevw.Price ? "can" : "CANNOT")} afford this card!",
+                                        Card.HoveredObject.Fraction => $"This is the card's faction symbol.\nIt determines which faction\nthe card belongs to.\nThis card belongs to the {fname} cards.",
+                                        Card.HoveredObject.BaseAbilities => $"This field shows the card's base abilities.\n" +
+                                                                            $"These abilities have no requirements,\n" +
+                                                                            $"playing the card always grants their values to the player.\n\n" +
+                                                                            $"This card provides {prevw.Money} money, {prevw.Health} health and {prevw.GetTrueAttack()} attack.",
+                                        Card.HoveredObject.SpecialAbility => $"This field shows the card's special ability.\n" +
+                                                                             $"The ability is {(prevw.EffectRequirement != Card.Fraction.None ? $"conditional.\nTo use the special ability, at least one\n{reqname} card must be played this turn!\n" : "NOT conditional,\nit can be played together with the base abilities.\n")}" +
+                                                                             $"The card's special ability triggers {prevw.EffectAmount} times:\n{specEffect}",
+                                        Card.HoveredObject.Unknown => "This card's data is unknown!",
                                         _ => string.Empty
                                     };
                                 }
@@ -1577,11 +1760,14 @@ namespace CardGame {
                             mouse.Previous.LeftButton == ButtonState.Pressed) {
                             previewThis[^1].Item2.StartLocation = selectedCard.Rect;
                             if (PlayerHand.Contains(selectedCard)) {
-                                if (PlayedPileLoc.Contains(mouse.GetMousePosition()))
+                                if (PlayedPileLoc.Contains(mouse.GetMousePosition())) {
                                     AddToPlayedPile(selectedCard, PlayerHandTarget[PlayerHand.IndexOf(selectedCard)], true);
+                                    // SEND
+                                    peer.SendAsync(new ActionPayload(ActionType.Play, selectedCard.GetCardDetails(), CryptographyHelper.NowMs()));
+                                }
                             }
                             else {
-                                if (PlayerHandLoc.Contains(mouse.GetMousePosition())) {
+                                if (PlayerHandLoc.Contains(mouse.GetMousePosition()) && Shop.Contains(selectedCard)) {
                                     if (PlayerMoney >= selectedCard.Price) {
                                         PlayerMoney -= selectedCard.Price;
                                         BuyFromShop(selectedCard, true);
@@ -1765,5 +1951,7 @@ namespace CardGame {
                 endingScreen.Draw(gameTime, spriteBatch);
             }
         }
+
+        public void Dispose() => peer.Dispose();
     }
 }
